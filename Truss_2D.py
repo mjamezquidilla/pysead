@@ -395,7 +395,7 @@ class Truss_2D:
         C = np.cos(x)
         S = np.sin(x)
         s_member = elasticity / L * np.array([-C, -S, C, S]).dot(np.array(displacement))    
-        return np.round(s_member)
+        return np.round(s_member, 5)
 
 
     def Draw_Truss_Setup(self, figure_size = None, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
@@ -421,12 +421,13 @@ class Truss_2D:
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
-        forces = self.forces        
+        forces = self.forces 
+        cross_area = self.cross_area       
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
        
-        # plotting members
+        # plotting nodes and members
         for element in dict(elements):
             fromPoint, toPoint = self.__Extract_Coordinate_Points(element, nodes, elements)
             x1 = fromPoint[0]
@@ -467,7 +468,7 @@ class Truss_2D:
             middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
-            plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c='blue')
+            plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
             
         # plotting force vectors
         # loop all x-direction forces
@@ -539,3 +540,76 @@ class Truss_2D:
             displacements_dict.update({displacement: [displacements[2 * displacement - 1], displacements[2 * displacement]]})
 
         return displacements_dict
+
+def Draw_Truss_Displacements(self, figure_size = None, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
+        '''
+        Draws the Truss displacements after solving the truss
+        
+        Parameters
+        ----------
+        
+        figure_size: array
+                    size of the plot's figure in x, y heights.
+        length_of_arrow: float
+                        length of force vector arrow. default value is 1.0
+        width_of_arrow: float
+                        width of force vector arrow head. default value is 0.1
+        arrow_line_width: float
+                        width of force vector line. default value is 2.0
+        grid: boolean
+              activates gridlines. default value is False
+        '''
+        
+        
+        nodes = self.nodes + self.displacements_
+        elements = self.elements
+        supports = self.supports
+        forces = self.forces  
+
+        plt.figure(figsize = figure_size)
+        plt.grid(grid)
+       
+        # plotting nodes and members
+        for element in dict(elements):
+            fromPoint, toPoint = self.__Extract_Coordinate_Points(element, nodes, elements)
+            x1 = fromPoint[0]
+            y1 = fromPoint[1]
+            x2 = toPoint[0]
+            y2 = toPoint[1]
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5)
+
+        # plotting supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+
+            if support_x == 1 and support_y == 1:
+                plt.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1:
+                plt.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                plt.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+    
+        # plotting node labels
+        offset = 0.12
+        
+        for node in nodes:
+            plt.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            
+        # plotting member labels
+        for element in elements:
+            fromNode = elements[element][0]
+            toNode = elements[element][1]
+            fromPoint = nodes[fromNode]
+            toPoint = nodes[toNode]
+            
+            middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
+                           abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
+            
+            plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            
+        plt.show()
