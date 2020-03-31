@@ -421,8 +421,7 @@ class Truss_2D:
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
-        forces = self.forces 
-        cross_area = self.cross_area       
+        forces = self.forces      
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
@@ -541,7 +540,7 @@ class Truss_2D:
 
         return displacements_dict
 
-def Draw_Truss_Displacements(self, figure_size = None, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
+    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = None, grid = False):
         '''
         Draws the Truss displacements after solving the truss
         
@@ -559,19 +558,35 @@ def Draw_Truss_Displacements(self, figure_size = None, length_of_arrow = 1.0, wi
         grid: boolean
               activates gridlines. default value is False
         '''
-        
-        
-        nodes = self.nodes + self.displacements_
+
+        nodes = self.nodes
         elements = self.elements
         supports = self.supports
-        forces = self.forces  
+
+        new_nodes = {}
+        for _ in self.displacements_:
+            for node in nodes:
+                x_dist = self.displacements_[node][0] * magnification_factor + nodes[node][0]
+                y_dist = self.displacements_[node][1] * magnification_factor + nodes[node][1]
+                new_nodes.update({node: [x_dist, y_dist]})
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
        
+        # Plotting Old nodes
         # plotting nodes and members
         for element in dict(elements):
             fromPoint, toPoint = self.__Extract_Coordinate_Points(element, nodes, elements)
+            x1 = fromPoint[0]
+            y1 = fromPoint[1]
+            x2 = toPoint[0]
+            y2 = toPoint[1]
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linestyle = '--', alpha = 0.10)
+    
+        # Plotting New nodes
+        # plotting nodes and members
+        for element in dict(elements):
+            fromPoint, toPoint = self.__Extract_Coordinate_Points(element, new_nodes, elements)
             x1 = fromPoint[0]
             y1 = fromPoint[1]
             x2 = toPoint[0]
@@ -584,8 +599,8 @@ def Draw_Truss_Displacements(self, figure_size = None, length_of_arrow = 1.0, wi
             support_x = supports[support][0]
             support_y = supports[support][1]
 
-            x = nodes[support][0]
-            y = nodes[support][1]
+            x = new_nodes[support][0]
+            y = new_nodes[support][1]
 
             if support_x == 1 and support_y == 1:
                 plt.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
@@ -597,19 +612,19 @@ def Draw_Truss_Displacements(self, figure_size = None, length_of_arrow = 1.0, wi
         # plotting node labels
         offset = 0.12
         
-        for node in nodes:
-            plt.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+        for node in new_nodes:
+            plt.annotate(node, (new_nodes[node][0]+offset, new_nodes[node][1]+offset), zorder = 10, c='black')
             
         # plotting member labels
         for element in elements:
             fromNode = elements[element][0]
             toNode = elements[element][1]
-            fromPoint = nodes[fromNode]
-            toPoint = nodes[toNode]
+            fromPoint = new_nodes[fromNode]
+            toPoint = new_nodes[toNode]
             
             middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
             plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
-            
+
         plt.show()
