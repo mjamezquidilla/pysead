@@ -143,10 +143,8 @@ class Truss_2D:
             pass
         elif vec[0] < 0 and vec[1] <= 0:
             theta = 180 - theta
-            pass
         elif vec[0] >= 0 and vec[1] < 0:
-            theta = 360 -  theta
-            pass
+            theta = 360 - theta
         else:
             pass
 
@@ -339,6 +337,14 @@ class Truss_2D:
         self.member_forces_ = member_forces
         self.member_stresses_ = member_stresses
         self.K_global_ = K_global
+        self.Element_Displacements = __Element_Displacements
+
+        # Creating a Dictionary of Member Lengths
+        member_length_ = {}
+        for key, length in enumerate(L):
+            member_length_.update({key+1: length})
+
+        self.member_lengths_ = member_length_
         
         print("Truss Solved")
         
@@ -377,6 +383,9 @@ class Truss_2D:
 
 
     def __Element_Displacement(self, element_number, global_displacement, elements):
+        # for i in elements:
+        #     elements[i] = sorted(elements[i])
+
         fromNode = elements[element_number][0]
         toNode = elements[element_number][1]
 
@@ -398,7 +407,7 @@ class Truss_2D:
         return np.round(s_member, 5)
 
 
-    def Draw_Truss_Setup(self, figure_size = None, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
+    def Draw_Truss_Setup(self, figure_size = None, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
         '''
         Draws the Truss as initialized by the class
         
@@ -452,7 +461,7 @@ class Truss_2D:
                 plt.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
     
         # plotting node labels
-        offset = 0.12
+        # offset = 0.12
         
         for node in nodes:
             plt.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
@@ -540,7 +549,7 @@ class Truss_2D:
 
         return displacements_dict
 
-    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = None, grid = False):
+    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = None, offset = 0.12, grid = False):
         '''
         Draws the Truss displacements after solving the truss
         
@@ -610,7 +619,7 @@ class Truss_2D:
                 plt.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
     
         # plotting node labels
-        offset = 0.12
+        # offset = 0.12
         
         for node in new_nodes:
             plt.annotate(node, (new_nodes[node][0]+offset, new_nodes[node][1]+offset), zorder = 10, c='black')
