@@ -73,7 +73,7 @@ class Truss_2D:
         return np.sqrt((x2-x1)**2+(y2-y1)**2)
 
 
-    def __Plane_Truss_Element_Stiffness(self, E, A, L, theta):
+    def __Plane_Truss_Element_Stiffness(self, element, E, A, nodes, elements):
         '''
         This function returns the element
         stiffness matrix for a plane truss
@@ -83,13 +83,22 @@ class Truss_2D:
         The size of the element stiffness
         matrix is 4x4.
         '''
-        x = theta * np.pi / 180
-        C = np.cos(x)
-        S = np.sin(x)
-        y = E*A/L * np.array([[C*C, C*S, -C*C, -C*S],
-                              [C*S, S*S, -C*S, -S*S],
-                              [-C*C, -C*S, C*C, C*S],
-                              [-C*S, -S*S, C*S, S*S]])
+        
+        X = self.__Extract_Coordinate_Points(element,nodes, elements)
+        x1 = X[0][0]
+        y1 = X[0][1]
+        x2 = X[1][0]
+        y2 = X[1][1]
+        L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
+
+        T = np.array([[c, s, 0, 0], [-s, c, 0, 0] , [0, 0, c, s] , [0, 0, -s, c]])
+        kk = E * A / L
+        k_loc = np.array([[kk, 0, -kk, 0], [0, 0, 0, 0], [-kk, 0, kk, 0], [0, 0, 0, 0]] )
+
+        T_inv = np.linalg.inv(T)
+        y = T_inv.dot(k_loc).dot(T)                              
         return y
 
 
@@ -102,53 +111,10 @@ class Truss_2D:
         matrix K after the element stiffness matrix
         k is assembled.
         '''    
-        K[2*i-2, 2*i-2] += k[0,0]
-        K[2*i-2, 2*i-1] += k[0,1]
-        K[2*i-2, 2*j-2] += k[0,2]
-        K[2*i-2, 2*j-1] += k[0,3]
-        K[2*i-1, 2*i-2] += k[1,0]
-        K[2*i-1, 2*i-1] += k[1,1]
-        K[2*i-1, 2*j-2] += k[1,2]  
-        K[2*i-1, 2*j-1] += k[1,3]  
-        K[2*j-2, 2*i-2] += k[2,0]  
-        K[2*j-2, 2*i-1] += k[2,1]  
-        K[2*j-2, 2*j-2] += k[2,2]  
-        K[2*j-2, 2*j-1] += k[2,3]  
-        K[2*j-1, 2*i-2] += k[3,0]  
-        K[2*j-1, 2*i-1] += k[3,1]  
-        K[2*j-1, 2*j-2] += k[3,2]  
-        K[2*j-1, 2*j-1] += k[3,3]  
+        
+        dofs = [2*i-2,2*i-1, 2*j-2, 2*j-1]
+        K[np.ix_(dofs,dofs)] += k
         return K
-
-
-    def __Direction_Cosine_From_x_Axis(self, element):
-        '''
-        Solves for the angle between the element and the x-axis. It extracts the coordinates of the element.
-        '''
-        x1 = element[0][0]
-        y1 = element[0][1]
-        x2 = element[1][0]
-        y2 = element[1][1]
-
-        x = x2 - x1
-        y = y2 - y1
-
-        vec = np.array([x,y])
-
-        theta = np.arccos(np.dot(vec, [1,0]) / (np.linalg.norm(vec) * np.linalg.norm([1,0]))) * 180 / np.pi
-
-        if vec[0] > 0 and vec[1] >= 0:
-            pass
-        elif vec[0] <= 0 and vec[1] > 0:
-            pass
-        elif vec[0] < 0 and vec[1] <= 0:
-            theta = 180 - theta
-        elif vec[0] >= 0 and vec[1] < 0:
-            theta = 360 - theta
-        else:
-            pass
-
-        return theta
 
 
     def __Apply_Boundary_Conditions(self, restrained_dofs, K_global):
@@ -205,21 +171,6 @@ class Truss_2D:
         return __Support_Vector
 
 
-    def __Plane_Truss_Inclined_Support(self, T, i, alpha):
-        '''
-        This function calculates the
-        tranformation matrix T of the inclined
-        support at node i with angle of
-        inclination alpha (in degrees).
-        '''
-        x = alpha * np.pi / 180
-        T[2*i-2, 2*i-2] = np.cos(x)
-        T[2*i-2, 2*i-1] = np.sin(x)
-        T[2*i-1, 2*i-2] = -np.sin(x)
-        T[2*i-1, 2*i-1] = np.cos(x)
-        return T 
-
-
     def Solve(self):
         '''
         Solves the 2D Truss.
@@ -266,19 +217,13 @@ class Truss_2D:
         for elem in elems:
             L.append(self.__Plane_Truss_Element_Length(elem))
 
-        # Step 1.3: Compute angle between x-axis and the member
-        thetas = []
-
-        for elem in elems:
-            thetas.append(self.__Direction_Cosine_From_x_Axis(elem))
-
-        # Step 1.4: Assemble Elasticity List
+        # Step 1.3: Assemble Elasticity List
         E = []
 
         for element in dict(elements):
             E.append(elasticity[element])
 
-        # Step 1.5: Assemble Cross-Sectional Area List
+        # Step 1.4: Assemble Cross-Sectional Area List
         A = []
 
         for element in dict(elements):
@@ -288,7 +233,7 @@ class Truss_2D:
         k_elems = []
 
         for i, elem in enumerate(elems):
-            k_elems.append(self.__Plane_Truss_Element_Stiffness(E[i], A[i], L[i], thetas[i]))
+            k_elems.append(self.__Plane_Truss_Element_Stiffness(i+1, E[i], A[i], nodes, elements))
 
         # Step 3: Compute Global Matrix
         K_global = np.zeros([2 * len(nodes),2 * len(nodes)])
@@ -322,14 +267,14 @@ class Truss_2D:
         member_forces = []
 
         for i, elem in enumerate(elems):
-            member_forces.append(self.__Solve_Member_Forces(E[i], A[i], L[i], thetas[i], __Element_Displacements[i]))
+            member_forces.append(self.__Solve_Member_Forces(E[i], A[i], i+1, nodes, elements, __Element_Displacements[i]))
         member_forces = {key: member_forces[i] for (i, key) in enumerate(elements)}
 
         # Step 11: Solve Member Stresses
         member_stresses = []
 
         for i, elem in enumerate(elems):
-            member_stresses.append(self.__Solve_Member_Stresses(E[i], L[i], thetas[i], __Element_Displacements[i]))
+            member_stresses.append(self.__Solve_Member_Stresses(E[i], i+1, nodes, elements, __Element_Displacements[i]))
         member_stresses = {key: member_stresses[i] for (i, key) in enumerate(elements)}
 
         self.displacements_ = self.__Displacements(np.round(global_displacements, 5))
@@ -337,7 +282,6 @@ class Truss_2D:
         self.member_forces_ = member_forces
         self.member_stresses_ = member_stresses
         self.K_global_ = K_global
-        self.Element_Displacements = __Element_Displacements
 
         # Creating a Dictionary of Member Lengths
         member_length_ = {}
@@ -345,8 +289,6 @@ class Truss_2D:
             member_length_.update({key+1: length})
 
         self.member_lengths_ = member_length_
-        
-        print("Truss Solved")
         
 
     def __Truss_Global_Displacement(self, displacements, __Support_Vector, nodes):
@@ -374,17 +316,25 @@ class Truss_2D:
         return np.round(K_global.dot(displacement_vector))
 
 
-    def __Solve_Member_Forces(self, elasticity, cross_area, L, theta, displacement):
-        x = theta * np.pi / 180
-        C = np.cos(x)
-        S = np.sin(x)
-        f_member = elasticity * cross_area / L * np.array([-C, -S, C, S]).dot(np.array(displacement))
+    def __Solve_Member_Forces(self, elasticity, cross_area, element, nodes, elements, displacement):
+        X = self.__Extract_Coordinate_Points(element, nodes, elements)
+        x1 = X[0][0]
+        y1 = X[0][1]
+        x2 = X[1][0]
+        y2 = X[1][1]
+        L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
+
+        kk = elasticity * cross_area / L
+        la = np.array([-c,-s,c,s])
+        f_member = kk * la.dot(displacement)
+
+
         return np.round(f_member,5)
 
 
     def __Element_Displacement(self, element_number, global_displacement, elements):
-        # for i in elements:
-        #     elements[i] = sorted(elements[i])
 
         fromNode = elements[element_number][0]
         toNode = elements[element_number][1]
@@ -393,17 +343,28 @@ class Truss_2D:
 
         elem_displacements = []
 
-        for i, u_node in enumerate(u):
+        for _, u_node in enumerate(u):
             elem_displacements.append(global_displacement[u_node - 1])
 
         return np.round(elem_displacements,5)
 
 
-    def __Solve_Member_Stresses(self, elasticity, L, theta, displacement):
-        x = theta * np.pi / 180
-        C = np.cos(x)
-        S = np.sin(x)
-        s_member = elasticity / L * np.array([-C, -S, C, S]).dot(np.array(displacement))    
+    def __Solve_Member_Stresses(self, elasticity, element, nodes, elements, displacement):
+
+        X = self.__Extract_Coordinate_Points(element, nodes, elements)
+        x1 = X[0][0]
+        y1 = X[0][1]
+        x2 = X[1][0]
+        y2 = X[1][1]
+        L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
+
+        kk = elasticity / L
+        la = np.array([-c,-s,c,s])
+        s_member = kk * la.dot(displacement)
+
+
         return np.round(s_member, 5)
 
 
