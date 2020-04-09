@@ -111,7 +111,7 @@ class Truss_2D:
         matrix K after the element stiffness matrix
         k is assembled.
         '''    
-        
+
         dofs = [2*i-2,2*i-1, 2*j-2, 2*j-1]
         K[np.ix_(dofs,dofs)] += k
         return K
@@ -510,7 +510,7 @@ class Truss_2D:
 
         return displacements_dict
 
-    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = None, offset = 0.12, grid = False):
+    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = None, offset = 0.12):
         '''
         Draws the Truss displacements after solving the truss
         
@@ -525,8 +525,6 @@ class Truss_2D:
                         width of force vector arrow head. default value is 0.1
         arrow_line_width: float
                         width of force vector line. default value is 2.0
-        grid: boolean
-              activates gridlines. default value is False
         '''
 
         nodes = self.nodes
@@ -541,7 +539,6 @@ class Truss_2D:
                 new_nodes.update({node: [x_dist, y_dist]})
 
         plt.figure(figsize = figure_size)
-        plt.grid(grid)
        
         # Plotting Old nodes
         # plotting nodes and members
@@ -597,4 +594,6 @@ class Truss_2D:
             
             plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
 
+        plt.gca().axes.get_xaxis().set_visible(False)
+        plt.gca().axes.get_yaxis().set_visible(False)
         plt.show()
