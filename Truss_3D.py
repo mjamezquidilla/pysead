@@ -46,7 +46,7 @@ class Truss_3D:
         self.member_stresses_ = []
 
 
-    def __Direction_Cosines(self, element, nodes, elements):
+    def Direction_Cosines(self, element, nodes, elements):
         from_node = elements[element][0] 
         to_node = elements[element][1]
         from_point = nodes[from_node]
@@ -69,8 +69,8 @@ class Truss_3D:
         return (cx, cy, cz, length)
 
 
-    def __Assemble_Stiffness_Matrix(self, element, elasticity, area, nodes, elements):
-        cx, cy, cz, L = self.__Direction_Cosines(element, nodes, elements)
+    def Assemble_Stiffness_Matrix(self, element, elasticity, area, nodes, elements):
+        cx, cy, cz, L = self.Direction_Cosines(element, nodes, elements)
         k = elasticity[element] * area[element] / L * np.array([[1, -1],
                                                                 [-1, 1]])
         T = np.array([[cx,cy,cz,0,0,0],
@@ -79,13 +79,13 @@ class Truss_3D:
         return K
 
 
-    def __Assemble_Global_Stiffness(self, K, k, i, j):
+    def Assemble_Global_Stiffness(self, K, k, i, j):
         dofs = [3*i-3,3*i-2, 3*i-1, 3*j-3, 3*j-2, 3*j-1]
         K[np.ix_(dofs,dofs)] += k
         return K
 
 
-    def __Support_Vector(self, restrained_dofs, nodes):
+    def Support_Vector(self, restrained_dofs, nodes):
         dofs = np.zeros([3 * len(nodes)])
 
         for dof in restrained_dofs:
@@ -102,7 +102,7 @@ class Truss_3D:
         return Support_Vector
 
 
-    def __Apply_Boundary_Conditions(self, restrained_dofs, K_global):
+    def Apply_Boundary_Conditions(self, restrained_dofs, K_global):
         dofs = []
 
         for i,j in enumerate(restrained_dofs):
@@ -113,7 +113,7 @@ class Truss_3D:
         return k_new
 
 
-    def __Assemble_Force_Vector(self, forces, restrained_dofs, nodes):
+    def Assemble_Force_Vector(self, forces, restrained_dofs, nodes):
         # Create force vector
         f = np.zeros([3 * len(nodes)])
 
@@ -135,7 +135,7 @@ class Truss_3D:
         return f_new
 
 
-    def __Truss_Global_Displacement(self, displacements, Support_Vector, nodes):
+    def Truss_Global_Displacement(self, displacements, Support_Vector, nodes):
         # Create New Support Vector in python indexing
         support_vector_new = [x - 1 for x in Support_Vector]
 
@@ -156,11 +156,11 @@ class Truss_3D:
         return displacement_vector
 
 
-    def __Solve_Reactions(self, K_global, displacement_vector):
+    def Solve_Reactions(self, K_global, displacement_vector):
         return np.round(K_global.dot(displacement_vector))
 
 
-    def __Element_Displacement(self, element_number, global_displacement, elements):
+    def Element_Displacement(self, element_number, global_displacement, elements):
 
         fromNode = elements[element_number][0]
         toNode = elements[element_number][1]
@@ -176,8 +176,8 @@ class Truss_3D:
         return np.round(elem_displacements,5)
 
 
-    def __Solve_Member_Force(self, element, displacement_vector, area, elasticity, nodes, elements):
-        cx, cy, cz, L = self.__Direction_Cosines(element, nodes, elements)
+    def Solve_Member_Force(self, element, displacement_vector, area, elasticity, nodes, elements):
+        cx, cy, cz, L = self.Direction_Cosines(element, nodes, elements)
         T = np.array([[cx,cy,cz,0,0,0],
                     [0,0,0,cx,cy,cz]])
         u = T.dot(displacement_vector[element-1])
@@ -186,9 +186,20 @@ class Truss_3D:
         member_force = k.dot(u)
         return member_force # 1st vector: positive = compression, negative = Tension
 
+    def Solve_Member_Force_Component(self, element, displacement_vector, area, elasticity, nodes, elements):
+        cx, cy, cz, L = self.Direction_Cosines(element, nodes, elements)
+        T = np.array([[cx,cy,cz,0,0,0],
+                    [0,0,0,cx,cy,cz]])
+        u = T.dot(displacement_vector[element-1])
+        k = elasticity[element] * area[element] / L * np.array([[1, -1],
+                                                                [-1, 1]])
+        member_force = k.dot(u)
+        member_force_component = np.transpose(T).dot(member_force)
+        return member_force_component # 1st vector: positive = compression, negative = Tension
 
-    def __Solve_Member_Stress(self, element, displacement_vector, elasticity, nodes, elements):
-        cx, cy, cz, L = self.__Direction_Cosines(element, nodes, elements)
+
+    def Solve_Member_Stress(self, element, displacement_vector, elasticity, nodes, elements):
+        cx, cy, cz, L = self.Direction_Cosines(element, nodes, elements)
         T = np.array([[cx,cy,cz,0,0,0],
                     [0,0,0,cx,cy,cz]])
         u = T.dot(displacement_vector[element-1])
@@ -196,6 +207,17 @@ class Truss_3D:
                                                 [-1, 1]])
         member_stress = k.dot(u)
         return member_stress # 1st vector: positive = compression, negative = Tension
+
+    def Solve_Member_Stress_Component(self, element, displacement_vector, elasticity, nodes, elements):
+        cx, cy, cz, L = self.Direction_Cosines(element, nodes, elements)
+        T = np.array([[cx,cy,cz,0,0,0],
+                    [0,0,0,cx,cy,cz]])
+        u = T.dot(displacement_vector[element-1])
+        k = elasticity[element] / L * np.array([[1, -1],
+                                                [-1, 1]])
+        member_stress = k.dot(u)
+        member_stress_component = np.transpose(T).dot(member_stress)
+        return member_stress_component # 1st vector: positive = compression, negative = Tension
 
 
     def Solve(self):
@@ -233,56 +255,72 @@ class Truss_3D:
         member_lengths = []
 
         for element in elements:
-            _, _, _, L = self.__Direction_Cosines(element, nodes, elements)
+            _, _, _, L = self.Direction_Cosines(element, nodes, elements)
             member_lengths.append(L)
 
         # Step 2: Assemble Stiffness Matrix for All members
         k_elems = []
 
         for element in elements:
-            k_elems.append(self.__Assemble_Stiffness_Matrix(element, elasticity, cross_area, nodes, elements))
+            k_elems.append(self.Assemble_Stiffness_Matrix(element, elasticity, cross_area, nodes, elements))
 
         # Step 3: Assemble Global Stiffness Matrix
         K_global = np.zeros([3*len(nodes), 3*len(nodes)])
 
         for i, _ in enumerate(k_elems):
-            K_global = self.__Assemble_Global_Stiffness(K_global, k_elems[i], elements[i+1][0], elements[i+1][1])
+            K_global = self.Assemble_Global_Stiffness(K_global, k_elems[i], elements[i+1][0], elements[i+1][1])
 
         # Step 4: Apply Boundary conditions to reduce the Global Stiffness Matrix 
-        Support_Vector = self.__Support_Vector(supports, nodes)
-        K_new = self.__Apply_Boundary_Conditions(Support_Vector, K_global)
+        Support_Vector = self.Support_Vector(supports, nodes)
+        K_new = self.Apply_Boundary_Conditions(Support_Vector, K_global)
 
         # Step 5: Reduce Force Vector
-        f_new = self.__Assemble_Force_Vector(forces, Support_Vector, nodes)
+        f_new = self.Assemble_Force_Vector(forces, Support_Vector, nodes)
 
         # Step 6: Solve for Displacement
         displacements = np.linalg.inv(K_new).dot(f_new.transpose())
 
         # Step 7: Create Global Displacement Vector
-        global_displacements = self.__Truss_Global_Displacement(displacements, Support_Vector, nodes)
+        global_displacements = self.Truss_Global_Displacement(displacements, Support_Vector, nodes)
 
         # Step 8: Solve for Reactions 
-        reactions = self.__Solve_Reactions(K_global, global_displacements)
+        reactions = self.Solve_Reactions(K_global, global_displacements)
 
         # Step 9: Solve Member Displacements
         element_displacements = []
 
         for element in elements:
-            element_displacements.append(self.__Element_Displacement(element, global_displacements, elements))
+            element_displacements.append(self.Element_Displacement(element, global_displacements, elements))
 
-        # Step 10: Solve Member Forces
+        # Step 10A: Solve Member Forces
         member_forces = []
 
         for element in elements:
-            member_forces.append(self.__Solve_Member_Force(element, element_displacements, cross_area, elasticity, nodes, elements))
+            member_forces.append(self.Solve_Member_Force(element, element_displacements, cross_area, elasticity, nodes, elements))
         member_forces = {key: member_forces[key-1][1] for key in elements}
 
-        # Step 11: Solve Member Stresses
+        # Step 10B: Solve Member Forces in Components
+        member_forces_components = []
+
+        for element in elements:
+            member_forces_components.append(self.Solve_Member_Force_Component(element, element_displacements, cross_area, elasticity, nodes, elements))
+        member_forces_components = {key: member_forces_components[key-1] for key in elements}
+
+
+        # Step 11A: Solve Member Stresses
         member_stresses = []
 
         for element in elements:
-            member_stresses.append(self.__Solve_Member_Stress(element, element_displacements, elasticity, nodes, elements))
+            member_stresses.append(self.Solve_Member_Stress(element, element_displacements, elasticity, nodes, elements))
         member_stresses = {key: member_stresses[key-1][1] for key in elements}
+
+        # Step 11B: Solve Member Stresses in Components
+        member_stresses_components = []
+
+        for element in elements:
+            member_stresses_components.append(self.Solve_Member_Stress_Component(element, element_displacements, elasticity, nodes, elements))
+        member_stresses_components = {key: member_stresses_components[key-1] for key in elements}
+
 
         # Variable lists
 
@@ -290,9 +328,14 @@ class Truss_3D:
         self.reactions_ = reactions
         self.member_forces_ = member_forces
         self.member_stresses_ = member_stresses
+        self.member_forces_components_ = member_forces_components
+        self.member_stresses_components_ = member_stresses_components
+
         self.K_global_ = K_global
 
         lengths = {}
-        for key, length in enumerate(L):
+        for key, length in enumerate(member_lengths):
             lengths.update({key+1: length})
         self.member_lengths_ = lengths
+
+        print("Positive Stress/Force is in Tension, Negative Stress/Force is in Compression")
