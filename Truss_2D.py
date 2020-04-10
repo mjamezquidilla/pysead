@@ -123,7 +123,7 @@ class Truss_2D:
         '''
         dofs = []
 
-        for i,j in enumerate(restrained_dofs):
+        for j in restrained_dofs:
             dofs.append(j - 1)
 
         k = np.delete(K_global, obj = dofs, axis = 0)
@@ -147,7 +147,7 @@ class Truss_2D:
         dofs = []
 
         # loops and appends restrained dofs and appends it to the list dof
-        for i, j in enumerate(restrained_dofs):
+        for j in restrained_dofs:
             dofs.append(j-1)
 
         # removes force vector unecessary rows
@@ -238,7 +238,7 @@ class Truss_2D:
         # Step 3: Compute Global Matrix
         K_global = np.zeros([2 * len(nodes),2 * len(nodes)])
 
-        for i, k in enumerate(k_elems):
+        for i, _ in enumerate(k_elems):
             K_global = self.__Plane_Truss_Assemble_Global_Stiffness(K_global, k_elems[i], elements[i+1][0], elements[i+1][1])
 
         # Step 4: Apply Boundary conditions to reduce the Global Stiffness Matrix 
