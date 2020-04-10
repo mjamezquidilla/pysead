@@ -1,4 +1,8 @@
 import numpy as np 
+import matplotlib.pyplot as plt 
+from mpl_toolkits.mplot3d import Axes3D
+plt.style.use('fivethirtyeight')
+
 
 class Truss_3D:
     
@@ -105,7 +109,7 @@ class Truss_3D:
     def Apply_Boundary_Conditions(self, restrained_dofs, K_global):
         dofs = []
 
-        for i,j in enumerate(restrained_dofs):
+        for j in restrained_dofs:
             dofs.append(j - 1)
 
         k = np.delete(K_global, obj = dofs, axis = 0)
@@ -127,7 +131,7 @@ class Truss_3D:
         dofs = []
 
         # loops and appends restrained dofs and appends it to the list dof
-        for i, j in enumerate(restrained_dofs):
+        for j in restrained_dofs:
             dofs.append(j-1)
 
         # removes force vector unecessary rows
@@ -218,6 +222,17 @@ class Truss_3D:
         member_stress = k.dot(u)
         member_stress_component = np.transpose(T).dot(member_stress)
         return member_stress_component # 1st vector: positive = compression, negative = Tension
+
+    def __Displacements(self, displacements):
+
+        displacements = {key + 1: displacements[key] for (key, _) in enumerate(displacements + 1)}
+
+        displacements_dict = {}
+        
+        for displacement in range(1,int(len(displacements)/3 + 1)):
+            displacements_dict.update({displacement: [displacements[3 * displacement - 2], displacements[3 * displacement - 1], displacements[3 * displacement] ]})
+
+        return displacements_dict
 
 
     def Solve(self):
@@ -324,7 +339,7 @@ class Truss_3D:
 
         # Variable lists
 
-        self.displacements_ = global_displacements
+        self.displacements_ = self.__Displacements(np.round(global_displacements, 5))
         self.reactions_ = reactions
         self.member_forces_ = member_forces
         self.member_stresses_ = member_stresses
@@ -339,3 +354,215 @@ class Truss_3D:
         self.member_lengths_ = lengths
 
         print("Positive Stress/Force is in Tension, Negative Stress/Force is in Compression")
+
+    def Draw_Truss_Setup(self):
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        # forces = self.forces     
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection = '3d')
+
+        offset = 10
+
+        # Plotting Members
+        for element in elements:
+            from_point = elements[element][0]
+            to_point = elements[element][1]
+
+            from_node_x = nodes[from_point][0]
+            from_node_y = nodes[from_point][1]
+            from_node_z = nodes[from_point][2]
+            to_node_x = nodes[to_point][0]
+            to_node_y = nodes[to_point][1]
+            to_node_z = nodes[to_point][2]
+
+            x = [from_node_x, to_node_x]
+            y = [from_node_y, to_node_y]
+            z = [from_node_z, to_node_z]
+
+            ax.plot(x,y,z, marker = 'o', linewidth = 1, c = 'black', zorder=5)
+
+        # Plotting Supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+            support_z = supports[support][2]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+            z = nodes[support][2]
+
+            if support_x == 1 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='y', zorder = 2)
+
+        # plotting node labels
+        for node in nodes:
+            x = nodes[node][0]
+            y = nodes[node][1]
+            z = nodes[node][2]    
+            ax.text(x + offset,y + offset,z + offset, node, zorder = 10, c='black')
+
+        # plotting member labels
+        for element in elements:
+            from_point = elements[element][0]
+            to_point = elements[element][1]
+
+            from_node_x = nodes[from_point][0]
+            from_node_y = nodes[from_point][1]
+            from_node_z = nodes[from_point][2]
+            to_node_x = nodes[to_point][0]
+            to_node_y = nodes[to_point][1]
+            to_node_z = nodes[to_point][2]
+
+            x = [from_node_x, to_node_x]
+            y = [from_node_y, to_node_y]
+            z = [from_node_z, to_node_z]
+
+            middle_point_x = abs((x[1] - x[0])/2) + min(x[0], x[1])
+            middle_point_y = abs((y[1] - y[0])/2) + min(y[0], y[1])
+            middle_point_z = abs((z[1] - z[0])/2) + min(z[0], z[1])
+
+            ax.text(middle_point_x + offset,middle_point_y + offset,middle_point_z + offset, element, zorder = 10, c='b')
+
+
+        # plotting force vectors
+        # length_of_arrow = 0.1
+
+        # # loop all x-direction forces
+        # for force in forces:
+        #     x = nodes[force][0]
+        #     y = nodes[force][1]
+        #     z = nodes[force][2]
+
+        #     f_x = forces[force][0]
+
+        #     # plot arrow x-direction
+        #     if f_x > 0:
+        #         ax.quiver(x, y, z, x - length_of_arrow, y, z, pivot='tip', length = length_of_arrow, colors = 'r') 
+        #         ax.text(x, y, z, f_x, color = 'r')
+        #         # plt.scatter(x - length_of_arrow, y, c='white')
+        #     elif f_x < 0:
+        #         ax.quiver(x, y, z, length_of_arrow - x, y, z, pivot='tip', length = length_of_arrow, colors = 'r')
+        #         ax.text(x, y, z, f_x, color = 'r')
+        #     else:
+        #         pass
+
+        # # loop all y-direction forces
+        # for force in forces:
+        #     x = nodes[force][0]
+        #     y = nodes[force][1]
+        #     z = nodes[force][2]
+
+        #     f_y = forces[force][1]
+
+        #     # plot arrow y-direction
+        #     if f_y > 0:
+        #         ax.quiver(x, y, z, x, y - length_of_arrow, z, pivot='tip', length = length_of_arrow, colors = 'r') 
+        #         ax.text(x,offset - y, z, f_y, color = 'r')
+        #     elif f_y < 0:
+        #         ax.quiver(x, y, z, x, length_of_arrow - y, z, pivot='tip', length = length_of_arrow, colors = 'r')
+        #         ax.text(x,offset - y , z, f_y, color = 'r')
+        #     else:
+        #         pass
+
+        # # loop all z-direction forces
+        # for force in forces:
+        #     x = nodes[force][0]
+        #     y = nodes[force][1]
+        #     z = nodes[force][2]
+
+        #     f_z = forces[force][2]
+
+        #     # plot arrow y-direction
+        #     if f_z > 0:
+        #         ax.quiver(x, y, z, x, y, z - length_of_arrow, pivot='tip', length = length_of_arrow, colors = 'r') 
+        #         ax.text(x,offset - y, z, f_z, color = 'r')
+        #     elif f_z < 0:
+        #         ax.quiver(x, y, z, x, y, length_of_arrow - z, pivot='tip', length = length_of_arrow, colors = 'r')
+        #         ax.text(x,offset - y , z, f_z, color = 'r')
+        #     else:
+        #         pass
+
+
+        plt.show()
+
+
+    def Draw_Truss_Displacements(self, magnification_factor = 100):
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection = '3d')
+
+        # Plotting Old Members
+        for element in elements:
+            from_point = elements[element][0]
+            to_point = elements[element][1]
+
+            from_node_x = nodes[from_point][0]
+            from_node_y = nodes[from_point][1]
+            from_node_z = nodes[from_point][2]
+            to_node_x = nodes[to_point][0]
+            to_node_y = nodes[to_point][1]
+            to_node_z = nodes[to_point][2]
+
+            x = [from_node_x, to_node_x]
+            y = [from_node_y, to_node_y]
+            z = [from_node_z, to_node_z]
+
+            ax.plot(x,y,z, marker = 'o', linewidth = 1, c = 'black', zorder = 5, linestyle = '--', alpha = 0.10)
+
+        # Plotting Node Displacements
+        new_nodes = {}
+        for _ in self.displacements_:
+            for node in nodes:
+                x_dist = self.displacements_[node][0] * magnification_factor + nodes[node][0]
+                y_dist = self.displacements_[node][1] * magnification_factor + nodes[node][1]
+                z_dist = self.displacements_[node][2] * magnification_factor + nodes[node][2]
+                new_nodes.update({node: [x_dist, y_dist, z_dist]})
+
+        # Plotting Members
+        for element in elements:
+            from_point = elements[element][0]
+            to_point = elements[element][1]
+
+            from_node_x = new_nodes[from_point][0]
+            from_node_y = new_nodes[from_point][1]
+            from_node_z = new_nodes[from_point][2]
+            to_node_x = new_nodes[to_point][0]
+            to_node_y = new_nodes[to_point][1]
+            to_node_z = new_nodes[to_point][2]
+
+            x = [from_node_x, to_node_x]
+            y = [from_node_y, to_node_y]
+            z = [from_node_z, to_node_z]
+
+            ax.plot(x,y,z, marker = 'o', linewidth = 1, c = 'black', zorder=5)
+
+        # Plotting Supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+            support_z = supports[support][2]
+
+            x = new_nodes[support][0]
+            y = new_nodes[support][1]
+            z = new_nodes[support][2]
+
+            if support_x == 1 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='y', zorder = 2)
+
+        plt.show()
