@@ -161,7 +161,7 @@ class Truss_3D:
 
 
     def Solve_Reactions(self, K_global, displacement_vector):
-        return np.round(K_global.dot(displacement_vector))
+        return np.round(K_global.dot(displacement_vector), 5)
 
 
     def Element_Displacement(self, element_number, global_displacement, elements):
