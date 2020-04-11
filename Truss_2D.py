@@ -368,7 +368,7 @@ class Truss_2D:
         return np.round(s_member, 5)
 
 
-    def Draw_Truss_Setup(self, figure_size = None, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
+    def Draw_Truss_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True):
         '''
         Draws the Truss as initialized by the class
         
@@ -403,7 +403,7 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5)
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
 
         # plotting supports
         for support in supports:
@@ -510,7 +510,7 @@ class Truss_2D:
 
         return displacements_dict
 
-    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = None, offset = 0.12):
+    def Draw_Truss_Displacements(self, linewidth = 2, magnification_factor = 100, figure_size = None, offset = 0.12):
         '''
         Draws the Truss displacements after solving the truss
         
@@ -548,7 +548,7 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linestyle = '--', alpha = 0.10)
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linestyle = '--', alpha = 0.10, linewidth = linewidth)
     
         # Plotting New nodes
         # plotting nodes and members
@@ -558,7 +558,7 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5)
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
 
         # plotting supports
         for support in supports:
