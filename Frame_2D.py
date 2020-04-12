@@ -46,6 +46,49 @@ class Member_2D:
         self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
 
 
+    def Add_Load_Axial_Uniform(self, w):
+        L = self.length
+        beginning_axial = w * L / 2
+        end_axial = w * L / 2
+        
+        self.forces[self.node_list[0]][0] += beginning_axial
+        self.forces[self.node_list[1]][0] += end_axial
+
+        # Axial Values
+        axial_values = self.x_array.copy()
+        for index, _ in enumerate(axial_values):
+            axial_values[index] = beginning_axial
+
+        self.axial += axial_values        
+
+
+    def Add_Self_Weight(self, unit_weight):
+        w = unit_weight * self.area
+
+        nodes = self.nodes
+        coordinates = []
+        for node in nodes:
+            coordinates.append(nodes[node])
+        x1 = coordinates[0][0]
+        y1 = coordinates[0][1]
+        x2 = coordinates[1][0]
+        y2 = coordinates[1][1]
+        L = self.length
+        
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
+
+        w1 = w * c
+        
+        if y2 > y1:
+            w2 = -w * s
+        else:
+            w2 = w * s
+
+        self.Add_Load_Full_Uniform(w1)
+        self.Add_Load_Axial_Uniform(w2)
+
+
     def Add_load_Axial(self, P, a):
         L = self.length
         beginning_axial = P * (L - a) / L
@@ -53,7 +96,7 @@ class Member_2D:
         self.forces[self.node_list[0]][0] += beginning_axial
         self.forces[self.node_list[1]][0] += end_axial
         
-        # Shear Values
+        # Axial Values
         axial_values = self.x_array.copy()
         for index, _ in enumerate(axial_values):
             axial_values[index] = beginning_axial
@@ -103,10 +146,6 @@ class Member_2D:
         self.forces[self.node_list[1]][2] += end_moment
         self.forces[self.node_list[0]][1] += - beginning_shear
         self.forces[self.node_list[1]][1] += - end_shear
-
-        # for index, _ in enumerate(moment_values)
-        # shear_values = beginning_shear - w * self.x_array
-        # moment_values = beginning_shear * self.x_array - w * self.x_array**2 / 2
 
         shear_values = self.x_array.copy()
         for index, shear_value in enumerate(shear_values):
@@ -822,7 +861,7 @@ class Frame_2D:
             x = nodes[force][0]
             y = nodes[force][1]
 
-            f_x = forces[force][0]
+            f_x = np.round(forces[force][0],2)
 
             # plot arrow x-direction
             if f_x > 0:
@@ -845,7 +884,7 @@ class Frame_2D:
             x = nodes[force][0]
             y = nodes[force][1]
 
-            f_y = forces[force][1]
+            f_y = np.round(forces[force][1],2)
 
             # plot arrow y-direction
             if f_y > 0:
