@@ -104,8 +104,17 @@ class Member_2D:
         self.forces[self.node_list[0]][1] += - beginning_shear
         self.forces[self.node_list[1]][1] += - end_shear
 
-        shear_values = beginning_shear - w * self.x_array
-        moment_values = beginning_shear * self.x_array - w * self.x_array**2 / 2
+        # for index, _ in enumerate(moment_values)
+        # shear_values = beginning_shear - w * self.x_array
+        # moment_values = beginning_shear * self.x_array - w * self.x_array**2 / 2
+
+        shear_values = self.x_array.copy()
+        for index, shear_value in enumerate(shear_values):
+            shear_values[index] = beginning_shear - w * shear_value
+        
+        moment_values = self.x_array.copy()
+        for index, moment_value in enumerate(moment_values):
+            moment_values[index] = beginning_moment - beginning_shear * moment_value + w * moment_value**2 / 2
 
         self.shear += shear_values
         self.moment += moment_values
@@ -254,6 +263,10 @@ class Member_2D:
             shear_values[index] = shear
         self.shear += shear_values
 
+        moment_values = self.x_array.copy()
+        for index, moment_value in enumerate(moment_values):
+            moment_values[index] = -shear * moment_value
+        self.moment += moment_values
 
     def Add_Moment_At_Left_Support(self, moment):
         moment_values = self.x_array.copy()
@@ -299,7 +312,7 @@ class Member_2D:
         axs[2].set_xlim([0, self.length])
         axs[2].set_ylabel('Moment')
         axs[2].set_xlabel('Length')
-        axs[2].set_title('Shear Diagram of Member {}'.format(self.member_number))
+        axs[2].set_title('Moment Diagram of Member {}'.format(self.member_number))
  
         plt.tight_layout()
         plt.show()
@@ -699,7 +712,7 @@ class Frame_2D:
 
         # Storing of Variables lists
         self.displacements_ = self.Displacements(global_displacements)
-        self.reactions_ = reactions
+        self.reactions_ = self.__Reactions(reactions, supports)
         self.K_global_ = K_global
 
         # Member Lengths
@@ -948,3 +961,13 @@ class Frame_2D:
         plt.gca().axes.get_xaxis().set_visible(False)
         plt.gca().axes.get_yaxis().set_visible(False)
         plt.show()
+
+    def __Reactions(self, reactions, supports):
+
+        forces_dict = {key + 1: reactions[key] for (key, _) in enumerate(reactions + 1)}
+
+        reactions_dict = {}
+        for support in supports:
+            reactions_dict.update({support: [forces_dict[3 * support - 2], forces_dict[3 * support-1], forces_dict[3 * support]]})
+
+        return reactions_dict
