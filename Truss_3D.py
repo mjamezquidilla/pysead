@@ -355,13 +355,13 @@ class Truss_3D:
 
         print("Positive Stress/Force is in Tension, Negative Stress/Force is in Compression")
 
-    def Draw_Truss_Setup(self):
+    def Draw_Truss_Setup(self, figure_size = [15,15]):
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
         # forces = self.forces     
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=figure_size)
         ax = fig.add_subplot(111, projection = '3d')
 
         offset = 10
@@ -494,12 +494,12 @@ class Truss_3D:
         plt.show()
 
 
-    def Draw_Truss_Displacements(self, magnification_factor = 100):
+    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = [15,15]):
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
         
-        fig = plt.figure()
+        fig = plt.figure(figsize=figure_size)
         ax = fig.add_subplot(111, projection = '3d')
 
         # Plotting Old Members
