@@ -1,8 +1,10 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
 plt.style.use('fivethirtyeight')
+plt.rcParams['hatch.color'] = 'white'
 print("Positive Values for forces: right, up (righthand rule)")
 print("Negative moment = clockwise, Positive moment = counter-clockwise (righthand rule)")
+print("For adding Local Member Load: Axial Load is always parallel to the member local axis")
 print("For adding Local Member Load: Loading is always point downward towards the frame element and is considered positive")
 print("Member Forces: at left end to right end (based on local axis) - [Axial, Shear, Bending]. Local Axis is governed for positive/negative values. Right is positive, upward is positive, counterclockwise is positive")
 print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is positive, vertical - upward is positive, moment - counterclockwise is positive")
@@ -15,6 +17,7 @@ class Member_2D:
         self.area = area
         self.inertia = inertia
         self.elasticity = elasticity
+
 
         self.node_list = []
         for node in nodes:
@@ -33,19 +36,61 @@ class Member_2D:
         # create empty force vectors for each node
         self.forces = {}
         for node in nodes:
-            self.forces.update({node: [0,0]})
+            self.forces.update({node: [0,0,0]})
 
+        # Create Shear and Moment numpy arrays
+        division_spacing = 0.2
+        self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/division_spacing))
+        self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
+        self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
+        self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
+
+
+    def Add_load_Axial(self, P, a):
+        L = self.length
+        beginning_axial = P * (L - a) / L
+        end_axial = P * (a) / L
+        self.forces[self.node_list[0]][0] += beginning_axial
+        self.forces[self.node_list[1]][0] += end_axial
         
+        # Shear Values
+        axial_values = self.x_array.copy()
+        for index, _ in enumerate(axial_values):
+            axial_values[index] = beginning_axial
+
+        self.axial += axial_values
+
+
     def Add_Load_Point(self, P, a):
         L = self.length
         beginning_moment = P * (L-a)**2 * a / L**2
         end_moment = -P * (L-a) * a**2 / L**2
         beginning_shear = P * (L-a) / L
         end_shear = P * a / L
-        self.forces[self.node_list[0]][1] += beginning_moment
-        self.forces[self.node_list[1]][1] += end_moment
-        self.forces[self.node_list[0]][0] += - beginning_shear
-        self.forces[self.node_list[1]][0] += - end_shear
+        self.forces[self.node_list[0]][2] += beginning_moment
+        self.forces[self.node_list[1]][2] += end_moment
+        self.forces[self.node_list[0]][1] += - beginning_shear
+        self.forces[self.node_list[1]][1] += - end_shear
+
+        # Shear Values
+        shear_values = self.x_array.copy()
+        for index, shear_value in enumerate(shear_values):
+            if shear_value < a:
+                shear_values[index] = P * (L-a) / L
+            else:
+                shear_values[index] = P * (L-a) / L - P
+
+        self.shear += shear_values
+
+        # Moment Values
+        moment_values = self.x_array.copy()
+        for index, moment_value in enumerate(moment_values):
+            if moment_value < a:
+                moment_values[index] = P * (L-a) / L * moment_value
+            else:
+                moment_values[index] = P * (L-a) / L * moment_value - P * (moment_value - a)
+
+        self.moment += moment_values        
 
 
     def Add_Load_Full_Uniform(self, w):
@@ -54,10 +99,16 @@ class Member_2D:
         end_moment = -w * L**2 / 12
         beginning_shear = w * L / 2
         end_shear = w * L / 2
-        self.forces[self.node_list[0]][1] += beginning_moment
-        self.forces[self.node_list[1]][1] += end_moment
-        self.forces[self.node_list[0]][0] += - beginning_shear
-        self.forces[self.node_list[1]][0] += - end_shear
+        self.forces[self.node_list[0]][2] += beginning_moment
+        self.forces[self.node_list[1]][2] += end_moment
+        self.forces[self.node_list[0]][1] += - beginning_shear
+        self.forces[self.node_list[1]][1] += - end_shear
+
+        shear_values = beginning_shear - w * self.x_array
+        moment_values = beginning_shear * self.x_array - w * self.x_array**2 / 2
+
+        self.shear += shear_values
+        self.moment += moment_values
 
 
     def Add_Load_Moment(self,M,a):
@@ -65,20 +116,85 @@ class Member_2D:
         b = L - a
         beginning_moment = M * b * (2*a-b) / L**2
         end_moment = M * a * (2*b-a) / L**2
-        self.forces[self.node_list[0]][1] += beginning_moment
-        self.forces[self.node_list[1]][1] += end_moment
+        self.forces[self.node_list[0]][2] += beginning_moment
+        self.forces[self.node_list[1]][2] += end_moment
+
+        moment_values = self.x_array.copy()
+        for index, _ in enumerate(moment_values):
+            moment_values[index] = beginning_moment
+        self.moment += moment_values
 
 
     def Add_Load_Partial_Uniform(self, w, a, b):
         L = self.length
         beginning_moment = w * L**2 / 12 * (6*(b/L)**2 - 8*(b/L)**3 + 3*(b/L)**4)
         end_moment = -w * L**2 / 12 * (6*(a/L)**2 - 8*(a/L)**3 + 3*(a/L)**4)
-        beginning_shear = w * (b-a) / L * ((b-a)/2 + a)
-        end_shear = w * (b-a) / L * ((b-a)/2 + (L-b))
-        self.forces[self.node_list[0]][1] += beginning_moment
-        self.forces[self.node_list[1]][1] += end_moment
-        self.forces[self.node_list[0]][0] += - beginning_shear
-        self.forces[self.node_list[1]][0] += - end_shear
+        beginning_shear = w * (b-a) / L * ((b-a)/2 + (L-b))
+        end_shear = w * (b-a) / L * ((b-a)/2 + a)
+        self.forces[self.node_list[0]][2] += beginning_moment
+        self.forces[self.node_list[1]][2] += end_moment
+        self.forces[self.node_list[0]][1] += - beginning_shear
+        self.forces[self.node_list[1]][1] += - end_shear
+
+        # Shear Values
+        shear_values = self.x_array.copy()
+        for index, shear_value in enumerate(shear_values):
+            if shear_value < a:
+                shear_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b)))
+            elif shear_value >= a and shear_value < b :
+                shear_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) - w*(shear_value - a)
+            else:
+                shear_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) - w*(b - a)
+
+        self.shear += shear_values
+
+        # Moment Values
+        moment_values = self.x_array.copy()
+        for index, moment_value in enumerate(moment_values):
+            if moment_value < a:
+                moment_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) * moment_value
+            elif moment_value >= a and moment_value < b :
+                moment_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) * moment_value - w*(moment_value - a)**2 / 2
+            else:
+                moment_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) * moment_value - w * (b - a) * ((b-a)/2 + (moment_value - b))
+
+        self.moment += moment_values
+
+    def Plot_Axial_Diagram(self, figure_size=[10,5]):
+        plt.figure(figsize=figure_size)
+        plt.plot(self.x_array,self.axial)
+        plt.fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        plt.xlim([0, self.length])
+        plt.ylabel('Axial')
+        plt.xlabel('Length')
+        plt.title('Axial Diagram of Member {}'.format(self.member_number))
+        plt.tight_layout()
+        plt.show()
+
+
+    # Plot Shear Diagram
+    def Plot_Shear_Diagram(self, figure_size=[10,5]):
+        plt.figure(figsize=figure_size)
+        plt.plot(self.x_array,self.shear)
+        plt.fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        plt.xlim([0, self.length])
+        plt.ylabel('Shear')
+        plt.xlabel('Length')
+        plt.title('Shear Diagram of Member {}'.format(self.member_number))
+        plt.tight_layout()
+        plt.show()
+
+    # Plot Moment Diagram
+    def Plot_Moment_Diagram(self, figure_size = [10,5]):
+        plt.figure(figsize=figure_size)
+        plt.plot(self.x_array,self.moment)
+        plt.fill_between(self.x_array, 0, self.moment, hatch = '/', alpha = 0.1)
+        plt.xlim([0, self.length])
+        plt.ylabel('Moment')
+        plt.xlabel('Length')
+        plt.title('Moment Diagram of Member {}'.format(self.member_number))
+        plt.tight_layout()
+        plt.show()
 
 
     def Resolve_Forces_into_Components(self):
@@ -94,35 +210,101 @@ class Member_2D:
         y2 = coordinates[1][1]
         L = self.length
         
-        c = (x2 - x1) / L # 0 
-        s = (y2 - y1) / L # 1
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
 
-        F_1 = self.forces[self.node_list[0]][0] 
-        F_2 = self.forces[self.node_list[1]][0] 
-        M_1 = self.forces[self.node_list[0]][1] 
-        M_2 = self.forces[self.node_list[1]][1] 
+        FA_1 = self.forces[self.node_list[0]][0] 
+        FA_2 = self.forces[self.node_list[1]][0] 
+        FV_1 = self.forces[self.node_list[0]][1] 
+        FV_2 = self.forces[self.node_list[1]][1] 
+        M_1 = self.forces[self.node_list[0]][2] 
+        M_2 = self.forces[self.node_list[1]][2] 
 
         if y2 >= y1:
-            F_1_x = -F_1 * s
-            F_2_x = -F_2 * s
+            FV1_x = -FV_1 * s
+            FV2_x = -FV_2 * s
         else: 
-            F_1_x = -F_1 * s
-            F_2_x = -F_2 * s
+            FV1_x = -FV_1 * s
+            FV2_x = -FV_2 * s
 
-        F_1_y = F_1 * c
-        F_2_y = F_2 * c
+        FA_1_x = FA_1 * c
+        FA_1_y = FA_1 * s
+        FA_2_x = FA_2 * c
+        FA_2_y = FA_2 * s
 
-        self.forces = {}
+        FV1_y = FV_1 * c
+        FV2_y = FV_2 * c
+
+        self.resolved_forces = {}
         
         for node in nodes:
-            self.forces.update({node: [0,0,0]})
+            self.resolved_forces.update({node: [0,0,0]})
         
-        self.forces[self.node_list[0]][0] = F_1_x
-        self.forces[self.node_list[0]][1] = F_1_y
-        self.forces[self.node_list[0]][2] = - M_1
-        self.forces[self.node_list[1]][0] = F_2_x
-        self.forces[self.node_list[1]][1] = F_2_y
-        self.forces[self.node_list[1]][2] = - M_2
+        self.resolved_forces[self.node_list[0]][0] = FV1_x + FA_1_x
+        self.resolved_forces[self.node_list[0]][1] = FV1_y + FA_1_y
+        self.resolved_forces[self.node_list[0]][2] = - M_1
+        self.resolved_forces[self.node_list[1]][0] = FV2_x + FA_2_x
+        self.resolved_forces[self.node_list[1]][1] = FV2_y + FA_2_y
+        self.resolved_forces[self.node_list[1]][2] = - M_2
+
+
+    def Add_Shear_At_Left_Support(self, shear):
+        shear_values = self.x_array.copy()
+        for index, _ in enumerate(shear_values):
+            shear_values[index] = shear
+        self.shear += shear_values
+
+
+    def Add_Moment_At_Left_Support(self, moment):
+        moment_values = self.x_array.copy()
+        for index, _ in enumerate(moment_values):
+            moment_values[index] = moment
+        self.moment += moment_values
+
+
+    def Add_Axial_At_Left_Support(self, axial):
+        axial_values = self.x_array.copy()
+        for index, _ in enumerate(axial_values):
+            axial_values[index] = axial
+        self.axial += axial_values
+
+
+    def Plot_Diagrams(self, figure_size = [10,10]):
+        fig, axs = plt.subplots(3, 1)
+        fig.set_figheight(figure_size[0])
+        fig.set_figwidth(figure_size[1])
+
+        # Plot Axial Diagram
+        axs[0].plot(self.x_array,self.axial)
+        axs[0].plot(self.x_array,self.axial)
+        axs[0].fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        axs[0].set_xlim([0, self.length])
+        axs[0].set_ylabel('Axial')
+        axs[0].set_xlabel('Length')
+        axs[0].set_title('Axial Diagram of Member {}'.format(self.member_number))
+
+        # Plot Shear Diagram
+        axs[1].plot(self.x_array,self.shear)
+        axs[1].plot(self.x_array,self.shear)
+        axs[1].fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        axs[1].set_xlim([0, self.length])
+        axs[1].set_ylabel('Shear')
+        axs[1].set_xlabel('Length')
+        axs[1].set_title('Shear Diagram of Member {}'.format(self.member_number))
+        
+        # Plot Moment Diagram
+        axs[2].plot(self.x_array,self.moment)
+        axs[2].plot(self.x_array,self.moment)
+        axs[2].fill_between(self.x_array, 0, self.moment, hatch = '/', alpha = 0.1)
+        axs[2].set_xlim([0, self.length])
+        axs[2].set_ylabel('Moment')
+        axs[2].set_xlabel('Length')
+        axs[2].set_title('Shear Diagram of Member {}'.format(self.member_number))
+ 
+        plt.tight_layout()
+        plt.show()
+
+
 
 
 class Frame_2D:
@@ -198,13 +380,13 @@ class Frame_2D:
 
         __local_member_forces_dict = {key: [0,0,0,0,0,0] for key in range(1,len(local_member_forces)+1)}
         for i, force in enumerate(local_member_forces):
-            __local_member_forces_dict.update({i+1: np.array([0, -force[0][0], force[0][1], 0, -force[1][0], force[1][1]])})
+            __local_member_forces_dict.update({i+1: np.array([force[0][0], -force[0][1], force[0][2], force[1][1], -force[1][1], force[1][2]])})
         
         # Compile all load forces
         forces = {key: [0,0,0] for key in nodes}
         for member in members_list:
             member.Resolve_Forces_into_Components()
-            member_forces_temp = member.forces
+            member_forces_temp = member.resolved_forces
 
             for key in forces: 
                 if key in member_forces_temp: 
@@ -221,6 +403,7 @@ class Frame_2D:
         self.areas = areas
         self.inertias = inertias
         self.local_member_forces = __local_member_forces_dict
+        self.members_list = members_list
 
     
     def Add_Load_Node(self, nodal_load):
@@ -507,33 +690,42 @@ class Frame_2D:
             element_displacements.append(self.Element_Displacement(element, global_displacements, elements))
 
         # Step 10A: Solve Member Forces
-        member_forces = []
+        solved_member_forces = []
 
         for element in elements:
-            member_forces.append(self.Solve_Member_Force(element, element_displacements, areas, nodes, elements, elasticities, inertias))
-        member_forces = {key: member_forces[key-1] for key in elements}
+            solved_member_forces.append(self.Solve_Member_Force(element, element_displacements, areas, nodes, elements, elasticities, inertias))
+        solved_member_forces = {key: solved_member_forces[key-1] for key in elements}
 
-        # Variable lists
+
+        # Storing of Variables lists
         self.displacements_ = self.Displacements(global_displacements)
         self.reactions_ = reactions
         self.K_global_ = K_global
 
+        # Member Lengths
         lengths = {}
         for key, length in enumerate(member_lengths):
             lengths.update({key+1: length})
         self.member_lengths_ = lengths
 
+        # Solved Member Forces
+        self.solved_member_forces = solved_member_forces
+        
+        # Updated Local Member Forces
         new_member_forces_dict = {}
-        for key in member_forces:
-            new_member_forces = member_forces[key] + self.local_member_forces[key]
+        for key in solved_member_forces:
+            new_member_forces = solved_member_forces[key] + self.local_member_forces[key]
             new_member_forces_dict.update({key: new_member_forces})
-        self.member_forces_new = new_member_forces_dict
+        self.local_member_forces_solved_ = new_member_forces_dict
 
-        self.member_forces_ = member_forces
-
-        self.element_displacements = element_displacements
-
-        self.global_displacements = global_displacements
+        # Step 11: Update Local Member Forces to its Member Class
+        self.Update_Member_Local_Forces()
+    
+    def Update_Member_Local_Forces(self):
+        for element, member in enumerate(self.members_list):
+            member.Add_Axial_At_Left_Support(self.solved_member_forces[element + 1][0])
+            member.Add_Shear_At_Left_Support(self.solved_member_forces[element + 1][1])
+            member.Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
 
 
     def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True):
