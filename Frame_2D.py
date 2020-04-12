@@ -3,12 +3,131 @@ import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 print("Positive Values for forces: right, up (righthand rule)")
 print("Negative moment = clockwise, Positive moment = counter-clockwise (righthand rule)")
+print("For adding Local Member Load: Loading is always point downward towards the frame element and is considered positive")
+print("Member Forces: at left end to right end (based on local axis) - [Axial, Shear, Bending]. Local Axis is governed for positive/negative values. Right is positive, upward is positive, counterclockwise is positive")
+print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is positive, vertical - upward is positive, moment - counterclockwise is positive")
 
+
+class Member_2D:
+    def __init__(self, member_number, nodes, area, elasticity, inertia):
+        self.member_number = member_number
+        self.nodes = nodes
+        self.area = area
+        self.inertia = inertia
+        self.elasticity = elasticity
+
+        self.node_list = []
+        for node in nodes:
+            self.node_list.append(node)
+
+        # compute length of member
+        coordinates = []
+        for node in nodes:
+            coordinates.append(nodes[node])
+        x1 = coordinates[0][0]
+        y1 = coordinates[0][1]
+        x2 = coordinates[1][0]
+        y2 = coordinates[1][1]
+        self.length = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+        # create empty force vectors for each node
+        self.forces = {}
+        for node in nodes:
+            self.forces.update({node: [0,0]})
+
+        
+    def Add_Load_Point(self, P, a):
+        L = self.length
+        beginning_moment = P * (L-a)**2 * a / L**2
+        end_moment = -P * (L-a) * a**2 / L**2
+        beginning_shear = P * (L-a) / L
+        end_shear = P * a / L
+        self.forces[self.node_list[0]][1] += beginning_moment
+        self.forces[self.node_list[1]][1] += end_moment
+        self.forces[self.node_list[0]][0] += - beginning_shear
+        self.forces[self.node_list[1]][0] += - end_shear
+
+
+    def Add_Load_Full_Uniform(self, w):
+        L = self.length
+        beginning_moment = w * L**2 / 12
+        end_moment = -w * L**2 / 12
+        beginning_shear = w * L / 2
+        end_shear = w * L / 2
+        self.forces[self.node_list[0]][1] += beginning_moment
+        self.forces[self.node_list[1]][1] += end_moment
+        self.forces[self.node_list[0]][0] += - beginning_shear
+        self.forces[self.node_list[1]][0] += - end_shear
+
+
+    def Add_Load_Moment(self,M,a):
+        L = self.length
+        b = L - a
+        beginning_moment = M * b * (2*a-b) / L**2
+        end_moment = M * a * (2*b-a) / L**2
+        self.forces[self.node_list[0]][1] += beginning_moment
+        self.forces[self.node_list[1]][1] += end_moment
+
+
+    def Add_Load_Partial_Uniform(self, w, a, b):
+        L = self.length
+        beginning_moment = w * L**2 / 12 * (6*(b/L)**2 - 8*(b/L)**3 + 3*(b/L)**4)
+        end_moment = -w * L**2 / 12 * (6*(a/L)**2 - 8*(a/L)**3 + 3*(a/L)**4)
+        beginning_shear = w * (b-a) / L * ((b-a)/2 + a)
+        end_shear = w * (b-a) / L * ((b-a)/2 + (L-b))
+        self.forces[self.node_list[0]][1] += beginning_moment
+        self.forces[self.node_list[1]][1] += end_moment
+        self.forces[self.node_list[0]][0] += - beginning_shear
+        self.forces[self.node_list[1]][0] += - end_shear
+
+
+    def Resolve_Forces_into_Components(self):
+        # solve for angle
+        nodes = self.nodes
+
+        coordinates = []
+        for node in nodes:
+            coordinates.append(nodes[node])
+        x1 = coordinates[0][0]
+        y1 = coordinates[0][1]
+        x2 = coordinates[1][0]
+        y2 = coordinates[1][1]
+        L = self.length
+        
+        c = (x2 - x1) / L # 0 
+        s = (y2 - y1) / L # 1
+
+        F_1 = self.forces[self.node_list[0]][0] 
+        F_2 = self.forces[self.node_list[1]][0] 
+        M_1 = self.forces[self.node_list[0]][1] 
+        M_2 = self.forces[self.node_list[1]][1] 
+
+        if y2 >= y1:
+            F_1_x = -F_1 * s
+            F_2_x = -F_2 * s
+        else: 
+            F_1_x = -F_1 * s
+            F_2_x = -F_2 * s
+
+        F_1_y = F_1 * c
+        F_2_y = F_2 * c
+
+        self.forces = {}
+        
+        for node in nodes:
+            self.forces.update({node: [0,0,0]})
+        
+        self.forces[self.node_list[0]][0] = F_1_x
+        self.forces[self.node_list[0]][1] = F_1_y
+        self.forces[self.node_list[0]][2] = - M_1
+        self.forces[self.node_list[1]][0] = F_2_x
+        self.forces[self.node_list[1]][1] = F_2_y
+        self.forces[self.node_list[1]][2] = - M_2
 
 
 class Frame_2D:
     
-    def __init__(self, nodes, elements, supports, forces, elasticities, areas, inertias):
+    def __init__(self):
         '''
         Initializes Frame class object. User should be aware of its units for consistency of solution.
         
@@ -37,15 +156,81 @@ class Frame_2D:
                     member's cross-sectional area. Member's name/mark followed by its cross-sectional area
                   
         '''
+        self.nodes = {}
+        self.elements = {}
+        self.supports = {}
+        self.forces = {}
+        self.elasticities = {}
+        self.areas = {}
+        self.inertias = {}
+
+
+    def Compile_Frame_Member_Properties(self, members_list):
+        # Compile all nodes
+        nodes = {}
+        for member in members_list:
+            nodes.update(member.nodes)
         
+        # Compile all elements
+        elements = {}
+        for member in members_list:
+            elements.update({member.member_number: [member.node_list[0], member.node_list[1]]})
         
+        # Compile all areas
+        areas = {}
+        for member in members_list:
+            areas.update({member.member_number: member.area})
+
+        # Compile all inertias
+        inertias = {}
+        for member in members_list:
+            inertias.update({member.member_number: member.inertia})
+        
+        # Compile all elasticities
+        elasticities = {}
+        for member in members_list:
+            elasticities.update({member.member_number: member.elasticity})
+
+        # Compile all local member forces
+        local_member_forces = []
+        for member in members_list:
+            local_member_forces.append([v for v in member.forces.values()])
+
+        __local_member_forces_dict = {key: [0,0,0,0,0,0] for key in range(1,len(local_member_forces)+1)}
+        for i, force in enumerate(local_member_forces):
+            __local_member_forces_dict.update({i+1: np.array([0, -force[0][0], force[0][1], 0, -force[1][0], force[1][1]])})
+        
+        # Compile all load forces
+        forces = {key: [0,0,0] for key in nodes}
+        for member in members_list:
+            member.Resolve_Forces_into_Components()
+            member_forces_temp = member.forces
+
+            for key in forces: 
+                if key in member_forces_temp: 
+                    forces[key][0] += member_forces_temp[key][0] 
+                    forces[key][1] += member_forces_temp[key][1] 
+                    forces[key][2] += member_forces_temp[key][2] 
+
+        forces = {k: v for k, v in sorted(forces.items(), key=lambda item: item[0])}
+
         self.nodes = nodes
         self.elements = elements
-        self.supports = supports
         self.forces = forces
         self.elasticities = elasticities
         self.areas = areas
         self.inertias = inertias
+        self.local_member_forces = __local_member_forces_dict
+
+    
+    def Add_Load_Node(self, nodal_load):
+        forces = self.forces
+        for key in forces: 
+            if key in nodal_load:
+                forces[key][0] += nodal_load[key][0] 
+                forces[key][1] += nodal_load[key][1] 
+                forces[key][2] += nodal_load[key][2] 
+        self.forces.update(forces)
 
 
     def Member_Lengths(self, element, nodes, elements):
@@ -189,6 +374,8 @@ class Frame_2D:
         u = [3 * fromNode - 2, 3 * fromNode - 1, 3 * fromNode, 
             3 * toNode - 2, 3 * toNode - 1, 3 * toNode]
 
+        # u.sort()
+
         elem_displacements = []
 
         for _, u_node in enumerate(u):
@@ -235,7 +422,7 @@ class Frame_2D:
         member_force = k.dot(T).dot(u)
         return member_force
 
-    def __Displacements(self, displacements):
+    def Displacements(self, displacements):
 
         displacements = {key + 1: displacements[key] for (key, _) in enumerate(displacements + 1)}
 
@@ -327,16 +514,26 @@ class Frame_2D:
         member_forces = {key: member_forces[key-1] for key in elements}
 
         # Variable lists
-
-        self.displacements_ = self.__Displacements(np.round(global_displacements, 5))
+        self.displacements_ = self.Displacements(global_displacements)
         self.reactions_ = reactions
-        self.member_forces_ = member_forces
         self.K_global_ = K_global
 
         lengths = {}
         for key, length in enumerate(member_lengths):
             lengths.update({key+1: length})
         self.member_lengths_ = lengths
+
+        new_member_forces_dict = {}
+        for key in member_forces:
+            new_member_forces = member_forces[key] + self.local_member_forces[key]
+            new_member_forces_dict.update({key: new_member_forces})
+        self.member_forces_new = new_member_forces_dict
+
+        self.member_forces_ = member_forces
+
+        self.element_displacements = element_displacements
+
+        self.global_displacements = global_displacements
 
 
     def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True):
