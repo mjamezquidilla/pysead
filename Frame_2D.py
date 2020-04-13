@@ -11,21 +11,56 @@ print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is po
 
 
 class Member_2D:
-    def __init__(self, member_number, nodes, area, elasticity, inertia):
+    def __init__(self, member_number, area, elasticity, inertia, nodes = {}):
         self.member_number = member_number
-        self.nodes = nodes
         self.area = area
         self.inertia = inertia
-        self.elasticity = elasticity
+        self.elasticity = elasticity        
 
+        # Check if nodes dictionary is not empty
+        if nodes:
+            self.nodes = nodes
+            self.node_list = []
+            for node in nodes:
+                self.node_list.append(node)
 
+            # compute length of member
+            coordinates = []
+            for node in nodes:
+                coordinates.append(nodes[node])
+            x1 = coordinates[0][0]
+            y1 = coordinates[0][1]
+            x2 = coordinates[1][0]
+            y2 = coordinates[1][1]
+            self.length = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+            # create empty force vectors for each node
+            self.forces = {}
+            for node in nodes:
+                self.forces.update({node: [0,0,0]})
+
+            # Create Shear and Moment numpy arrays
+            division_spacing = 0.2
+            self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/division_spacing))
+            self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
+            self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
+            self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
+            
+
+    def Add_Nodes_To_Element(self, element, nodes):
+        from_node = element[0]
+        to_node = element[1]
+        from_point = nodes[from_node]
+        to_point = nodes[to_node]
+
+        self.nodes = {from_node: from_point, to_node: to_point}
         self.node_list = []
-        for node in nodes:
+        for node in self.nodes:
             self.node_list.append(node)
 
         # compute length of member
         coordinates = []
-        for node in nodes:
+        for node in self.nodes:
             coordinates.append(nodes[node])
         x1 = coordinates[0][0]
         y1 = coordinates[0][1]
@@ -35,7 +70,7 @@ class Member_2D:
 
         # create empty force vectors for each node
         self.forces = {}
-        for node in nodes:
+        for node in self.nodes:
             self.forces.update({node: [0,0,0]})
 
         # Create Shear and Moment numpy arrays
