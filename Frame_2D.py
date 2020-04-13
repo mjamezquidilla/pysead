@@ -243,6 +243,7 @@ class Member_2D:
 
         self.moment += moment_values
 
+
     def Plot_Axial_Diagram(self, figure_size=[10,5]):
         plt.figure(figsize=figure_size)
         plt.plot(self.x_array,self.axial)
@@ -266,6 +267,7 @@ class Member_2D:
         plt.title('Shear Diagram of Member {}'.format(self.member_number))
         plt.tight_layout()
         plt.show()
+
 
     # Plot Moment Diagram
     def Plot_Moment_Diagram(self, figure_size = [10,5]):
@@ -331,7 +333,7 @@ class Member_2D:
         self.resolved_forces[self.node_list[1]][2] = - M_2
 
 
-    def Add_Shear_At_Left_Support(self, shear):
+    def Reaction_Add_Shear_At_Left_Support(self, shear):
         shear_values = self.x_array.copy()
         for index, _ in enumerate(shear_values):
             shear_values[index] = shear
@@ -342,14 +344,15 @@ class Member_2D:
             moment_values[index] = -shear * moment_value
         self.moment += moment_values
 
-    def Add_Moment_At_Left_Support(self, moment):
+
+    def Reaction_Add_Moment_At_Left_Support(self, moment):
         moment_values = self.x_array.copy()
         for index, _ in enumerate(moment_values):
             moment_values[index] = moment
         self.moment += moment_values
 
 
-    def Add_Axial_At_Left_Support(self, axial):
+    def Reaction_Add_Axial_At_Left_Support(self, axial):
         axial_values = self.x_array.copy()
         for index, _ in enumerate(axial_values):
             axial_values[index] = axial
@@ -391,7 +394,26 @@ class Member_2D:
         plt.tight_layout()
         plt.show()
 
+    def Summary(self):
+        self.moment_max = np.max(self.moment)
+        self.moment_min = np.min(self.moment)
+        self.moment_at_left = self.moment[0]
+        self.moment_at_right = self.moment[-1]
+        
+        self.shear_max = np.max(self.shear)
+        self.shear_min = np.min(self.shear)
+        self.shear_at_left = self.shear[0]
+        self.shear_at_right = self.shear[-1]
+        
+        print("Maximum Moment: {}".format(self.moment_max))
+        print("Minimum Moment: {}".format(self.moment_min))
+        print("Moment at left end: {}".format(self.moment_at_left))
+        print("Moment at right end: {}".format(self.moment_at_right))
 
+        print("Maximum Shear: {}".format(self.shear_max))
+        print("Minimum Shear: {}".format(self.shear_min))
+        print("Shear at left end: {}".format(self.shear_at_left))
+        print("Shear at right end: {}".format(self.shear_at_right))
 
 
 class Frame_2D:
@@ -503,7 +525,7 @@ class Frame_2D:
         self.forces.update(forces)
 
 
-    def Member_Lengths(self, element, nodes, elements):
+    def __Member_Lengths(self, element, nodes, elements):
         from_point = elements[element][0]
         to_point = elements[element][1]
         from_node = nodes[from_point]
@@ -518,7 +540,7 @@ class Frame_2D:
         return L
 
 
-    def Assemble_Stiffness_Matrix(self, element, areas, nodes, elements, elasticities, inertias):
+    def __Assemble_Stiffness_Matrix(self, element, areas, nodes, elements, elasticities, inertias):
         from_point = elements[element][0]
         to_point = elements[element][1]
         from_node = nodes[from_point]
@@ -556,13 +578,13 @@ class Frame_2D:
         return K
 
 
-    def Assemble_Global_Stiffness(self, K, k, i, j):
+    def __Assemble_Global_Stiffness(self, K, k, i, j):
         dofs = [3*i-3, 3*i-2, 3*i-1, 3*j-3, 3*j-2, 3*j-1]
         K[np.ix_(dofs,dofs)] += k
         return K
 
 
-    def Support_Vector(self, restrained_dofs, nodes):
+    def __Support_Vector(self, restrained_dofs, nodes):
         dofs = np.zeros([3 * len(nodes)])
 
         for dof in restrained_dofs:
@@ -579,7 +601,7 @@ class Frame_2D:
         return support_vector
 
 
-    def Apply_Boundary_Conditions(self, support_vector, K_global):
+    def __Apply_Boundary_Conditions(self, support_vector, K_global):
         dofs = []
 
         for j in support_vector:
@@ -590,7 +612,7 @@ class Frame_2D:
         return k_new
 
 
-    def Assemble_Force_Vector(self, forces, support_vector, nodes):
+    def __Assemble_Force_Vector(self, forces, support_vector, nodes):
         # Create force vector
         f = np.zeros([3 * len(nodes)])
 
@@ -612,7 +634,7 @@ class Frame_2D:
         return f_new
 
 
-    def Frame_Global_Displacement(self, displacements, Support_Vector, nodes):
+    def __Frame_Global_Displacement(self, displacements, Support_Vector, nodes):
         # Create New Support Vector in python indexing
         support_vector_new = [x - 1 for x in Support_Vector]
 
@@ -633,11 +655,11 @@ class Frame_2D:
         return displacement_vector
 
 
-    def Solve_Reactions(self, K_global, displacement_vector):
+    def __Solve_Reactions(self, K_global, displacement_vector):
         return np.round(K_global.dot(displacement_vector),5)
 
 
-    def Element_Displacement(self, element_number, global_displacement, elements):
+    def __Element_Displacement(self, element_number, global_displacement, elements):
         fromNode = elements[element_number][0]
         toNode = elements[element_number][1]
 
@@ -654,7 +676,7 @@ class Frame_2D:
         return elem_displacements
 
 
-    def Solve_Member_Force(self, element, element_displacements, areas, nodes, elements, elasticities, inertias):
+    def __Solve_Member_Force(self, element, element_displacements, areas, nodes, elements, elasticities, inertias):
         from_point = elements[element][0]
         to_point = elements[element][1]
         from_node = nodes[from_point]
@@ -692,7 +714,7 @@ class Frame_2D:
         member_force = k.dot(T).dot(u)
         return member_force
 
-    def Displacements(self, displacements):
+    def __Displacements(self, displacements):
 
         displacements = {key + 1: displacements[key] for (key, _) in enumerate(displacements + 1)}
 
@@ -739,53 +761,53 @@ class Frame_2D:
         member_lengths = []
 
         for element in elements:
-            L = self.Member_Lengths(element, nodes, elements)
+            L = self.__Member_Lengths(element, nodes, elements)
             member_lengths.append(L)
 
         # Step 2: Assemble Stiffness Matrix for All members
         k_elems = []
 
         for element in elements:
-            k_elems.append(self.Assemble_Stiffness_Matrix(element, areas, nodes, elements, elasticities, inertias))
+            k_elems.append(self.__Assemble_Stiffness_Matrix(element, areas, nodes, elements, elasticities, inertias))
 
         # Step 3: Assemble Global Stiffness Matrix
         K_global = np.zeros([3*len(nodes), 3*len(nodes)])
 
         for i, _ in enumerate(k_elems):
-            K_global = self.Assemble_Global_Stiffness(K_global, k_elems[i], elements[i+1][0], elements[i+1][1])
+            K_global = self.__Assemble_Global_Stiffness(K_global, k_elems[i], elements[i+1][0], elements[i+1][1])
 
         # Step 4: Apply Boundary conditions to reduce the Global Stiffness Matrix 
-        Support_Vector = self.Support_Vector(supports, nodes)
-        K_new = self.Apply_Boundary_Conditions(Support_Vector, K_global)
+        Support_Vector = self.__Support_Vector(supports, nodes)
+        K_new = self.__Apply_Boundary_Conditions(Support_Vector, K_global)
 
         # Step 5: Reduce Force Vector
-        f_new = self.Assemble_Force_Vector(forces, Support_Vector, nodes)
+        f_new = self.__Assemble_Force_Vector(forces, Support_Vector, nodes)
 
         # Step 6: Solve for Displacement
         displacements = np.linalg.inv(K_new).dot(f_new.transpose())
 
         # Step 7: Create Global Displacement Vector
-        global_displacements = self.Frame_Global_Displacement(displacements, Support_Vector, nodes)
+        global_displacements = self.__Frame_Global_Displacement(displacements, Support_Vector, nodes)
 
         # Step 8: Solve for Reactions 
-        reactions = self.Solve_Reactions(K_global, global_displacements)
+        reactions = self.__Solve_Reactions(K_global, global_displacements)
 
         # Step 9: Solve Member Displacements
         element_displacements = []
 
         for element in elements:
-            element_displacements.append(self.Element_Displacement(element, global_displacements, elements))
+            element_displacements.append(self.__Element_Displacement(element, global_displacements, elements))
 
         # Step 10A: Solve Member Forces
         solved_member_forces = []
 
         for element in elements:
-            solved_member_forces.append(self.Solve_Member_Force(element, element_displacements, areas, nodes, elements, elasticities, inertias))
+            solved_member_forces.append(self.__Solve_Member_Force(element, element_displacements, areas, nodes, elements, elasticities, inertias))
         solved_member_forces = {key: solved_member_forces[key-1] for key in elements}
 
 
         # Storing of Variables lists
-        self.displacements_ = self.Displacements(global_displacements)
+        self.displacements_ = self.__Displacements(global_displacements)
         self.reactions_ = self.__Reactions(reactions, supports)
         self.K_global_ = K_global
 
@@ -806,13 +828,13 @@ class Frame_2D:
         self.local_member_forces_solved_ = new_member_forces_dict
 
         # Step 11: Update Local Member Forces to its Member Class
-        self.Update_Member_Local_Forces()
+        self.__Update_Member_Local_Forces()
     
-    def Update_Member_Local_Forces(self):
+    def __Update_Member_Local_Forces(self):
         for element, member in enumerate(self.members_list):
-            member.Add_Axial_At_Left_Support(self.solved_member_forces[element + 1][0])
-            member.Add_Shear_At_Left_Support(self.solved_member_forces[element + 1][1])
-            member.Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
+            member.Reaction_Add_Axial_At_Left_Support(self.solved_member_forces[element + 1][0])
+            member.Reaction_Add_Shear_At_Left_Support(self.solved_member_forces[element + 1][1])
+            member.Reaction_Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
 
 
     def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True):
