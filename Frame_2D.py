@@ -11,12 +11,14 @@ print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is po
 
 
 class Member_2D:
-    def __init__(self, member_number, area, elasticity, inertia, nodes = {}):
+    def __init__(self, member_number, area, elasticity, inertia, nodes = {}, moment_release = [0,0]):
         self.member_number = member_number
         self.area = area
         self.inertia = inertia
-        self.elasticity = elasticity        
-
+        self.elasticity = elasticity
+        self.moment_release_left = moment_release[0]
+        self.moment_release_right = moment_release[1]
+        
         # Check if nodes dictionary is not empty
         if nodes:
             self.nodes = nodes
@@ -145,29 +147,52 @@ class Member_2D:
         end_moment = -P * (L-a) * a**2 / L**2
         beginning_shear = P * (L-a) / L
         end_shear = P * a / L
-        self.forces[self.node_list[0]][2] += beginning_moment
-        self.forces[self.node_list[1]][2] += end_moment
-        self.forces[self.node_list[0]][1] += - beginning_shear
-        self.forces[self.node_list[1]][1] += - end_shear
+
+        if self.moment_release_left == 1 and self.moment_release_right == 0:
+            beginning_shear = (beginning_shear - 3 / (2*L) * beginning_moment)
+            end_shear = (end_shear + 3 / (2*L) * beginning_moment)
+            end_moment = end_moment - 1 / 2 * beginning_moment
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[1]][2] += end_moment
+        elif self.moment_release_left == 0 and self.moment_release_right == 1:
+            beginning_shear = (beginning_shear - 3 / (2*L) * end_moment)
+            end_shear = (end_shear + 3 / (2*L) * end_moment)
+            beginning_moment = beginning_moment - 1 / 2 * end_moment
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[0]][2] += beginning_moment
+        elif self.moment_release_right == 1 and self.moment_release_right == 1:
+            beginning_shear = (beginning_shear - 1 / L * (beginning_moment + end_moment))
+            end_shear = (end_shear + 1 / L * (beginning_moment + end_moment))
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+        else:
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[0]][2] += beginning_moment
+            self.forces[self.node_list[1]][2] += end_moment
 
         # Shear Values
         shear_values = self.x_array.copy()
         for index, shear_value in enumerate(shear_values):
             if shear_value < a:
-                shear_values[index] = P * (L-a) / L
+                shear_values[index] = beginning_shear
             else:
-                shear_values[index] = P * (L-a) / L - P
+                shear_values[index] = beginning_shear - P
 
         self.shear += shear_values
 
         # Moment Values
+        if self.moment_release_left == 1:
+            beginning_moment = 0
+
         moment_values = self.x_array.copy()
         for index, moment_value in enumerate(moment_values):
             if moment_value < a:
-                moment_values[index] = P * (L-a) / L * moment_value
+                moment_values[index] = beginning_moment - beginning_shear * moment_value
             else:
-                moment_values[index] = P * (L-a) / L * moment_value - P * (moment_value - a)
-
+                moment_values[index] = beginning_moment - beginning_shear * moment_value + P * (moment_value - a)
         self.moment += moment_values        
 
 
@@ -177,15 +202,40 @@ class Member_2D:
         end_moment = -w * L**2 / 12
         beginning_shear = w * L / 2
         end_shear = w * L / 2
-        self.forces[self.node_list[0]][2] += beginning_moment
-        self.forces[self.node_list[1]][2] += end_moment
-        self.forces[self.node_list[0]][1] += - beginning_shear
-        self.forces[self.node_list[1]][1] += - end_shear
-
+        
+        if self.moment_release_left == 1 and self.moment_release_right == 0:
+            beginning_shear = (beginning_shear - 3 / (2*L) * beginning_moment)
+            end_shear = (end_shear + 3 / (2*L) * beginning_moment)
+            end_moment = end_moment - 1 / 2 * beginning_moment
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[1]][2] += end_moment
+        elif self.moment_release_left == 0 and self.moment_release_right == 1:
+            beginning_shear = (beginning_shear - 3 / (2*L) * end_moment)
+            end_shear = (end_shear + 3 / (2*L) * end_moment)
+            beginning_moment = beginning_moment - 1 / 2 * end_moment
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[0]][2] += beginning_moment
+        elif self.moment_release_right == 1 and self.moment_release_right == 1:
+            beginning_shear = (beginning_shear - 1 / L * (beginning_moment + end_moment))
+            end_shear = (end_shear + 1 / L * (beginning_moment + end_moment))
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+        else:
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[0]][2] += beginning_moment
+            self.forces[self.node_list[1]][2] += end_moment
+        
+        # Shear Values
         shear_values = self.x_array.copy()
         for index, shear_value in enumerate(shear_values):
             shear_values[index] = beginning_shear - w * shear_value
         
+        # Moment Values
+        if self.moment_release_left == 1:
+            beginning_moment = 0
         moment_values = self.x_array.copy()
         for index, moment_value in enumerate(moment_values):
             moment_values[index] = beginning_moment - beginning_shear * moment_value + w * moment_value**2 / 2
@@ -199,9 +249,23 @@ class Member_2D:
         b = L - a
         beginning_moment = M * b * (2*a-b) / L**2
         end_moment = M * a * (2*b-a) / L**2
-        self.forces[self.node_list[0]][2] += beginning_moment
-        self.forces[self.node_list[1]][2] += end_moment
 
+        if self.moment_release_left == 1 and self.moment_release_right == 0:
+            end_moment = end_moment - 1 / 2 * beginning_moment
+            self.forces[self.node_list[1]][2] += end_moment
+        elif self.moment_release_left == 0 and self.moment_release_right == 1:
+            beginning_moment = beginning_moment - 1 / 2 * end_moment
+            self.forces[self.node_list[0]][2] += beginning_moment
+        elif self.moment_release_right == 1 and self.moment_release_right == 1:
+            pass
+        else:
+            self.forces[self.node_list[0]][2] += beginning_moment
+            self.forces[self.node_list[1]][2] += end_moment
+
+        
+        # Moment Values
+        if self.moment_release_left == 1:
+            beginning_moment = 0
         moment_values = self.x_array.copy()
         for index, _ in enumerate(moment_values):
             moment_values[index] = beginning_moment
@@ -214,32 +278,55 @@ class Member_2D:
         end_moment = -w * L**2 / 12 * (6*(a/L)**2 - 8*(a/L)**3 + 3*(a/L)**4)
         beginning_shear = w * (b-a) / L * ((b-a)/2 + (L-b))
         end_shear = w * (b-a) / L * ((b-a)/2 + a)
-        self.forces[self.node_list[0]][2] += beginning_moment
-        self.forces[self.node_list[1]][2] += end_moment
-        self.forces[self.node_list[0]][1] += - beginning_shear
-        self.forces[self.node_list[1]][1] += - end_shear
+
+        if self.moment_release_left == 1 and self.moment_release_right == 0:
+            beginning_shear = (beginning_shear - 3 / (2*L) * beginning_moment)
+            end_shear = (end_shear + 3 / (2*L) * beginning_moment)
+            end_moment = end_moment - 1 / 2 * beginning_moment
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[1]][2] += end_moment
+        elif self.moment_release_left == 0 and self.moment_release_right == 1:
+            beginning_shear = (beginning_shear - 3 / (2*L) * end_moment)
+            end_shear = (end_shear + 3 / (2*L) * end_moment)
+            beginning_moment = beginning_moment - 1 / 2 * end_moment
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[0]][2] += beginning_moment
+        elif self.moment_release_right == 1 and self.moment_release_right == 1:
+            beginning_shear = (beginning_shear - 1 / L * (beginning_moment + end_moment))
+            end_shear = (end_shear + 1 / L * (beginning_moment + end_moment))
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+        else:
+            self.forces[self.node_list[0]][1] += - beginning_shear
+            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[0]][2] += beginning_moment
+            self.forces[self.node_list[1]][2] += end_moment
 
         # Shear Values
         shear_values = self.x_array.copy()
         for index, shear_value in enumerate(shear_values):
             if shear_value < a:
-                shear_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b)))
+                shear_values[index] = beginning_shear
             elif shear_value >= a and shear_value < b :
-                shear_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) - w*(shear_value - a)
+                shear_values[index] = beginning_shear - w*(shear_value - a)
             else:
-                shear_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) - w*(b - a)
+                shear_values[index] = beginning_shear - w*(b - a)
 
         self.shear += shear_values
 
         # Moment Values
+        if self.moment_release_left == 1:
+            beginning_moment = 0
         moment_values = self.x_array.copy()
         for index, moment_value in enumerate(moment_values):
             if moment_value < a:
-                moment_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) * moment_value
+                moment_values[index] = beginning_shear * moment_value
             elif moment_value >= a and moment_value < b :
-                moment_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) * moment_value - w*(moment_value - a)**2 / 2
+                moment_values[index] = beginning_shear * moment_value - w*(moment_value - a)**2 / 2
             else:
-                moment_values[index] = (w * (b-a) / L * ((b-a)/2 + (L-b))) * moment_value - w * (b - a) * ((b-a)/2 + (moment_value - b))
+                moment_values[index] = beginning_shear * moment_value - w * (b - a) * ((b-a)/2 + (moment_value - b))
 
         self.moment += moment_values
 
@@ -405,15 +492,88 @@ class Member_2D:
         self.shear_at_left = self.shear[0]
         self.shear_at_right = self.shear[-1]
         
-        print("Maximum Moment: {}".format(self.moment_max))
-        print("Minimum Moment: {}".format(self.moment_min))
-        print("Moment at left end: {}".format(self.moment_at_left))
-        print("Moment at right end: {}".format(self.moment_at_right))
-
-        print("Maximum Shear: {}".format(self.shear_max))
+        print("At Left End:")
+        print("Axial: {}".format(self.axial[0]))
+        print("Shear: {}".format(self.shear_at_left))
+        print("Moment: {}".format(self.moment_at_left))
+        print()
+        print("At Right End:")
+        print("Axial: {}".format(self.axial[-1]))
+        print("Shear: {}".format(self.shear_at_right))
+        print("Moment: {}".format(self.moment_at_right))
+        print()
+        print("Minimum and Maximum")
         print("Minimum Shear: {}".format(self.shear_min))
-        print("Shear at left end: {}".format(self.shear_at_left))
-        print("Shear at right end: {}".format(self.shear_at_right))
+        print("Maximum Shear: {}".format(self.shear_max))
+        print("Minimum Moment: {}".format(self.moment_min))
+        print("Maximum Moment: {}".format(self.moment_max))
+
+
+    def Assemble_Stiffness_Matrix(self):
+            moment_releases_left = self.moment_release_left
+            moment_releases_right = self.moment_release_right
+            
+            nodes = self.nodes
+
+            coordinates = []
+            for node in nodes:
+                coordinates.append(nodes[node])
+            x1 = coordinates[0][0]
+            y1 = coordinates[0][1]
+            x2 = coordinates[1][0]
+            y2 = coordinates[1][1]
+
+            L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+            c = (x2 - x1)/L
+            s = (y2 - y1)/L
+
+            A = self.area
+            I = self.inertia
+            E = self.elasticity
+            
+
+            if moment_releases_left == 1 and moment_releases_right == 1:
+                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                            [0,            0,      0,         0,     0,      0],
+                                            [0,            0,      0,         0,     0,      0],
+                                            [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
+                                            [0,            0,      0,         0,     0,      0],
+                                            [0,            0,      0,         0,     0,      0]])
+            
+            elif moment_releases_left == 1 and moment_releases_right == 0:
+                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
+                                            [0,          3,        0,         0,   -3,    3*L],
+                                            [0,          0,        0,         0,    0,      0],
+                                            [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
+                                            [0,         -3,        0,         0,    3,    -3*L],
+                                            [0,         3*L,       0,         0,  -3*L, 3*L**2]])
+            
+            elif moment_releases_left == 0 and moment_releases_right == 1:
+                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
+                                            [0,            3,    3*L,         0,   -3,    0],
+                                            [0,          3*L, 3*L**2,         0, -3*L,    0],
+                                            [-A*L**2/I,   0,       0,  A*L**2/I,    0,    0],
+                                            [0,          -3,    -3*L,         0,    3,    0],
+                                            [0,           0,       0,         0,    0,    0]])
+
+            else:
+                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                            [0,          12,    6*L,         0,   -12,    6*L],
+                                            [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
+                                            [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
+                                            [0,         -12,   -6*L,         0,    12,   -6*L],
+                                            [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
+            
+            T = np.array([[c, s, 0 , 0, 0, 0],
+                        [-s, c, 0, 0, 0, 0],
+                        [0, 0, 1, 0, 0, 0],
+                        [0, 0, 0, c, s, 0],
+                        [0, 0, 0, -s, c, 0],
+                        [0, 0, 0, 0, 0, 1]])
+
+            K = np.transpose(T).dot(k).dot(T)
+
+            return K
 
 
 class Frame_2D:
@@ -489,7 +649,7 @@ class Frame_2D:
 
         __local_member_forces_dict = {key: [0,0,0,0,0,0] for key in range(1,len(local_member_forces)+1)}
         for i, force in enumerate(local_member_forces):
-            __local_member_forces_dict.update({i+1: np.array([force[0][0], -force[0][1], force[0][2], force[1][1], -force[1][1], force[1][2]])})
+            __local_member_forces_dict.update({i+1: np.array([force[0][0], -force[0][1], force[0][2], force[1][0], -force[1][1], force[1][2]])})
         
         # Compile all load forces
         forces = {key: [0,0,0] for key in nodes}
@@ -505,6 +665,11 @@ class Frame_2D:
 
         forces = {k: v for k, v in sorted(forces.items(), key=lambda item: item[0])}
 
+        # Compile all member releases
+        member_moment_releases = {}
+        for member in members_list:
+            member_moment_releases.update({member.member_number: [member.moment_release_left, member.moment_release_right]})
+
         self.nodes = nodes
         self.elements = elements
         self.forces = forces
@@ -513,6 +678,7 @@ class Frame_2D:
         self.inertias = inertias
         self.local_member_forces = __local_member_forces_dict
         self.members_list = members_list
+        self.member_moment_releases = member_moment_releases
 
     
     def Add_Load_Node(self, nodal_load):
@@ -541,6 +707,9 @@ class Frame_2D:
 
 
     def __Assemble_Stiffness_Matrix(self, element, areas, nodes, elements, elasticities, inertias):
+        moment_releases_left = self.member_moment_releases[element][0]
+        moment_releases_right = self.member_moment_releases[element][1]
+        
         from_point = elements[element][0]
         to_point = elements[element][1]
         from_node = nodes[from_point]
@@ -558,14 +727,39 @@ class Frame_2D:
         A = areas[element]
         I = inertias[element]
         E = elasticities[element]
-        
-        k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-                                    [0,          12,    6*L,         0,   -12,    6*L],
-                                    [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
-                                    [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
-                                    [0,         -12,   -6*L,         0,    12,   -6*L],
-                                    [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
 
+        if moment_releases_left == 1 and moment_releases_right == 1:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [0,            0,      0,         0,     0,      0]])
+        
+        elif moment_releases_left == 1 and moment_releases_right == 0:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
+                                        [0,          3,        0,         0,   -3,    3*L],
+                                        [0,          0,        0,         0,    0,      0],
+                                        [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
+                                        [0,         -3,        0,         0,    3,    -3*L],
+                                        [0,         3*L,       0,         0,  -3*L, 3*L**2]])
+        
+        elif moment_releases_left == 0 and moment_releases_right == 1:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
+                                        [0,            3,    3*L,         0,   -3,    0],
+                                        [0,          3*L, 3*L**2,         0, -3*L,    0],
+                                        [-A*L**2/I,   0,       0,  A*L**2/I,    0,    0],
+                                        [0,          -3,    -3*L,         0,    3,    0],
+                                        [0,           0,       0,         0,    0,    0]])
+
+        else:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                        [0,          12,    6*L,         0,   -12,    6*L],
+                                        [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
+                                        [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
+                                        [0,         -12,   -6*L,         0,    12,   -6*L],
+                                        [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
+        
         T = np.array([[c, s, 0 , 0, 0, 0],
                     [-s, c, 0, 0, 0, 0],
                     [0, 0, 1, 0, 0, 0],
@@ -677,6 +871,9 @@ class Frame_2D:
 
 
     def __Solve_Member_Force(self, element, element_displacements, areas, nodes, elements, elasticities, inertias):
+        moment_releases_left = self.member_moment_releases[element][0]
+        moment_releases_right = self.member_moment_releases[element][1]
+
         from_point = elements[element][0]
         to_point = elements[element][1]
         from_node = nodes[from_point]
@@ -696,19 +893,46 @@ class Frame_2D:
         E = elasticities[element]
         u = element_displacements[element-1]
         
-        k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-                                    [0,          12,    6*L,         0,   -12,    6*L],
-                                    [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
-                                    [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
-                                    [0,         -12,   -6*L,         0,    12,   -6*L],
-                                    [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
 
+        if moment_releases_left == 1 and moment_releases_right == 1:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [0,            0,      0,         0,     0,      0]])
+        
+        elif moment_releases_left == 1 and moment_releases_right == 0:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
+                                        [0,          3,        0,         0,   -3,    3*L],
+                                        [0,          0,        0,         0,    0,      0],
+                                        [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
+                                        [0,         -3,        0,         0,    3,    -3*L],
+                                        [0,         3*L,       0,         0,  -3*L, 3*L**2]])
+        
+        elif moment_releases_left == 0 and moment_releases_right == 1:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
+                                        [0,            3,    3*L,         0,   -3,    0],
+                                        [0,          3*L, 3*L**2,         0, -3*L,    0],
+                                        [-A*L**2/I,   0,       0,  A*L**2/I,    0,    0],
+                                        [0,          -3,    -3*L,         0,    3,    0],
+                                        [0,           0,       0,         0,    0,    0]])
+
+        else:
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                        [0,          12,    6*L,         0,   -12,    6*L],
+                                        [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
+                                        [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
+                                        [0,         -12,   -6*L,         0,    12,   -6*L],
+                                        [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
+        
         T = np.array([[c, s, 0 , 0, 0, 0],
                     [-s, c, 0, 0, 0, 0],
                     [0, 0, 1, 0, 0, 0],
                     [0, 0, 0, c, s, 0],
                     [0, 0, 0, -s, c, 0],
                     [0, 0, 0, 0, 0, 1]])
+
 
 
         member_force = k.dot(T).dot(u)
@@ -784,13 +1008,26 @@ class Frame_2D:
         f_new = self.__Assemble_Force_Vector(forces, Support_Vector, nodes)
 
         # Step 6: Solve for Displacement
+        # Remove all columns and rows with all 0 for stiffness matrix and forces
+        zero_index = np.where(~K_new.any(axis=0))[0]
+        K_new = np.delete(K_new, obj = zero_index, axis = 0)
+        K_new = np.delete(K_new, obj = zero_index, axis = 1)
+        f_new = np.delete(f_new, obj = zero_index, axis = 0)
+
         displacements = np.linalg.inv(K_new).dot(f_new.transpose())
+        displacements = np.insert(displacements, zero_index, 0)
 
         # Step 7: Create Global Displacement Vector
         global_displacements = self.__Frame_Global_Displacement(displacements, Support_Vector, nodes)
 
         # Step 8: Solve for Reactions 
-        reactions = self.__Solve_Reactions(K_global, global_displacements)
+        forces_for_reactions = []
+        for force in self.forces:
+            for i in range(3):
+                forces_for_reactions.append(self.forces[force][i])
+
+        forces_for_reactions = np.array(forces_for_reactions)
+        reactions = self.__Solve_Reactions(K_global, global_displacements) - forces_for_reactions
 
         # Step 9: Solve Member Displacements
         element_displacements = []
@@ -808,8 +1045,12 @@ class Frame_2D:
 
         # Storing of Variables lists
         self.displacements_ = self.__Displacements(global_displacements)
+        self.displacements_array_ = global_displacements
         self.reactions_ = self.__Reactions(reactions, supports)
         self.K_global_ = K_global
+        self.K_reduced_ = K_new
+        self.F_reduced_ = f_new
+        self.element_displacements_ = element_displacements
 
         # Member Lengths
         lengths = {}
@@ -861,6 +1102,13 @@ class Frame_2D:
         elements = self.elements
         supports = self.supports
         forces = self.forces      
+        areas = self.areas
+
+        average_area = []
+        for area in areas:
+            average_area.append(areas[area])
+        average_area = np.array(average_area)
+        average_area = np.average(average_area)
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
@@ -875,7 +1123,7 @@ class Frame_2D:
             y1 = from_point[1]
             x2 = to_point[0]
             y2 = to_point[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area)
 
         # plotting supports
         for support in supports:
