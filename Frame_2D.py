@@ -8,6 +8,7 @@ print("For adding Local Member Load: Axial Load is always parallel to the member
 print("For adding Local Member Load: Loading is always point downward towards the frame element and is considered positive")
 print("Member Forces: at left end to right end (based on local axis) - [Axial, Shear, Bending]. Local Axis is governed for positive/negative values. Right is positive, upward is positive, counterclockwise is positive")
 print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is positive, vertical - upward is positive, moment - counterclockwise is positive")
+print("Frame Moment Release: All elements that is connected to the same release node should be released at node end of the element")
 
 
 class Member_2D:
@@ -47,6 +48,53 @@ class Member_2D:
             self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
             self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
             self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
+
+            # Plotting Member Releases
+            self.Release_Node_Coordinates()
+
+    def Release_Node_Coordinates(self):
+        nodes = self.nodes
+        moment_release = [self.moment_release_left, self.moment_release_right]
+
+        nodes_coordinate_List = []
+
+        for node in nodes:
+            nodes_coordinate_List.append(nodes[node].copy())
+
+        self.release_node_coordinates = []
+
+        for i, _ in enumerate(moment_release):
+            if moment_release[i] == 1:
+                self.release_node_coordinates.append(nodes_coordinate_List[i])
+
+        self.release_node_coordinates = self.release_node_coordinates
+
+        # compute length of member
+        coordinates = []
+        for node in nodes:
+            coordinates.append(nodes[node])
+        x1 = coordinates[0][0]
+        y1 = coordinates[0][1]
+        x2 = coordinates[1][0]
+        y2 = coordinates[1][1]
+        self.length = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        c = (x2 - x1) / self.length
+        s = (y2 - y1) / self.length
+
+        node_vert = self.length * 0.1 * s
+        node_hor = self.length * 0.1 * c
+
+        if moment_release[0] == 1 and moment_release[1] == 0:
+            self.release_node_coordinates[0][0] += node_hor
+            self.release_node_coordinates[0][1] += node_vert
+        elif moment_release[0] == 0 and moment_release[1] == 1:
+            self.release_node_coordinates[0][0] -= node_hor
+            self.release_node_coordinates[0][1] -= node_vert
+        elif moment_release[0] == 1 and moment_release[1] == 1:
+            self.release_node_coordinates[0][0] += node_hor
+            self.release_node_coordinates[0][1] += node_vert
+            self.release_node_coordinates[1][0] -= node_hor
+            self.release_node_coordinates[1][1] -= node_vert
             
 
     def Add_Nodes_To_Element(self, element, nodes):
@@ -81,6 +129,8 @@ class Member_2D:
         self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
         self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
         self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
+
+        self.Release_Node_Coordinates()
 
 
     def Add_Load_Axial_Uniform(self, w):
@@ -670,6 +720,12 @@ class Frame_2D:
         for member in members_list:
             member_moment_releases.update({member.member_number: [member.moment_release_left, member.moment_release_right]})
 
+        # Compile all member release coordinates for plotting
+        moment_releases_coordinates = []
+        for member in members_list:
+            for m in member.release_node_coordinates:
+                moment_releases_coordinates.append(m)
+
         self.nodes = nodes
         self.elements = elements
         self.forces = forces
@@ -679,6 +735,7 @@ class Frame_2D:
         self.local_member_forces = __local_member_forces_dict
         self.members_list = members_list
         self.member_moment_releases = member_moment_releases
+        self.moment_releases_coordinates = moment_releases_coordinates
 
     
     def Add_Load_Node(self, nodal_load):
@@ -1078,7 +1135,7 @@ class Frame_2D:
             member.Reaction_Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
 
 
-    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True):
+    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True, node_size = 10):
         '''
         Draws the Truss as initialized by the class
         
@@ -1103,6 +1160,7 @@ class Frame_2D:
         supports = self.supports
         forces = self.forces      
         areas = self.areas
+        moment_releases_coordinates = self.moment_releases_coordinates
 
         average_area = []
         for area in areas:
@@ -1123,7 +1181,7 @@ class Frame_2D:
             y1 = from_point[1]
             x2 = to_point[0]
             y2 = to_point[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area)
+            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area, markersize = node_size)
 
         # plotting supports
         for support in supports:
@@ -1207,6 +1265,10 @@ class Frame_2D:
             else:
                 pass
             
+        # Plot Member Release Coordinates
+        for member_release in moment_releases_coordinates:
+            plt.scatter(member_release[0], member_release[1], color = 'lime', s = node_size * 10, zorder = 20)
+
         plt.show()
 
 
