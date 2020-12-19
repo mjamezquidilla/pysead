@@ -907,7 +907,7 @@ class Frame_2D:
 
 
     def __Solve_Reactions(self, K_global, displacement_vector):
-        return np.round(K_global.dot(displacement_vector),5)
+        return (K_global.dot(displacement_vector))
 
 
     def __Element_Displacement(self, element_number, global_displacement, elements):
@@ -1231,13 +1231,13 @@ class Frame_2D:
                 plt.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_x, ((x - length_of_arrow), y + 0.1), c='red')
+                plt.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
                 plt.scatter(x - length_of_arrow, y, c='white')
             elif f_x < 0:
                 plt.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_x, ((x + length_of_arrow), y + 0.1), c='red')
+                plt.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
                 plt.scatter(x + length_of_arrow,y, c='white')
             else:
                 pass
@@ -1254,13 +1254,13 @@ class Frame_2D:
                 plt.arrow(x, y - length_of_arrow, 0, length_of_arrow,
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_y, (x + 0.1, (y - length_of_arrow)), c='red') 
+                plt.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
                 plt.scatter(x,y - length_of_arrow, c='white')
             elif f_y < 0:
                 plt.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_y, (x + 0.1, (y + length_of_arrow)), c='red')
+                plt.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
                 plt.scatter(x,y + length_of_arrow, c='white')
             else:
                 pass
