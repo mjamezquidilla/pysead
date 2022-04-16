@@ -234,6 +234,16 @@ class Truss_3D:
 
         return displacements_dict
 
+    def __Reactions(self, reactions, supports):
+
+        forces_dict = {key + 1: reactions[key] for (key, _) in enumerate(reactions + 1)}
+
+        reactions_dict = {}
+        for support in supports:
+            reactions_dict.update({support: [forces_dict[3 * support - 2], forces_dict[3 * support-1], forces_dict[3 * support]]})
+
+        return reactions_dict
+
 
     def Solve(self):
         '''
@@ -340,7 +350,7 @@ class Truss_3D:
         # Variable lists
 
         self.displacements_ = self.__Displacements(np.round(global_displacements, 5))
-        self.reactions_ = reactions
+        self.reactions_ = self.__Reactions(reactions, supports)
         self.member_forces_ = member_forces
         self.member_stresses_ = member_stresses
         self.member_forces_components_ = member_forces_components
@@ -355,7 +365,7 @@ class Truss_3D:
 
         print("Positive Stress/Force is in Tension, Negative Stress/Force is in Compression")
 
-    def Draw_Truss_Setup(self, figure_size = [15,15]):
+    def Draw_Truss_Setup(self, figure_size = [7,7]):
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
@@ -364,7 +374,9 @@ class Truss_3D:
         fig = plt.figure(figsize=figure_size)
         ax = fig.add_subplot(111, projection = '3d')
 
-        offset = 10
+        self.__scale_plot(ax)
+
+        offset = 0.01
 
         # Plotting Members
         for element in elements:
@@ -494,13 +506,17 @@ class Truss_3D:
         plt.show()
 
 
-    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = [15,15]):
+    def Draw_Truss_Displacements(self, magnification_factor = 100, figure_size = [7,7]):
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
         
         fig = plt.figure(figsize=figure_size)
         ax = fig.add_subplot(111, projection = '3d')
+
+        self.__scale_plot(ax)
+
+        offset = 0.01
 
         # Plotting Old Members
         for element in elements:
@@ -565,4 +581,38 @@ class Truss_3D:
             else: 
                 ax.scatter(x, y, z, marker = 'o', s = 200, c='y', zorder = 2)
 
+        # plotting node labels
+        for node in nodes:
+            x = nodes[node][0]
+            y = nodes[node][1]
+            z = nodes[node][2]    
+            ax.text(x + offset,y + offset,z + offset, node, zorder = 10, c='black')
+
         plt.show()
+
+    def __scale_plot(self, ax):
+        nodes = self.nodes
+
+        X = []
+        Y = []
+        Z = []
+
+
+        for i in nodes:
+            X.append(nodes[i][0])
+            Y.append(nodes[i][1])
+            Z.append(nodes[i][2])
+        
+        X = np.asarray(X)
+        Y = np.asarray(Y)
+        Z = np.asarray(Z)
+
+        max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max() / 2.0
+        mid_x = (X.max()+X.min()) * 0.5
+        mid_y = (Y.max()+Y.min()) * 0.5
+        mid_z = (Z.max()+Z.min()) * 0.5
+        ax.set_xlim(mid_x - max_range, mid_x + max_range)
+        ax.set_ylim(mid_y - max_range, mid_y + max_range)
+        ax.set_zlim(mid_z - max_range, mid_z + max_range)
+        
+        
