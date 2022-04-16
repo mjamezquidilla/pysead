@@ -395,6 +395,9 @@ class Truss_2D:
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
+
+        ax = plt.gca()
+        ax.set_aspect(aspect='equal')
        
         # plotting nodes and members
         for element in dict(elements):
@@ -403,7 +406,7 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
 
         # plotting supports
         for support in supports:
@@ -415,17 +418,17 @@ class Truss_2D:
             y = nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                plt.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
             elif support_x == 0 and support_y == 1:
-                plt.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
             else: 
-                plt.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
     
         # plotting node labels
         # offset = 0.12
         
         for node in nodes:
-            plt.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
             
         # plotting member labels
         for element in elements:
@@ -437,7 +440,7 @@ class Truss_2D:
             middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
-            plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
             
         # plotting force vectors
         # loop all x-direction forces
@@ -449,17 +452,17 @@ class Truss_2D:
 
             # plot arrow x-direction
             if f_x > 0:
-                plt.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
+                ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_x, ((x - length_of_arrow), y + 0.1), c='red')
-                plt.scatter(x - length_of_arrow, y, c='white')
+                ax.annotate(f_x, ((x - length_of_arrow), y + 0.1), c='red')
+                ax.scatter(x - length_of_arrow, y, c='white')
             elif f_x < 0:
-                plt.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
+                ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_x, ((x + length_of_arrow), y + 0.1), c='red')
-                plt.scatter(x + length_of_arrow,y, c='white')
+                ax.annotate(f_x, ((x + length_of_arrow), y + 0.1), c='red')
+                ax.scatter(x + length_of_arrow,y, c='white')
             else:
                 pass
 
@@ -472,17 +475,17 @@ class Truss_2D:
 
             # plot arrow y-direction
             if f_y > 0:
-                plt.arrow(x, y - length_of_arrow, 0, length_of_arrow,
+                ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_y, (x + 0.1, (y - length_of_arrow)), c='red') 
-                plt.scatter(x,y - length_of_arrow, c='white')
+                ax.annotate(f_y, (x + 0.1, (y - length_of_arrow)), c='red') 
+                ax.scatter(x,y - length_of_arrow, c='white')
             elif f_y < 0:
-                plt.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
+                ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_y, (x + 0.1, (y + length_of_arrow)), c='red')
-                plt.scatter(x,y + length_of_arrow, c='white')
+                ax.annotate(f_y, (x + 0.1, (y + length_of_arrow)), c='red')
+                ax.scatter(x,y + length_of_arrow, c='white')
             else:
                 pass
             
@@ -539,6 +542,8 @@ class Truss_2D:
                 new_nodes.update({node: [x_dist, y_dist]})
 
         plt.figure(figsize = figure_size)
+        ax = plt.gca()
+        ax.set_aspect(aspect='equal')
        
         # Plotting Old nodes
         # plotting nodes and members
@@ -548,7 +553,7 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linestyle = '--', alpha = 0.10, linewidth = linewidth)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linestyle = '--', alpha = 0.10, linewidth = linewidth)
     
         # Plotting New nodes
         # plotting nodes and members
@@ -558,7 +563,7 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
 
         # plotting supports
         for support in supports:
@@ -570,17 +575,17 @@ class Truss_2D:
             y = new_nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                plt.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
             elif support_x == 0 and support_y == 1:
-                plt.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
             else: 
-                plt.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
     
         # plotting node labels
         # offset = 0.12
         
         for node in new_nodes:
-            plt.annotate(node, (new_nodes[node][0]+offset, new_nodes[node][1]+offset), zorder = 10, c='black')
+            ax.annotate(node, (new_nodes[node][0]+offset, new_nodes[node][1]+offset), zorder = 10, c='black')
             
         # plotting member labels
         for element in elements:
@@ -592,7 +597,7 @@ class Truss_2D:
             middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
-            plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
 
         plt.gca().axes.get_xaxis().set_visible(False)
         plt.gca().axes.get_yaxis().set_visible(False)
