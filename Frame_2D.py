@@ -43,7 +43,7 @@ class Member_2D:
                 self.forces.update({node: [0,0,0]})
 
             # Create Shear and Moment numpy arrays
-            division_spacing = 0.2
+            division_spacing = self.length/10
             self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/division_spacing))
             self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
             self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
@@ -383,7 +383,7 @@ class Member_2D:
 
     def Plot_Axial_Diagram(self, figure_size=[10,5]):
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,self.axial)
+        plt.plot(self.x_array,self.axial, marker='o')
         plt.fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
         plt.xlim([0, self.length])
         plt.ylabel('Axial')
@@ -396,7 +396,7 @@ class Member_2D:
     # Plot Shear Diagram
     def Plot_Shear_Diagram(self, figure_size=[10,5]):
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,self.shear)
+        plt.plot(self.x_array,self.shear, marker='o')
         plt.fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
         plt.xlim([0, self.length])
         plt.ylabel('Shear')
@@ -409,7 +409,7 @@ class Member_2D:
     # Plot Moment Diagram
     def Plot_Moment_Diagram(self, figure_size = [10,5]):
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,self.moment)
+        plt.plot(self.x_array,self.moment, marker='o')
         plt.fill_between(self.x_array, 0, self.moment, hatch = '/', alpha = 0.1)
         plt.xlim([0, self.length])
         plt.ylabel('Moment')
@@ -502,8 +502,7 @@ class Member_2D:
         fig.set_figwidth(figure_size[1])
 
         # Plot Axial Diagram
-        axs[0].plot(self.x_array,self.axial)
-        axs[0].plot(self.x_array,self.axial)
+        axs[0].plot(self.x_array,self.axial, marker = 'o')
         axs[0].fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
         axs[0].set_xlim([0, self.length])
         axs[0].set_ylabel('Axial')
@@ -511,8 +510,7 @@ class Member_2D:
         axs[0].set_title('Axial Diagram of Member {}'.format(self.member_number))
 
         # Plot Shear Diagram
-        axs[1].plot(self.x_array,self.shear)
-        axs[1].plot(self.x_array,self.shear)
+        axs[1].plot(self.x_array,self.shear, marker = 'o')
         axs[1].fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
         axs[1].set_xlim([0, self.length])
         axs[1].set_ylabel('Shear')
@@ -520,8 +518,7 @@ class Member_2D:
         axs[1].set_title('Shear Diagram of Member {}'.format(self.member_number))
         
         # Plot Moment Diagram
-        axs[2].plot(self.x_array,self.moment)
-        axs[2].plot(self.x_array,self.moment)
+        axs[2].plot(self.x_array,self.moment, marker = 'o')
         axs[2].fill_between(self.x_array, 0, self.moment, hatch = '/', alpha = 0.1)
         axs[2].set_xlim([0, self.length])
         axs[2].set_ylabel('Moment')
@@ -557,74 +554,6 @@ class Member_2D:
         print("Maximum Shear: {}".format(self.shear_max))
         print("Minimum Moment: {}".format(self.moment_min))
         print("Maximum Moment: {}".format(self.moment_max))
-
-
-    def Assemble_Stiffness_Matrix(self):
-            moment_releases_left = self.moment_release_left
-            moment_releases_right = self.moment_release_right
-            
-            nodes = self.nodes
-
-            coordinates = []
-            for node in nodes:
-                coordinates.append(nodes[node])
-            x1 = coordinates[0][0]
-            y1 = coordinates[0][1]
-            x2 = coordinates[1][0]
-            y2 = coordinates[1][1]
-
-            L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-            c = (x2 - x1)/L
-            s = (y2 - y1)/L
-
-            A = self.area
-            I = self.inertia
-            E = self.elasticity
-            
-
-            if moment_releases_left == 1 and moment_releases_right == 1:
-                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-                                            [0,            0,      0,         0,     0,      0],
-                                            [0,            0,      0,         0,     0,      0],
-                                            [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
-                                            [0,            0,      0,         0,     0,      0],
-                                            [0,            0,      0,         0,     0,      0]])
-            
-            elif moment_releases_left == 1 and moment_releases_right == 0:
-                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
-                                            [0,          3,        0,         0,   -3,    3*L],
-                                            [0,          0,        0,         0,    0,      0],
-                                            [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
-                                            [0,         -3,        0,         0,    3,    -3*L],
-                                            [0,         3*L,       0,         0,  -3*L, 3*L**2]])
-            
-            elif moment_releases_left == 0 and moment_releases_right == 1:
-                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
-                                            [0,            3,    3*L,         0,   -3,    0],
-                                            [0,          3*L, 3*L**2,         0, -3*L,    0],
-                                            [-A*L**2/I,   0,       0,  A*L**2/I,    0,    0],
-                                            [0,          -3,    -3*L,         0,    3,    0],
-                                            [0,           0,       0,         0,    0,    0]])
-
-            else:
-                k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-                                            [0,          12,    6*L,         0,   -12,    6*L],
-                                            [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
-                                            [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
-                                            [0,         -12,   -6*L,         0,    12,   -6*L],
-                                            [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
-            
-            T = np.array([[c, s, 0 , 0, 0, 0],
-                        [-s, c, 0, 0, 0, 0],
-                        [0, 0, 1, 0, 0, 0],
-                        [0, 0, 0, c, s, 0],
-                        [0, 0, 0, -s, c, 0],
-                        [0, 0, 0, 0, 0, 1]])
-
-            K = np.transpose(T).dot(k).dot(T)
-
-            return K
-
 
 class Frame_2D:
     
@@ -1269,6 +1198,7 @@ class Frame_2D:
         for member_release in moment_releases_coordinates:
             plt.scatter(member_release[0], member_release[1], color = 'lime', s = node_size * 10, zorder = 20)
 
+        plt.axis('equal')
         plt.show()
 
 
@@ -1366,6 +1296,7 @@ class Frame_2D:
 
         plt.gca().axes.get_xaxis().set_visible(False)
         plt.gca().axes.get_yaxis().set_visible(False)
+        plt.axis('equal')
         plt.show()
 
     def __Reactions(self, reactions, supports):
