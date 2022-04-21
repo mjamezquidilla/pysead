@@ -50,9 +50,9 @@ class Member_2D:
             self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
 
             # Plotting Member Releases
-            self.Release_Node_Coordinates()
+            self.__Release_Node_Coordinates()
 
-    def Release_Node_Coordinates(self):
+    def __Release_Node_Coordinates(self):
         nodes = self.nodes
         moment_release = [self.moment_release_left, self.moment_release_right]
 
@@ -97,7 +97,7 @@ class Member_2D:
             self.release_node_coordinates[1][1] -= node_vert
             
 
-    def Add_Nodes_To_Element(self, element, nodes):
+    def __Add_Nodes_To_Element(self, element, nodes):
         from_node = element[0]
         to_node = element[1]
         from_point = nodes[from_node]
@@ -130,7 +130,7 @@ class Member_2D:
         self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
         self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
 
-        self.Release_Node_Coordinates()
+        self.__Release_Node_Coordinates()
 
 
     def Add_Load_Axial_Uniform(self, w):
@@ -450,7 +450,7 @@ class Member_2D:
         plt.show()
 
 
-    def Resolve_Forces_into_Components(self):
+    def __Resolve_Forces_into_Components(self):
         # solve for angle
         nodes = self.nodes
 
@@ -501,7 +501,7 @@ class Member_2D:
         self.resolved_forces[self.node_list[1]][2] = - M_2
 
 
-    def Reaction_Add_Shear_At_Left_Support(self, shear):
+    def __Reaction_Add_Shear_At_Left_Support(self, shear):
         shear_values = self.x_array.copy()
         for index, _ in enumerate(shear_values):
             shear_values[index] = shear
@@ -513,14 +513,14 @@ class Member_2D:
         self.moment += moment_values
 
 
-    def Reaction_Add_Moment_At_Left_Support(self, moment):
+    def __Reaction_Add_Moment_At_Left_Support(self, moment):
         moment_values = self.x_array.copy()
         for index, _ in enumerate(moment_values):
             moment_values[index] = moment
         self.moment += moment_values
 
 
-    def Reaction_Add_Axial_At_Left_Support(self, axial):
+    def __Reaction_Add_Axial_At_Left_Support(self, axial):
         axial_values = self.x_array.copy()
         for index, _ in enumerate(axial_values):
             axial_values[index] = axial
