@@ -451,7 +451,7 @@ class Member_2D:
         plt.show()
 
 
-    def __Resolve_Forces_into_Components(self):
+    def Resolve_Forces_into_Components(self):
         # solve for angle
         nodes = self.nodes
 
@@ -502,7 +502,7 @@ class Member_2D:
         self.resolved_forces[self.node_list[1]][2] = - M_2
 
 
-    def __Reaction_Add_Shear_At_Left_Support(self, shear):
+    def Reaction_Add_Shear_At_Left_Support(self, shear):
         shear_values = self.x_array.copy()
         for index, _ in enumerate(shear_values):
             shear_values[index] = shear
@@ -514,14 +514,14 @@ class Member_2D:
         self.moment += moment_values
 
 
-    def __Reaction_Add_Moment_At_Left_Support(self, moment):
+    def Reaction_Add_Moment_At_Left_Support(self, moment):
         moment_values = self.x_array.copy()
         for index, _ in enumerate(moment_values):
             moment_values[index] = moment
         self.moment += moment_values
 
 
-    def __Reaction_Add_Axial_At_Left_Support(self, axial):
+    def Reaction_Add_Axial_At_Left_Support(self, axial):
         axial_values = self.x_array.copy()
         for index, _ in enumerate(axial_values):
             axial_values[index] = axial
