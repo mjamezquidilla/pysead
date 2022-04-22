@@ -97,7 +97,7 @@ class Member_2D:
             self.release_node_coordinates[1][1] -= node_vert
             
 
-    def __Add_Nodes_To_Element(self, element, nodes):
+    def Add_Nodes_To_Element(self, element, nodes):
         from_node = element[0]
         to_node = element[1]
         from_point = nodes[from_node]
@@ -194,19 +194,19 @@ class Member_2D:
         self.Add_Load_Axial_Uniform(w2)
 
 
-    def Add_load_Axial(self, P, a):
-        L = self.length
-        beginning_axial = P * (L - a) / L
-        end_axial = P * (a) / L
-        self.forces[self.node_list[0]][0] += beginning_axial
-        self.forces[self.node_list[1]][0] += end_axial
+    # def Add_load_Axial(self, P, a):
+    #     L = self.length
+    #     beginning_axial = P * (L - a) / L
+    #     end_axial = P * (a) / L
+    #     self.forces[self.node_list[0]][0] += beginning_axial
+    #     self.forces[self.node_list[1]][0] += end_axial
         
-        # Axial Values
-        axial_values = self.x_array.copy()
-        for index, _ in enumerate(axial_values):
-            axial_values[index] = beginning_axial
+    #     # Axial Values
+    #     axial_values = self.x_array.copy()
+    #     for index, _ in enumerate(axial_values):
+    #         axial_values[index] = beginning_axial
 
-        self.axial += axial_values
+    #     self.axial += axial_values
 
 
     def Add_Load_Point(self, P, a):
