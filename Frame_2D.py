@@ -212,39 +212,40 @@ class Member_2D:
     def Add_Load_Point(self, P, a):
         L = self.length
         beginning_moment = P * (L-a)**2 * a / L**2
-        end_moment = -P * (L-a) * a**2 / L**2
-        beginning_shear = P * (L-a) / L
-        end_shear = P * a / L
+        end_moment = -P * a**2 * (L-a)/L**2
+        beginning_shear = (P*(L-a) + beginning_moment + end_moment) / L
+        end_shear = (-P*a + end_moment + beginning_moment) / L
 
         if self.moment_release_left == 1 and self.moment_release_right == 0:
             beginning_shear = (beginning_shear - 3 / (2*L) * beginning_moment)
-            end_shear = (end_shear + 3 / (2*L) * beginning_moment)
+            end_shear = (-end_shear + 3 / (2*L) * beginning_moment)
             end_moment = end_moment - 1 / 2 * beginning_moment
             self.forces[self.node_list[0]][1] += - beginning_shear
             self.forces[self.node_list[1]][1] += - end_shear
             self.forces[self.node_list[1]][2] += end_moment
         elif self.moment_release_left == 0 and self.moment_release_right == 1:
             beginning_shear = (beginning_shear - 3 / (2*L) * end_moment)
-            end_shear = (end_shear + 3 / (2*L) * end_moment)
+            end_shear = (-end_shear + 3 / (2*L) * end_moment)
             beginning_moment = beginning_moment - 1 / 2 * end_moment
             self.forces[self.node_list[0]][1] += - beginning_shear
             self.forces[self.node_list[1]][1] += - end_shear
             self.forces[self.node_list[0]][2] += beginning_moment
         elif self.moment_release_right == 1 and self.moment_release_right == 1:
             beginning_shear = (beginning_shear - 1 / L * (beginning_moment + end_moment))
-            end_shear = (end_shear + 1 / L * (beginning_moment + end_moment))
+            end_shear = (-end_shear + 1 / L * (beginning_moment + end_moment))
             self.forces[self.node_list[0]][1] += - beginning_shear
             self.forces[self.node_list[1]][1] += - end_shear
         else:
             self.forces[self.node_list[0]][1] += - beginning_shear
-            self.forces[self.node_list[1]][1] += - end_shear
+            self.forces[self.node_list[1]][1] += end_shear
             self.forces[self.node_list[0]][2] += beginning_moment
             self.forces[self.node_list[1]][2] += end_moment
 
+
         # Shear Values
         shear_values = self.x_array.copy()
-        for index, shear_value in enumerate(shear_values):
-            if shear_value < a:
+        for index, x in enumerate(self.x_array):
+            if x <= a:
                 shear_values[index] = beginning_shear
             else:
                 shear_values[index] = beginning_shear - P
@@ -256,11 +257,11 @@ class Member_2D:
             beginning_moment = 0
 
         moment_values = self.x_array.copy()
-        for index, moment_value in enumerate(moment_values):
-            if moment_value < a:
-                moment_values[index] = beginning_moment - beginning_shear * moment_value
+        for index, x in enumerate(self.x_array):
+            if x <= a:
+                moment_values[index] = beginning_moment  - beginning_shear * x
             else:
-                moment_values[index] = beginning_moment - beginning_shear * moment_value + P * (moment_value - a)
+                moment_values[index] = beginning_moment  - beginning_shear * x + P * (x - a)
         self.moment += moment_values        
 
 
@@ -436,15 +437,15 @@ class Member_2D:
     # Plot Moment Diagram
     def Plot_Moment_Diagram(self, figure_size = [10,5]):
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,self.moment, marker='o')
-        plt.fill_between(self.x_array, 0, self.moment, hatch = '/', alpha = 0.1)
+        plt.plot(self.x_array,-self.moment, marker='o')
+        plt.fill_between(self.x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
         plt.xlim([0, self.length])
         plt.ylabel('Moment')
         plt.xlabel('Length')
         plt.title('Moment Diagram of Member {}'.format(self.member_number))
 
         for i, text in enumerate(self.moment):
-            plt.annotate(round(text,2), (self.x_array[i]+0.1, self.moment[i]))
+            plt.annotate(round(-text,2), (self.x_array[i]+0.1, -self.moment[i]))
 
         plt.tight_layout()
         plt.show()
@@ -559,15 +560,15 @@ class Member_2D:
         axs[1].margins(0.2)
 
         # Plot Moment Diagram
-        axs[2].plot(self.x_array,self.moment, marker = 'o')
-        axs[2].fill_between(self.x_array, 0, self.moment, hatch = '/', alpha = 0.1)
+        axs[2].plot(self.x_array,-self.moment, marker = 'o')
+        axs[2].fill_between(self.x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
         axs[2].set_xlim([-0.20, self.length+0.20])
         axs[2].set_ylabel('Moment')
         axs[2].set_xlabel('Length')
         axs[2].set_title('Moment Diagram of Member {}'.format(self.member_number))
 
         for i, text in enumerate(self.moment):
-            axs[2].annotate(round(text,2), (self.x_array[i]+0.1, self.moment[i]))
+            axs[2].annotate(round(-text,2), (self.x_array[i]+0.1, -self.moment[i]))
         
         axs[2].margins(0.2)
         
