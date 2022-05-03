@@ -1,5 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
+from matplotlib.patches import Arc, RegularPolygon
+from numpy import radians as rad
 plt.style.use('fivethirtyeight')
 plt.rcParams['hatch.color'] = 'white'
 print("Positive Values for forces: right, up (righthand rule)")
@@ -1111,7 +1113,7 @@ class Frame_2D:
             member.Reaction_Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
 
 
-    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True, node_size = 10):
+    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 0.2):
         '''
         Draws the Truss as initialized by the class
         
@@ -1146,6 +1148,7 @@ class Frame_2D:
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
+        ax = plt.gca()
        
         # plotting nodes and members
         for element in elements:
@@ -1157,7 +1160,7 @@ class Frame_2D:
             y1 = from_point[1]
             x2 = to_point[0]
             y2 = to_point[1]
-            plt.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area, markersize = node_size)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area, markersize = node_size)
 
         # plotting supports
         for support in supports:
@@ -1170,17 +1173,17 @@ class Frame_2D:
             y = nodes[support][1]
 
             if support_x == 1 and support_y == 1 and support_z == 1:
-                plt.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
             elif support_x == 1 and support_y == 1 and support_z == 0:
-                plt.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
             else: 
-                plt.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
     
         # plotting node labels
         # offset = 0.12
         
         for node in nodes:
-            plt.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
             
         # plotting member labels
         for element in elements:
@@ -1192,7 +1195,7 @@ class Frame_2D:
             middlePoint = [abs((to_point[0] - from_point[0])/2) + min(from_point[0], to_point[0]), 
                            abs((to_point[1] - from_point[1])/2) + min(from_point[1], to_point[1])]
             
-            plt.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
             
         # plotting force vectors
         # loop all x-direction forces
@@ -1201,51 +1204,56 @@ class Frame_2D:
             y = nodes[force][1]
 
             f_x = np.round(forces[force][0],2)
+            f_y = np.round(forces[force][1],2)
+            M_x = np.round(forces[force][2],2)
 
             # plot arrow x-direction
             if f_x > 0:
-                plt.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
+                ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
-                plt.scatter(x - length_of_arrow, y, c='white')
+                ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
+                ax.scatter(x - length_of_arrow, y, c='white')
             elif f_x < 0:
-                plt.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
+                ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
-                plt.scatter(x + length_of_arrow,y, c='white')
+                ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
+                ax.scatter(x + length_of_arrow,y, c='white')
             else:
                 pass
 
-        # loop all y-direction forces
-        for force in forces:
-            x = nodes[force][0]
-            y = nodes[force][1]
-
-            f_y = np.round(forces[force][1],2)
-
             # plot arrow y-direction
             if f_y > 0:
-                plt.arrow(x, y - length_of_arrow, 0, length_of_arrow,
+                ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
-                plt.scatter(x,y - length_of_arrow, c='white')
+                ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
+                ax.scatter(x,y - length_of_arrow, c='white')
             elif f_y < 0:
-                plt.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
+                ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
                           shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
-                plt.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
-                plt.scatter(x,y + length_of_arrow, c='white')
+                ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
+                ax.scatter(x,y + length_of_arrow, c='white')
+            else:
+                pass
+
+            # plot moment arrows
+            if M_x > 0:
+                self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Positive")
+                ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+            elif M_x < 0:
+                self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Negative")
+                ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
             else:
                 pass
             
         # Plot Member Release Coordinates
         for member_release in moment_releases_coordinates:
-            plt.scatter(member_release[0], member_release[1], color = 'lime', s = node_size * 10, zorder = 20)
+            ax.scatter(member_release[0], member_release[1], color = 'lime', s = node_size * 10, zorder = 20)
 
-        plt.axis('equal')
+        ax.axis('equal')
         plt.show()
 
 
@@ -1355,3 +1363,39 @@ class Frame_2D:
             reactions_dict.update({support: [forces_dict[3 * support - 2], forces_dict[3 * support-1], forces_dict[3 * support]]})
 
         return reactions_dict
+
+    def __drawCirc(self, ax,radius,centX,centY,angle_,theta2_,color_='green',lw=2,direction="Positive"):
+        # Arc
+        arc = Arc([centX,centY],radius,radius,angle=angle_,
+            theta1=0,theta2=theta2_,capstyle='round',linestyle='-',lw=lw,color=color_)
+        ax.add_patch(arc)
+
+
+        # Create the arrow head
+        startX = centX-(radius/2)*np.cos(rad(theta2_+angle_))
+        startY = centY-(radius/2)*np.sin(rad(theta2_+angle_))
+        endX=centX+(radius/2)*np.cos(rad(theta2_+angle_)) #Do trig to determine end position
+        endY=centY+(radius/2)*np.sin(rad(theta2_+angle_))
+
+        if direction=="Positive":
+            ax.add_patch(                    #Create triangle as arrow head
+                RegularPolygon(
+                    (endX, endY),            # (x,y)
+                    3,                       # number of vertices
+                    radius/9,                # radius
+                    rad(angle_+theta2_),     # orientation
+                    color=color_
+                )
+            )
+        else:
+            ax.add_patch(                    #Create triangle as arrow head
+                RegularPolygon(
+                    (startX, startY),            # (x,y)
+                    3,                       # number of vertices
+                    radius/9,                # radius
+                    rad(angle_+theta2_),     # orientation
+                    color=color_
+                )
+            )
+        # ax.set_xlim([centX-radius,centY+radius]) and ax.set_ylim([centY-radius,centY+radius]) 
+        # Make sure you keep the axes scaled or else arrow will distort
