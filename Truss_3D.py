@@ -1,3 +1,4 @@
+from locale import normalize
 import numpy as np 
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
@@ -365,11 +366,11 @@ class Truss_3D:
 
         print("Positive Stress/Force is in Tension, Negative Stress/Force is in Compression")
 
-    def Draw_Truss_Setup(self, figure_size = [7,7]):
+    def Draw_Truss_Setup(self, figure_size = [7,7], length_of_arrow = 2):
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
-        # forces = self.forces     
+        forces = self.forces     
 
         fig = plt.figure(figsize=figure_size)
         ax = fig.add_subplot(111, projection = '3d')
@@ -443,66 +444,51 @@ class Truss_3D:
 
             ax.text(middle_point_x + offset,middle_point_y + offset,middle_point_z + offset, element, zorder = 10, c='b')
 
-
         # plotting force vectors
-        # length_of_arrow = 0.1
+        # loop all x-direction forces
+        for force in forces:
+            x = nodes[force][0]
+            y = nodes[force][1]
+            z = nodes[force][2]
 
-        # # loop all x-direction forces
-        # for force in forces:
-        #     x = nodes[force][0]
-        #     y = nodes[force][1]
-        #     z = nodes[force][2]
+            f_x = forces[force][0]
+            f_y = forces[force][1]
+            f_z = forces[force][2]
 
-        #     f_x = forces[force][0]
-
-        #     # plot arrow x-direction
-        #     if f_x > 0:
-        #         ax.quiver(x, y, z, x - length_of_arrow, y, z, pivot='tip', length = length_of_arrow, colors = 'r') 
-        #         ax.text(x, y, z, f_x, color = 'r')
-        #         # plt.scatter(x - length_of_arrow, y, c='white')
-        #     elif f_x < 0:
-        #         ax.quiver(x, y, z, length_of_arrow - x, y, z, pivot='tip', length = length_of_arrow, colors = 'r')
-        #         ax.text(x, y, z, f_x, color = 'r')
-        #     else:
-        #         pass
-
-        # # loop all y-direction forces
-        # for force in forces:
-        #     x = nodes[force][0]
-        #     y = nodes[force][1]
-        #     z = nodes[force][2]
-
-        #     f_y = forces[force][1]
-
-        #     # plot arrow y-direction
-        #     if f_y > 0:
-        #         ax.quiver(x, y, z, x, y - length_of_arrow, z, pivot='tip', length = length_of_arrow, colors = 'r') 
-        #         ax.text(x,offset - y, z, f_y, color = 'r')
-        #     elif f_y < 0:
-        #         ax.quiver(x, y, z, x, length_of_arrow - y, z, pivot='tip', length = length_of_arrow, colors = 'r')
-        #         ax.text(x,offset - y , z, f_y, color = 'r')
-        #     else:
-        #         pass
-
-        # # loop all z-direction forces
-        # for force in forces:
-        #     x = nodes[force][0]
-        #     y = nodes[force][1]
-        #     z = nodes[force][2]
-
-        #     f_z = forces[force][2]
-
-        #     # plot arrow y-direction
-        #     if f_z > 0:
-        #         ax.quiver(x, y, z, x, y, z - length_of_arrow, pivot='tip', length = length_of_arrow, colors = 'r') 
-        #         ax.text(x,offset - y, z, f_z, color = 'r')
-        #     elif f_z < 0:
-        #         ax.quiver(x, y, z, x, y, length_of_arrow - z, pivot='tip', length = length_of_arrow, colors = 'r')
-        #         ax.text(x,offset - y , z, f_z, color = 'r')
-        #     else:
-        #         pass
-
-
+            # plot arrow x-direction
+            if f_x > 0:
+                ax.quiver(x, y, z, -1, 0, 0, pivot='tip', length = length_of_arrow, colors = 'r', normalize=True) 
+                ax.text(x + length_of_arrow, y, z, f_x, color = 'r')
+            elif f_x < 0:
+                ax.quiver(x, y, z, 1, 0, 0, pivot='tip', length = length_of_arrow, colors = 'r', normalize=True) 
+                ax.text(x - length_of_arrow, y, z, f_x, color = 'r')
+            else:
+                pass
+        
+            # plot arrow y-direction
+            if f_y > 0:
+                ax.quiver(x, y, z, 0, -1, 0, pivot='tip', length = length_of_arrow, colors = 'b', normalize=True) 
+                ax.text(x, y + length_of_arrow, z, f_y, color = 'b')
+            elif f_y < 0:
+                ax.quiver(x, y, z, 0, 1, 0, pivot='tip', length = length_of_arrow, colors = 'b', normalize=True) 
+                ax.text(x, y - length_of_arrow, z, f_y, color = 'b')
+            else:
+                pass
+            
+            # plot arrow z-direction
+            if f_z > 0:
+                ax.quiver(x, y, z, 0, 0, 1, pivot='tip', length = length_of_arrow, colors = 'g', normalize=True) 
+                ax.text(x, y, z - length_of_arrow, f_z, color = 'g')
+            elif f_z < 0:
+                ax.quiver(x, y, z, 0, 0, -1, pivot='tip', length = length_of_arrow, colors = 'g', normalize=True) 
+                ax.text(x, y, z + length_of_arrow, f_z, color = 'g')
+            else:
+                pass
+        
+        ax.grid(False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_zticks([])
         plt.show()
 
 
@@ -588,6 +574,10 @@ class Truss_3D:
             z = nodes[node][2]    
             ax.text(x + offset,y + offset,z + offset, node, zorder = 10, c='black')
 
+        ax.grid(False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_zticks([])
         plt.show()
 
     def __scale_plot(self, ax):
