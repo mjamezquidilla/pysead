@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from matplotlib import cm
+import matplotlib as mpl
 
 class Truss_2D:
     
@@ -601,4 +602,172 @@ class Truss_2D:
 
         plt.gca().axes.get_xaxis().set_visible(False)
         plt.gca().axes.get_yaxis().set_visible(False)
+        plt.show()
+
+    def Draw_Truss_Axial_Force_Map(self, figure_size = None, linewidth = 2, grid = True, color_bar_orientation = 'vertical', color_bar_padding = 0.05):
+        '''
+        Draws the Truss Axial Force Color Map
+        
+        Parameters
+        ----------
+        
+        figure_size: array
+            size of the plot's figure in x, y heights.
+        grid: boolean
+            activates gridlines. default value is False
+        color_bar_orientation: 'vertical', 'horizontal'
+            places colorbar at orientation specified. Vertical at the right, Horizontal at the bottom
+        '''
+        
+        
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        member_forces = self.member_forces_
+
+        # Extract member forces
+        forces = []
+        for i in member_forces:
+            forces.append(member_forces[i])
+
+        # color_map = cm.get_cmap('PiYG')
+        # heat_map = color_map(forces)
+
+        normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
+        colorparams = forces
+        colormap = cm.plasma
+
+        # Colorbar setup
+        s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
+        s_map.set_array(colorparams)
+
+        plt.figure(figsize = figure_size)
+        plt.grid(grid)
+
+        ax = plt.gca()
+        ax.set_aspect(aspect='equal')
+       
+        # plotting nodes and members
+        for i, element in enumerate(dict(elements)):
+            fromPoint, toPoint = self.__Extract_Coordinate_Points(element, nodes, elements)
+            x1 = fromPoint[0]
+            y1 = fromPoint[1]
+            x2 = toPoint[0]
+            y2 = toPoint[1]
+            color = colormap(normalize(forces[i]))
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = color, zorder = 5, linewidth = linewidth)
+
+        # plotting supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+
+            if support_x == 1 and support_y == 1:
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1:
+                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+            
+        # plotting member labels
+        for element in elements:
+            fromNode = elements[element][0]
+            toNode = elements[element][1]
+            fromPoint = nodes[fromNode]
+            toPoint = nodes[toNode]
+            
+            middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
+                           abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
+            
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            
+        cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
+        cbar.set_label(label='Force, (+) Tension, (-) Compression')    
+        plt.show()
+
+
+    def Draw_Truss_Axial_Stress_Map(self, figure_size = None, linewidth = 2, grid = True,color_bar_orientation = 'vertical', color_bar_padding=0.05):
+        '''
+        Draws the Truss Axial Stress Color Map
+        
+        Parameters
+        ----------
+        
+        figure_size: array
+            size of the plot's figure in x, y heights.
+        grid: boolean
+            activates gridlines. default value is False
+        color_bar_orientation: 'vertical', 'horizontal'
+            places colorbar at orientation specified. Vertical at the right, Horizontal at the bottom
+        '''
+        
+        
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        member_stresses = self.member_stresses_
+
+        # Extract member forces
+        stresses = []
+        for i in member_stresses:
+            stresses.append(member_stresses[i])
+
+        normalize  = mpl.colors.Normalize(vmin=min(stresses), vmax=max(stresses))
+        colorparams = stresses
+        colormap = cm.plasma
+
+        # Colorbar setup
+        s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
+        s_map.set_array(colorparams)
+
+        plt.figure(figsize = figure_size)
+        plt.grid(grid)
+
+        ax = plt.gca()
+        ax.set_aspect(aspect='equal')
+       
+        # plotting nodes and members
+        for i, element in enumerate(dict(elements)):
+            fromPoint, toPoint = self.__Extract_Coordinate_Points(element, nodes, elements)
+            x1 = fromPoint[0]
+            y1 = fromPoint[1]
+            x2 = toPoint[0]
+            y2 = toPoint[1]
+            color = colormap(normalize(stresses[i]))
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = color, zorder = 5, linewidth = linewidth)
+
+        # plotting supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+
+            if support_x == 1 and support_y == 1:
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1:
+                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+            
+        # plotting member labels
+        for element in elements:
+            fromNode = elements[element][0]
+            toNode = elements[element][1]
+            fromPoint = nodes[fromNode]
+            toPoint = nodes[toNode]
+            
+            middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
+                           abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
+            
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            
+        cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
+        cbar.set_label(label='Stress, (+) Tension, (-) Compression')    
         plt.show()
