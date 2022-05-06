@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from matplotlib.patches import Arc, RegularPolygon
 from numpy import radians as rad
+from sympy import div
 plt.style.use('fivethirtyeight')
 plt.rcParams['hatch.color'] = 'white'
 print("Positive Values for forces: right, up (righthand rule)")
@@ -14,13 +15,14 @@ print("Frame Moment Release: All elements that is connected to the same release 
 
 
 class Member_2D:
-    def __init__(self, member_number, area, elasticity, inertia, nodes = {}, moment_release = [0,0]):
+    def __init__(self, member_number, area, elasticity, inertia, nodes = {}, moment_release = [0,0], no_of_divs = 11):
         self.member_number = member_number
         self.area = area
         self.inertia = inertia
         self.elasticity = elasticity
         self.moment_release_left = moment_release[0]
         self.moment_release_right = moment_release[1]
+        self.no_of_divs = no_of_divs
         
         # Check if nodes dictionary is not empty
         if nodes:
@@ -45,11 +47,11 @@ class Member_2D:
                 self.forces.update({node: [0,0,0]})
 
             # Create Shear and Moment numpy arrays
-            division_spacing = self.length/10
-            self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/division_spacing))
-            self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
-            self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
-            self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
+            self.division_spacing = self.length/no_of_divs
+            self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/self.division_spacing))
+            self.axial = np.zeros(int(np.ceil(self.length)/self.division_spacing))
+            self.shear = np.zeros(int(np.ceil(self.length)/self.division_spacing))
+            self.moment = np.zeros(int(np.ceil(self.length)/self.division_spacing))
 
             # Plotting Member Releases
             self.__Release_Node_Coordinates()
@@ -126,11 +128,11 @@ class Member_2D:
             self.forces.update({node: [0,0,0]})
 
         # Create Shear and Moment numpy arrays
-        division_spacing = self.length/10
-        self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/division_spacing))
-        self.axial = np.zeros(int(np.ceil(self.length)/division_spacing))
-        self.shear = np.zeros(int(np.ceil(self.length)/division_spacing))
-        self.moment = np.zeros(int(np.ceil(self.length)/division_spacing))
+        self.division_spacing = self.length/self.no_of_divs
+        self.x_array = np.linspace(0,self.length,int(np.ceil(self.length)/self.division_spacing))
+        self.axial = np.zeros(int(np.ceil(self.length)/self.division_spacing))
+        self.shear = np.zeros(int(np.ceil(self.length)/self.division_spacing))
+        self.moment = np.zeros(int(np.ceil(self.length)/self.division_spacing))
 
         self.__Release_Node_Coordinates()
 
@@ -402,17 +404,25 @@ class Member_2D:
         self.moment += moment_values
 
 
-    def Plot_Axial_Diagram(self, figure_size=[10,5]):
+    def Plot_Axial_Diagram(self, figure_size=[10,5], show_annoation = True):
+
+        range = int(np.ceil(self.length)/self.division_spacing)
+        x_array = np.linspace(0,1,range)
+
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,self.axial, marker='o')
-        plt.fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
-        plt.xlim([0, self.length])
+        plt.plot(x_array,self.axial, marker='o')
+        plt.fill_between(x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        plt.xlim([-0.1, 1.1])
+        # plt.plot(self.x_array,self.axial, marker='o')
+        # plt.fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        # plt.xlim([0, self.length])
         plt.ylabel('Axial')
-        plt.xlabel('Length')
+        plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Axial Diagram of Member {}'.format(self.member_number))
 
-        for i, text in enumerate(self.axial):
-            plt.annotate(round(text,2), (self.x_array[i]+0.1, self.axial[i]))
+        if show_annoation == True:
+            for i, text in enumerate(self.axial):
+                plt.annotate(round(text,2), (x_array[i], self.axial[i]))
 
         plt.tight_layout()
         plt.show()
@@ -420,35 +430,53 @@ class Member_2D:
 
 
     # Plot Shear Diagram
-    def Plot_Shear_Diagram(self, figure_size=[10,5]):
+    def Plot_Shear_Diagram(self, figure_size=[10,5], show_annotation = True):
+        
+        range = int(np.ceil(self.length)/self.division_spacing)
+        x_array = np.linspace(0,1,range)
+
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,self.shear, marker='o')
-        plt.fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
-        plt.xlim([0, self.length])
+        plt.plot(x_array,self.shear, marker='o')
+        plt.fill_between(x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        plt.xlim([-0.1, 1.1])
+        # plt.plot(self.x_array,self.shear, marker='o')
+        # plt.fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        # plt.xlim([0, self.length])
         plt.ylabel('Shear')
-        plt.xlabel('Length')
+        plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Shear Diagram of Member {}'.format(self.member_number))
 
-        for i, text in enumerate(self.shear):
-            plt.annotate(round(text,2), (self.x_array[i]+0.1, self.shear[i]))
-            
+        if show_annotation == True:
+            for i, text in enumerate(self.shear):
+                plt.annotate(round(text,2), (x_array[i], self.shear[i]))
+        
+        plt.xticks(x_array)
         plt.tight_layout()
         plt.show()
 
 
     # Plot Moment Diagram
-    def Plot_Moment_Diagram(self, figure_size = [10,5]):
+    def Plot_Moment_Diagram(self, figure_size = [10,5], show_annotation = True):
+
+        range = int(np.ceil(self.length)/self.division_spacing)
+        x_array = np.linspace(0,1,range)
+
         plt.figure(figsize=figure_size)
-        plt.plot(self.x_array,-self.moment, marker='o')
-        plt.fill_between(self.x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
-        plt.xlim([0, self.length])
+        plt.plot(x_array,-self.moment, marker='o')
+        plt.fill_between(x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
+        plt.xlim([-0.1, 1.1])
+        # plt.plot(self.x_array,-self.moment, marker='o')
+        # plt.fill_between(self.x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
+        # plt.xlim([0, self.length])
         plt.ylabel('Moment')
-        plt.xlabel('Length')
+        plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Moment Diagram of Member {}'.format(self.member_number))
 
-        for i, text in enumerate(self.moment):
-            plt.annotate(round(-text,2), (self.x_array[i]+0.1, -self.moment[i]))
+        if show_annotation == True:
+            for i, text in enumerate(self.moment):
+                plt.annotate(round(-text,2), (x_array[i], -self.moment[i]))
 
+        plt.xticks(x_array)
         plt.tight_layout()
         plt.show()
 
@@ -530,47 +558,53 @@ class Member_2D:
         self.axial += axial_values
 
 
-    def Plot_Diagrams(self, figure_size = [15,10]):
+    def Plot_Diagrams(self, figure_size = [15,10], show_annotation = True):
         fig, axs = plt.subplots(3, 1)
         fig.set_figheight(figure_size[0])
         fig.set_figwidth(figure_size[1])
 
+        range = int(np.ceil(self.length)/self.division_spacing)
+        x_array = np.linspace(0,1,range)
+
         # Plot Axial Diagram
-        axs[0].plot(self.x_array,self.axial, marker = 'o')
-        axs[0].fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
-        axs[0].set_xlim([-0.20, self.length+0.20])
+        axs[0].plot(x_array,self.axial, marker = 'o')
+        axs[0].fill_between(x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        axs[0].set_xlim([-0.1,1.1])
         axs[0].set_ylabel('Axial')
-        axs[0].set_xlabel('Length')
+        axs[0].set_xlabel('Length ratio, Length = {}'.format(self.length))
         axs[0].set_title('Axial Diagram of Member {}'.format(self.member_number))
         
-        for i, text in enumerate(self.axial):
-            axs[0].annotate(round(text,2), (self.x_array[i], self.axial[i]))
+        if show_annotation == True:
+            for i, text in enumerate(self.axial):
+                axs[0].annotate(round(text,2), (x_array[i], self.axial[i]))
 
         axs[0].margins(0.2)
 
         # Plot Shear Diagram
-        axs[1].plot(self.x_array,self.shear, marker = 'o')
-        axs[1].fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
-        axs[1].set_xlim([-0.20, self.length+0.20])
+        axs[1].plot(x_array,self.shear, marker = 'o')
+        axs[1].fill_between(x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        axs[1].set_xlim([-0.1,1.1])
         axs[1].set_ylabel('Shear')
-        axs[1].set_xlabel('Length')
+        axs[1].set_xlabel('Length ratio, Length = {}'.format(self.length))
         axs[1].set_title('Shear Diagram of Member {}'.format(self.member_number))
 
-        for i, text in enumerate(self.shear):
-            axs[1].annotate(round(text,2), (self.x_array[i], self.shear[i]))
+        if show_annotation == True:
+            for i, text in enumerate(self.shear):
+                axs[1].annotate(round(text,2), (x_array[i], self.shear[i]))
         
         axs[1].margins(0.2)
 
         # Plot Moment Diagram
-        axs[2].plot(self.x_array,-self.moment, marker = 'o')
-        axs[2].fill_between(self.x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
-        axs[2].set_xlim([-0.20, self.length+0.20])
+        axs[2].plot(x_array,-self.moment, marker = 'o')
+        axs[2].fill_between(x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
+        axs[2].set_xlim([-0.1,1.1])
         axs[2].set_ylabel('Moment')
-        axs[2].set_xlabel('Length')
+        axs[2].set_xlabel('Length ratio, Length = {}'.format(self.length))
         axs[2].set_title('Moment Diagram of Member {}'.format(self.member_number))
 
-        for i, text in enumerate(self.moment):
-            axs[2].annotate(round(-text,2), (self.x_array[i]+0.1, -self.moment[i]))
+        if show_annotation == True:
+            for i, text in enumerate(self.moment):
+                axs[2].annotate(round(-text,2), (x_array[i], -self.moment[i]))
         
         axs[2].margins(0.2)
         
