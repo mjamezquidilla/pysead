@@ -2,6 +2,8 @@ from locale import normalize
 import numpy as np 
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import matplotlib as mpl
 plt.style.use('fivethirtyeight')
 
 
@@ -605,4 +607,190 @@ class Truss_3D:
         ax.set_ylim(mid_y - max_range, mid_y + max_range)
         ax.set_zlim(mid_z - max_range, mid_z + max_range)
         
+    def Draw_Truss_Axial_Force_Map(self, figure_size = None, linewidth = 2, grid = True, color_bar_orientation = 'vertical', color_bar_padding = 0.05, show_member_label = True):
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        member_forces = self.member_forces_     
+
+        fig = plt.figure(figsize=figure_size)
+        ax = fig.add_subplot(111, projection = '3d')
+
+        self.__scale_plot(ax)
+
+        # Extract member forces
+        forces = []
+        for i in member_forces:
+            forces.append(member_forces[i])
+
+        normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
+        colorparams = forces
+        colormap = cm.plasma
+
+        # Colorbar setup
+        s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
+        s_map.set_array(colorparams)
+
+        offset = 0.01
+
+        # Plotting Members
+        for i, element in enumerate(elements):
+            from_point = elements[element][0]
+            to_point = elements[element][1]
+
+            from_node_x = nodes[from_point][0]
+            from_node_y = nodes[from_point][1]
+            from_node_z = nodes[from_point][2]
+            to_node_x = nodes[to_point][0]
+            to_node_y = nodes[to_point][1]
+            to_node_z = nodes[to_point][2]
+
+            x = [from_node_x, to_node_x]
+            y = [from_node_y, to_node_y]
+            z = [from_node_z, to_node_z]
+
+            color = colormap(normalize(forces[i]))
+            ax.plot(x,y,z, marker = 'o', color = color, zorder = 5, linewidth = linewidth)
+
+        # Plotting Supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+            support_z = supports[support][2]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+            z = nodes[support][2]
+
+            if support_x == 1 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='y', zorder = 2)
+
+        # plotting member labels
+        if show_member_label==True:
+            for element in elements:
+                from_point = elements[element][0]
+                to_point = elements[element][1]
+
+                from_node_x = nodes[from_point][0]
+                from_node_y = nodes[from_point][1]
+                from_node_z = nodes[from_point][2]
+                to_node_x = nodes[to_point][0]
+                to_node_y = nodes[to_point][1]
+                to_node_z = nodes[to_point][2]
+
+                x = [from_node_x, to_node_x]
+                y = [from_node_y, to_node_y]
+                z = [from_node_z, to_node_z]
+
+                middle_point_x = abs((x[1] - x[0])/2) + min(x[0], x[1])
+                middle_point_y = abs((y[1] - y[0])/2) + min(y[0], y[1])
+                middle_point_z = abs((z[1] - z[0])/2) + min(z[0], z[1])
+
+                ax.text(middle_point_x + offset,middle_point_y + offset,middle_point_z + offset, element, zorder = 10, c='b')
         
+        cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
+        cbar.set_label(label='Force: (+) Tension, (-) Compression')   
+        ax.grid(False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_zticks([])
+        plt.show()
+
+    def Draw_Truss_Axial_Stress_Map(self, figure_size = None, linewidth = 2, grid = True, color_bar_orientation = 'vertical', color_bar_padding = 0.05, show_member_label = True):
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        member_stresses = self.member_stresses_     
+
+        fig = plt.figure(figsize=figure_size)
+        ax = fig.add_subplot(111, projection = '3d')
+
+        self.__scale_plot(ax)
+
+        # Extract member forces
+        forces = []
+        for i in member_stresses:
+            forces.append(member_stresses[i])
+
+        normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
+        colorparams = forces
+        colormap = cm.plasma
+
+        # Colorbar setup
+        s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
+        s_map.set_array(colorparams)
+
+        offset = 0.01
+
+        # Plotting Members
+        for i, element in enumerate(elements):
+            from_point = elements[element][0]
+            to_point = elements[element][1]
+
+            from_node_x = nodes[from_point][0]
+            from_node_y = nodes[from_point][1]
+            from_node_z = nodes[from_point][2]
+            to_node_x = nodes[to_point][0]
+            to_node_y = nodes[to_point][1]
+            to_node_z = nodes[to_point][2]
+
+            x = [from_node_x, to_node_x]
+            y = [from_node_y, to_node_y]
+            z = [from_node_z, to_node_z]
+
+            color = colormap(normalize(forces[i]))
+            ax.plot(x,y,z, marker = 'o', color = color, zorder = 5, linewidth = linewidth)
+
+        # Plotting Supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+            support_z = supports[support][2]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+            z = nodes[support][2]
+
+            if support_x == 1 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = '^', s = 200, c='r', zorder = 2)
+            elif support_x == 0 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, z, marker = 'o', s = 200, c='y', zorder = 2)
+
+        # plotting member labels
+        if show_member_label==True:
+            for element in elements:
+                from_point = elements[element][0]
+                to_point = elements[element][1]
+
+                from_node_x = nodes[from_point][0]
+                from_node_y = nodes[from_point][1]
+                from_node_z = nodes[from_point][2]
+                to_node_x = nodes[to_point][0]
+                to_node_y = nodes[to_point][1]
+                to_node_z = nodes[to_point][2]
+
+                x = [from_node_x, to_node_x]
+                y = [from_node_y, to_node_y]
+                z = [from_node_z, to_node_z]
+
+                middle_point_x = abs((x[1] - x[0])/2) + min(x[0], x[1])
+                middle_point_y = abs((y[1] - y[0])/2) + min(y[0], y[1])
+                middle_point_z = abs((z[1] - z[0])/2) + min(z[0], z[1])
+
+                ax.text(middle_point_x + offset,middle_point_y + offset,middle_point_z + offset, element, zorder = 10, c='b')
+        
+        cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
+        cbar.set_label(label='Stress: (+) Tension, (-) Compression')   
+        ax.grid(False)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_zticks([])
+        plt.show()
