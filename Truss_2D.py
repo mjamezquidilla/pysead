@@ -690,7 +690,7 @@ class Truss_2D:
         plt.show()
 
 
-    def Draw_Truss_Axial_Stress_Map(self, figure_size = None, linewidth = 2, grid = True,color_bar_orientation = 'vertical', color_bar_padding=0.05):
+    def Draw_Truss_Axial_Stress_Map(self, figure_size = None, linewidth = 2, grid = True,color_bar_orientation = 'vertical', color_bar_padding=0.05, show_member_label = True):
         '''
         Draws the Truss Axial Stress Color Map
         
@@ -757,16 +757,17 @@ class Truss_2D:
                 ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
             
         # plotting member labels
-        for element in elements:
-            fromNode = elements[element][0]
-            toNode = elements[element][1]
-            fromPoint = nodes[fromNode]
-            toPoint = nodes[toNode]
-            
-            middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
-                           abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
-            
-            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+        if show_member_label == True:
+            for element in elements:
+                fromNode = elements[element][0]
+                toNode = elements[element][1]
+                fromPoint = nodes[fromNode]
+                toPoint = nodes[toNode]
+                
+                middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
+                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
+                
+                ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
             
         cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
         cbar.set_label(label='Stress, (+) Tension, (-) Compression')    
