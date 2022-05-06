@@ -686,7 +686,7 @@ class Truss_2D:
             ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
             
         cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
-        cbar.set_label(label='Force, (+) Tension, (-) Compression')    
+        cbar.set_label(label='Force: (+) Tension, (-) Compression')    
         plt.show()
 
 
@@ -770,5 +770,5 @@ class Truss_2D:
                 ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
             
         cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
-        cbar.set_label(label='Stress, (+) Tension, (-) Compression')    
+        cbar.set_label(label='Stress: (+) Tension, (-) Compression')    
         plt.show()
