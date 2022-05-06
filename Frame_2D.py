@@ -1147,7 +1147,7 @@ class Frame_2D:
             member.Reaction_Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
 
 
-    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 0.2):
+    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 0.2):
         '''
         Draws the Truss as initialized by the class
         
@@ -1158,7 +1158,7 @@ class Frame_2D:
                     size of the plot's figure in x, y heights.
         length_of_arrow: float
                         length of force vector arrow. default value is 1.0
-        width_of_arrow: float
+        arrow_head_width: float
                         width of force vector arrow head. default value is 0.1
         arrow_line_width: float
                         width of force vector line. default value is 2.0
@@ -1244,13 +1244,13 @@ class Frame_2D:
             # plot arrow x-direction
             if f_x > 0:
                 ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
                 ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
                 ax.scatter(x - length_of_arrow, y, c='white')
             elif f_x < 0:
                 ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
                 ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
                 ax.scatter(x + length_of_arrow,y, c='white')
@@ -1260,13 +1260,13 @@ class Frame_2D:
             # plot arrow y-direction
             if f_y > 0:
                 ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
                 ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
                 ax.scatter(x,y - length_of_arrow, c='white')
             elif f_y < 0:
                 ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                           linewidth = arrow_line_width)
                 ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
                 ax.scatter(x,y + length_of_arrow, c='white')
@@ -1291,8 +1291,7 @@ class Frame_2D:
         plt.show()
 
 
-
-    def Draw_Frame_Displacements(self, linewidth = 2, magnification_factor = 100, figure_size = None, offset = 0.12):
+    def Draw_Frame_Displacements_(self, linewidth = 2, magnification_factor = 100, figure_size = None, offset = 0.12):
         '''
         Draws the Truss displacements after solving the truss
         
@@ -1433,3 +1432,202 @@ class Frame_2D:
             )
         # ax.set_xlim([centX-radius,centY+radius]) and ax.set_ylim([centY-radius,centY+radius]) 
         # Make sure you keep the axes scaled or else arrow will distort
+
+    def Draw_Reactions_(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 0.2, show_ext_forces = False):
+        '''
+        Draws the Truss as initialized by the class
+        
+        Parameters
+        ----------
+        
+        figure_size: array
+                    size of the plot's figure in x, y heights.
+        length_of_arrow: float
+                        length of force vector arrow. default value is 1.0
+        arrow_head_width: float
+                        width of force vector arrow head. default value is 0.1
+        arrow_line_width: float
+                        width of force vector line. default value is 2.0
+        grid: boolean
+              activates gridlines. default value is False
+        '''
+        
+        
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        forces = self.forces      
+        areas = self.areas
+        moment_releases_coordinates = self.moment_releases_coordinates
+        reactions = self.reactions_
+
+        average_area = []
+        for area in areas:
+            average_area.append(areas[area])
+        average_area = np.array(average_area)
+        average_area = np.average(average_area)
+
+        plt.figure(figsize = figure_size)
+        plt.grid(grid)
+        ax = plt.gca()
+       
+        # plotting nodes and members
+        for element in elements:
+            from_node = elements[element][0]
+            to_node = elements[element][1]
+            from_point = nodes[from_node]
+            to_point = nodes[to_node]
+            x1 = from_point[0]
+            y1 = from_point[1]
+            x2 = to_point[0]
+            y2 = to_point[1]
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area, markersize = node_size)
+
+        # plotting supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+            support_z = supports[support][2]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+
+            if support_x == 1 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
+            elif support_x == 1 and support_y == 1 and support_z == 0:
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+
+        
+    
+        # plotting node labels
+        # offset = 0.12
+        
+        for node in nodes:
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            
+        # plotting member labels
+        # for element in elements:
+        #     fromNode = elements[element][0]
+        #     toNode = elements[element][1]
+        #     from_point = nodes[fromNode]
+        #     to_point = nodes[toNode]
+            
+        #     middlePoint = [abs((to_point[0] - from_point[0])/2) + min(from_point[0], to_point[0]), 
+        #                    abs((to_point[1] - from_point[1])/2) + min(from_point[1], to_point[1])]
+            
+        #     ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            
+        # plotting force vectors
+        # loop all x-direction forces
+        if show_ext_forces == True:
+            for force in forces:
+                x = nodes[force][0]
+                y = nodes[force][1]
+
+                f_x = np.round(forces[force][0],2)
+                f_y = np.round(forces[force][1],2)
+                M_x = np.round(forces[force][2],2)
+
+                # plot arrow x-direction
+                if f_x > 0:
+                    ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
+                            shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                            linewidth = arrow_line_width)
+                    ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
+                    ax.scatter(x - length_of_arrow, y, c='white')
+                elif f_x < 0:
+                    ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
+                            shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                            linewidth = arrow_line_width)
+                    ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
+                    ax.scatter(x + length_of_arrow,y, c='white')
+                else:
+                    pass
+
+                # plot arrow y-direction
+                if f_y > 0:
+                    ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
+                            shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                            linewidth = arrow_line_width)
+                    ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
+                    ax.scatter(x,y - length_of_arrow, c='white')
+                elif f_y < 0:
+                    ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
+                            shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                            linewidth = arrow_line_width)
+                    ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
+                    ax.scatter(x,y + length_of_arrow, c='white')
+                else:
+                    pass
+
+                # plot moment arrows
+                if M_x > 0:
+                    self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Positive")
+                    ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+                elif M_x < 0:
+                    self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Negative")
+                    ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+                else:
+                    pass
+            
+        # Plot Member Release Coordinates
+        for member_release in moment_releases_coordinates:
+            ax.scatter(member_release[0], member_release[1], color = 'lime', s = node_size * 10, zorder = 20)
+
+        # plotting support vectors
+        # loop all x-direction forces
+        for reaction in reactions:
+            x = nodes[reaction][0]
+            y = nodes[reaction][1]
+
+            f_x = np.round(reactions[reaction][0],2)
+            f_y = np.round(reactions[reaction][1],2)
+            M_x = np.round(reactions[reaction][2],2)
+
+            # plot arrow x-direction
+            if f_x > 0:
+                ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                          linewidth = arrow_line_width)
+                ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
+                ax.scatter(x - length_of_arrow, y, c='white')
+            elif f_x < 0:
+                ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                          linewidth = arrow_line_width)
+                ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
+                ax.scatter(x + length_of_arrow,y, c='white')
+            else:
+                pass
+
+            # plot arrow y-direction
+            if f_y > 0:
+                ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                          linewidth = arrow_line_width)
+                ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
+                ax.scatter(x,y - length_of_arrow, c='white')
+            elif f_y < 0:
+                ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                          linewidth = arrow_line_width)
+                ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
+                ax.scatter(x,y + length_of_arrow, c='white')
+            else:
+                pass
+
+            # plot moment arrows
+            if M_x > 0:
+                self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Positive")
+                ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+            elif M_x < 0:
+                self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Negative")
+                ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+            else:
+                pass
+
+        ax.axis('equal')
+        plt.show()
