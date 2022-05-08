@@ -2,16 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from matplotlib.patches import Arc, RegularPolygon
 from numpy import radians as rad
-from sympy import div
 plt.style.use('fivethirtyeight')
 plt.rcParams['hatch.color'] = 'white'
-print("Positive Values for forces: right, up (righthand rule)")
-print("Negative moment = clockwise, Positive moment = counter-clockwise (righthand rule)")
-print("For adding Local Member Load: Axial Load is always parallel to the member local axis")
-print("For adding Local Member Load: Loading is always point downward towards the frame element and is considered positive")
-print("Member Forces: at left end to right end (based on local axis) - [Axial, Shear, Bending]. Local Axis is governed for positive/negative values. Right is positive, upward is positive, counterclockwise is positive")
-print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is positive, vertical - upward is positive, moment - counterclockwise is positive")
-print("Frame Moment Release: All elements that is connected to the same release node should be released at node end of the element")
+# print("Positive Values for forces: right, up (righthand rule)")
+# print("Negative moment = clockwise, Positive moment = counter-clockwise (righthand rule)")
+# print("For adding Local Member Load: Axial Load is always parallel to the member local axis")
+# print("For adding Local Member Load: Loading is always point downward towards the frame element and is considered positive")
+# print("Member Forces: at left end to right end (based on local axis) - [Axial, Shear, Bending]. Local Axis is governed for positive/negative values. Right is positive, upward is positive, counterclockwise is positive")
+# print("Frame Reactions: [horizontal, vertical, Moment]. horizontal - right is positive, vertical - upward is positive, moment - counterclockwise is positive")
+# print("Frame Moment Release: All elements that is connected to the same release node should be released at node end of the element")
 
 
 class Member_2D:
