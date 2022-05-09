@@ -1,9 +1,9 @@
 # from PyQt5 import QtWidgets
-from os import X_OK
-from PyQt5.QtCore import QFile
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QTableWidget, QPushButton, QFrame, QAction, QTableWidgetItem, QHBoxLayout, QFileDialog
-from PyQt5 import uic
 import sys
+# import qdarktheme
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QTableWidget, QPushButton, QFrame, QAction, QTableWidgetItem, QHBoxLayout, QFileDialog, QComboBox
+from PyQt5 import uic, QtCore
+from isort import file
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
@@ -14,32 +14,26 @@ class UI(QMainWindow):
         super(UI, self).__init__()
 
         #Global Variables
-        global file_name
-        file_name = ('C:/temp.xlsx',0)
 
         # Load the UI file
-        uic.loadUi("GUI.ui", self)
+        uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
 
         # Define our widgets
         # Button Widget
         self.Add_Node_Button = self.findChild(QPushButton, "Add_Node_Button")
-        self.Update_Node_Button = self.findChild(QPushButton, "Update_Node_Button")
+        self.Renumber_Nodes_Button = self.findChild(QPushButton, "Renumber_Nodes_Button")
         self.Remove_Node_Button = self.findChild(QPushButton, "Remove_Node_Button")
         
         self.Add_Bar_Button = self.findChild(QPushButton, "Add_Bar_Button")
-        self.Update_Bar_Button = self.findChild(QPushButton, "Update_Bar_Button")
+        self.Renumber_Bar_Button = self.findChild(QPushButton, "Renumber_Bar_Button")
         self.Remove_Bar_Button = self.findChild(QPushButton, "Remove_Bar_Button")
         
-        self.Add_Material_Button = self.findChild(QPushButton, "Add_Material_Button")
         self.Update_Material_Button = self.findChild(QPushButton, "Update_Material_Button")
-        self.Remove_Material_Button = self.findChild(QPushButton, "Remove_Material_Button")
         
         self.Add_Force_Button = self.findChild(QPushButton, "Add_Force_Button")
-        self.Update_Force_Button = self.findChild(QPushButton, "Update_Force_Button")
         self.Remove_Force_Button = self.findChild(QPushButton, "Remove_Force_Button")
         
         self.Add_Support_Button = self.findChild(QPushButton, "Add_Support_Button")
-        self.Update_Support_Button = self.findChild(QPushButton, "Update_Support_Button")
         self.Remove_Support_Button = self.findChild(QPushButton, "Remove_Support_Button")
         
         self.Solve_Truss_Button = self.findChild(QPushButton, "Solve_Truss_Button")
@@ -64,6 +58,10 @@ class UI(QMainWindow):
         self.Arrow_Head_Size_LEdit = self.findChild(QLineEdit, "Arrow_Head_Size_LEdit")
         self.Arrow_Line_Width_LEdit = self.findChild(QLineEdit, "Arrow_Line_Width_LEdit")
 
+        # Combo Box
+        self.X_Coord_ComboBox = self.findChild(QComboBox, "X_Coord_ComboBox")
+        self.Y_Coord_ComboBox = self.findChild(QComboBox, "Y_Coord_ComboBox")
+
         # Table Widget
         self.Nodes_Table_Widget = self.findChild(QTableWidget, "Nodes_Table_Widget")
         self.Element_Table_Widget = self.findChild(QTableWidget, "Element_Table_Widget")
@@ -72,7 +70,6 @@ class UI(QMainWindow):
         self.Support_Table_Widget = self.findChild(QTableWidget, "Support_Table_Widget")
         
         self.Post_Processing_Table = self.findChild(QTableWidget, "Post_Processing_Table")
-
 
         # Frame Widget
         self.Matplotlib_Frame = self.findChild(QFrame,"Matplotlib_Frame")
@@ -93,11 +90,21 @@ class UI(QMainWindow):
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")
         self.Open_Menu = self.findChild(QAction, "actionOpen")
-        self.Save_Menu = self.findChild(QAction, "actionSave")
         self.Save_As_Menu = self.findChild(QAction, "actionSave_As")
         self.Quit_Menu = self.findChild(QAction, "actionQuit")
 
         self.PySEAD_Truss_Menu = self.findChild(QAction, "actionPySEAD_Truss")
+
+        # Keyboard Shortcuts
+        self.New_Menu.setShortcut("Ctrl+N")
+        self.Save_As_Menu.setShortcut("Ctrl+S")
+        self.Open_Menu.setShortcut("Ctrl+O")
+        self.Quit_Menu.setShortcut("Ctrl+Q")
+        self.Setup_Button.setShortcut("F4")
+        self.Solve_Truss_Button.setShortcut("F5")
+        self.Reactions_Button.setShortcut("F6")
+        self.Displacement_Button.setShortcut("F7")
+        self.Axial_Force_Button.setShortcut("F8")
 
         # Run Commands
 
@@ -105,12 +112,23 @@ class UI(QMainWindow):
         # Nodes
         self.Add_Node_Button.clicked.connect(self.Add_Node_Button_Func)
         self.Remove_Node_Button.clicked.connect(self.Remove_Node_Button_Func)
-        self.Update_Node_Button.clicked.connect(self.Update_Node_Button_Func)
+        self.Renumber_Nodes_Button.clicked.connect(self.Renumber_Nodes_Func)
 
         # Elements
         self.Add_Bar_Button.clicked.connect(self.Add_Bar_Button_Func)
         self.Remove_Bar_Button.clicked.connect(self.Remove_Bar_Button_Func)
-        self.Update_Bar_Button.clicked.connect(self.Update_Bar_Button_Func)
+        self.Renumber_Bar_Button.clicked.connect(self.Renumber_Bars_Func)
+        
+        # Materials
+        self.Update_Material_Button.clicked.connect(self.Update_Material_Button_Func)
+
+        # Forces
+        self.Add_Force_Button.clicked.connect(self.Add_Force_Button_Func)
+        self.Remove_Force_Button.clicked.connect(self.Remove_Force_Button_Func)
+
+        # Supports
+        self.Add_Support_Button.clicked.connect(self.Add_Support_Button_Func)
+        self.Remove_Support_Button.clicked.connect(self.Remove_Support_Button_Func)
 
         # Solve
         self.Solve_Truss_Button.clicked.connect(self.Solve_Truss_Func)
@@ -119,12 +137,11 @@ class UI(QMainWindow):
         self.Axial_Force_Button.clicked.connect(self.Draw_Truss_Axial_Force_Map)
         self.Displacement_Button.clicked.connect(self.Draw_Truss_Displacement)
 
-
-
         # Menu Commands
         self.New_Menu.triggered.connect(self.New_File_Func)
         self.Open_Menu.triggered.connect(self.Open_File_Func)
         self.Save_As_Menu.triggered.connect(self.Save_As_Func)
+        self.Quit_Menu.triggered.connect(self.Quit_Func)
         
 
         # Show the App
@@ -137,45 +154,25 @@ class UI(QMainWindow):
     ###### Nodes Function ######
     def Add_Node_Button_Func(self):
         # Grabe Item from LEdit Box
+        
         node = self.Node_Number_LEdit.text()
         x_coord = self.X_Coord_LEdit.text()
         y_coord = self.Y_Coord_LEdit.text()
         
+        new_node = int(node) + 1
+
         # Add Items to Table Widget
         rowPosition = self.Nodes_Table_Widget.rowCount()
         self.Nodes_Table_Widget.insertRow(rowPosition)
         self.Nodes_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
         self.Nodes_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x_coord))
         self.Nodes_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_coord))
-
+        
         # Clear the Textboxes
-        self.Node_Number_LEdit.setText("")
+        self.Node_Number_LEdit.setText(str(new_node))
         self.X_Coord_LEdit.setText("")
         self.Y_Coord_LEdit.setText("")
-
-    def Update_Node_Button_Func(self):
-        # Grab Item from Highlighted Row
-        clicked_row = self.Nodes_Table_Widget.currentRow()
-
-        # Delete Highlighted Row
-        self.Nodes_Table_Widget.removeRow(clicked_row)
-
-        # Grab Items from Columns of the Selected Row
-        node = self.Node_Number_LEdit.text()
-        x_coord = self.X_Coord_LEdit.text()
-        y_coord = self.Y_Coord_LEdit.text()
-
-        # Add Items to Table Widget
-        self.Nodes_Table_Widget.insertRow(clicked_row)
-        self.Nodes_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(node))
-        self.Nodes_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(x_coord))
-        self.Nodes_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(y_coord))
-
-        # Clear the Textboxes
-        self.Node_Number_LEdit.setText("")
-        self.X_Coord_LEdit.setText("")
-        self.Y_Coord_LEdit.setText("")
-
+        
     def Remove_Node_Button_Func(self):
         # Grab Item from Highlighted Row
         clicked = self.Nodes_Table_Widget.currentRow()
@@ -183,13 +180,35 @@ class UI(QMainWindow):
         # Delete Highlighted Row
         self.Nodes_Table_Widget.removeRow(clicked)
 
+    def Renumber_Nodes_Func(self):
+        rowPosition = self.Nodes_Table_Widget.rowCount()
+        
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            # node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = self.Nodes_Table_Widget.item(index,1).text()
+            y_coord = self.Nodes_Table_Widget.item(index,2).text()
+
+            if x_coord == "":
+                x_coord = '0'
+
+            if y_coord == "":
+                y_coord = '0'
+            
+            # print(type(str(index)), type(x_coord), type(y_coord))
+            self.Nodes_Table_Widget.setItem(index, 0, QTableWidgetItem(str(index+1)))
+            self.Nodes_Table_Widget.setItem(index, 1, QTableWidgetItem(x_coord))
+            self.Nodes_Table_Widget.setItem(index, 2, QTableWidgetItem(y_coord))
+            
+
     ###### Elements Function ######
     def Add_Bar_Button_Func(self):
         # Grabe Item from LEdit Box
         bar = self.Bar_Number_LEdit.text()
         node_1 = self.Node_1_LEdit.text()
         node_2 = self.Node_2_LEdit.text()
-        
+        area = self.Area_LEdit.text()
+        elasticity = self.Elasticity_LEdit.text()
+
         # Add Items to Table Widget
         rowPosition = self.Element_Table_Widget.rowCount()
         self.Element_Table_Widget.insertRow(rowPosition)
@@ -197,33 +216,43 @@ class UI(QMainWindow):
         self.Element_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(node_1))
         self.Element_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(node_2))
 
-        # Clear the Textboxes
-        self.Bar_Number_LEdit.setText("")
-        self.Node_1_LEdit.setText("")
-        self.Node_2_LEdit.setText("")
-
-    def Update_Bar_Button_Func(self):
-        # Grab Item from Highlighted Row
-        clicked_row = self.Element_Table_Widget.currentRow()
-
-        # Delete Highlighted Row
-        self.Element_Table_Widget.removeRow(clicked_row)
-
-        # Grab Items from Columns of the Selected Row
-        bar = self.Bar_Number_LEdit.text()
-        node_1 = self.Node_1_LEdit.text()
-        node_2 = self.Node_2_LEdit.text()
-
         # Add Items to Table Widget
-        self.Element_Table_Widget.insertRow(clicked_row)
-        self.Element_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(bar))
-        self.Element_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(node_1))
-        self.Element_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(node_2))
+        rowPosition = self.Material_Table_Widget.rowCount()
+        self.Material_Table_Widget.insertRow(rowPosition)
+        self.Material_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar))
+        self.Material_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(area))
+        self.Material_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(elasticity))
 
         # Clear the Textboxes
-        self.Bar_Number_LEdit.setText("")
+        self.Bar_Number_LEdit.setText(str(int(bar)+1))
         self.Node_1_LEdit.setText("")
         self.Node_2_LEdit.setText("")
+
+    def Renumber_Bars_Func(self):
+        for index in range(self.Element_Table_Widget.rowCount()):
+            node_1 = self.Element_Table_Widget.item(index,1).text()
+            node_2 = self.Element_Table_Widget.item(index,2).text()
+            area = self.Material_Table_Widget.item(index,1).text()
+            elasticity = self.Material_Table_Widget.item(index,2).text()
+
+            if node_1 == "":
+                node_1 = '0'
+
+            if node_2 == "":
+                node_2 = '0'
+
+            if area == "":
+                area = '0'
+
+            if elasticity == "":
+                elasticity = '0'
+            
+            self.Element_Table_Widget.setItem(index, 0, QTableWidgetItem(str(index+1)))
+            self.Element_Table_Widget.setItem(index, 1, QTableWidgetItem(node_1))
+            self.Element_Table_Widget.setItem(index, 2, QTableWidgetItem(node_2))
+            self.Material_Table_Widget.setItem(index, 0, QTableWidgetItem(str(index+1)))
+            self.Material_Table_Widget.setItem(index, 1, QTableWidgetItem(area))
+            self.Material_Table_Widget.setItem(index, 2, QTableWidgetItem(elasticity))
 
     def Remove_Bar_Button_Func(self):
         # Grab Item from Highlighted Row
@@ -231,6 +260,94 @@ class UI(QMainWindow):
 
         # Delete Highlighted Row
         self.Element_Table_Widget.removeRow(clicked)
+        self.Material_Table_Widget.removeRow(clicked)
+
+    ###### Materials Function ######
+    def Update_Material_Button_Func(self):
+        # Grab Item from Highlighted Row
+        clicked_row = self.Material_Table_Widget.currentRow()
+
+        # Delete Highlighted Row
+        self.Material_Table_Widget.removeRow(clicked_row)
+
+        # Grab Items from Columns of the Selected Row
+        bar = self.Element_Table_Widget.item(clicked_row,0).text()
+        area = self.Area_LEdit.text()
+        elasticity = self.Elasticity_LEdit.text()
+
+        # Add Items to Table Widget
+        self.Material_Table_Widget.insertRow(clicked_row)
+        self.Material_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(bar))
+        self.Material_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(area))
+        self.Material_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(elasticity))
+
+    def Remove_Material_Button_Func(self):
+        # Grab Item from Highlighted Row
+        clicked = self.Material_Table_Widget.currentRow()
+
+        # Delete Highlighted Row
+        self.Material_Table_Widget.removeRow(clicked)
+        self.Element_Table_Widget.removeRow(clicked)
+
+    ###### Forces Function ######
+    def Add_Force_Button_Func(self):
+        # Grabe Item from LEdit Box
+        node = self.Force_Node_Number_LEdit.text()
+        f_x = self.Force_X_LEdit.text()
+        f_y = self.Force_Y_LEdit.text()
+
+        # Add Items to Table Widget
+        rowPosition = self.Force_Table_Widget.rowCount()
+        self.Force_Table_Widget.insertRow(rowPosition)
+        self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+        self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+        self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+
+        # Clear the Textboxes
+        self.Force_Node_Number_LEdit.setText(str(int(node)+1))
+        self.Force_X_LEdit.setText("")
+        self.Force_Y_LEdit.setText("")
+
+    def Remove_Force_Button_Func(self):
+        # Grab Item from Highlighted Row
+        clicked = self.Force_Table_Widget.currentRow()
+
+        # Delete Highlighted Row
+        self.Force_Table_Widget.removeRow(clicked)
+
+    ###### Support Function ######
+    def Add_Support_Button_Func(self):
+        # Grabe Item from LEdit Box
+        node = self.Support_Node_LEdit.text()
+        x = self.X_Coord_ComboBox.currentText()
+        y = self.Y_Coord_ComboBox.currentText()
+
+        if x == "Yes":
+            x = '1'
+        else:
+            x = '0'
+        
+        if y == "Yes":
+            y = '1'
+        else:
+            y = '0'
+
+        # Add Items to Table Widget
+        rowPosition = self.Support_Table_Widget.rowCount()
+        self.Support_Table_Widget.insertRow(rowPosition)
+        self.Support_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+        self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x))
+        self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y))
+
+        # Clear the Textboxes
+        self.Support_Node_LEdit.setText("")
+
+    def Remove_Support_Button_Func(self):
+        # Grab Item from Highlighted Row
+        clicked = self.Support_Table_Widget.currentRow()
+
+        # Delete Highlighted Row
+        self.Support_Table_Widget.removeRow(clicked)
 
 
     ###### Truss Functions ######
@@ -238,6 +355,7 @@ class UI(QMainWindow):
         plt.clf()
         self.Draw_Truss_Setup()
         self.canvas.draw()
+        self.Post_Processing_Table.setRow(0)
 
         self.Initialize_Truss_Components()
         self.Truss = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
@@ -447,61 +565,70 @@ class UI(QMainWindow):
         forces_dict = {}
         supports_dict = {}
 
-        # try:
-        # Nodes    
-        for index in range(self.Nodes_Table_Widget.rowCount()):
-            node = int(self.Nodes_Table_Widget.item(index,0).text())
-            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
-            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
-            nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
-        nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
+        try:
+            # Nodes    
+            for index in range(self.Nodes_Table_Widget.rowCount()):
+                node = int(self.Nodes_Table_Widget.item(index,0).text())
+                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+                nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
+            nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
 
-        # Elements
-        for index in range(self.Element_Table_Widget.rowCount()):
-            bar = int(self.Element_Table_Widget.item(index,0).text())
-            node_1 = int(self.Element_Table_Widget.item(index,1).text())
-            node_2 = int(self.Element_Table_Widget.item(index,2).text())
-            elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
-        elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
+            # Elements
+            for index in range(self.Element_Table_Widget.rowCount()):
+                bar = int(self.Element_Table_Widget.item(index,0).text())
+                node_1 = int(self.Element_Table_Widget.item(index,1).text())
+                node_2 = int(self.Element_Table_Widget.item(index,2).text())
+                elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
+            elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
 
-        # Materials
-        for index in range(self.Material_Table_Widget.rowCount()):
-            bar = int(self.Material_Table_Widget.item(index,0).text())
-            area = float(self.Material_Table_Widget.item(index,1).text())
-            elasticity = float(self.Material_Table_Widget.item(index,2).text())
-            materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
-        materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
-        
-        # Forces
-        for index in range(self.Force_Table_Widget.rowCount()):
-            node = int(self.Force_Table_Widget.item(index,0).text())
-            f_x = float(self.Force_Table_Widget.item(index,1).text())
-            f_y = float(self.Force_Table_Widget.item(index,2).text())
-            forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
-        forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
-        
-        # Supports
-        for index in range(self.Support_Table_Widget.rowCount()):
-            node = int(self.Support_Table_Widget.item(index,0).text())
-            x = int(self.Support_Table_Widget.item(index,1).text())
-            y = int(self.Support_Table_Widget.item(index,2).text())
-            supports_dict.update({index+1:[int(node), float(x), float(y)]})
-        supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
-        
-        with pd.ExcelWriter(file_name[0]) as writer:
-            nodes_df.to_excel(writer, sheet_name='Nodes')
-            elements_df.to_excel(writer, sheet_name='Elements')
-            materials_df.to_excel(writer, sheet_name='Materials')
-            forces_df.to_excel(writer, sheet_name='Forces')
-            supports_df.to_excel(writer, sheet_name='Supports')
-        # except:
-        #     pass
+            # Materials
+            for index in range(self.Material_Table_Widget.rowCount()):
+                bar = int(self.Material_Table_Widget.item(index,0).text())
+                area = float(self.Material_Table_Widget.item(index,1).text())
+                elasticity = float(self.Material_Table_Widget.item(index,2).text())
+                materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
+            materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
+            
+            # Forces
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
+            forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Supports
+            for index in range(self.Support_Table_Widget.rowCount()):
+                node = int(self.Support_Table_Widget.item(index,0).text())
+                x = int(self.Support_Table_Widget.item(index,1).text())
+                y = int(self.Support_Table_Widget.item(index,2).text())
+                supports_dict.update({index+1:[int(node), float(x), float(y)]})
+            supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
+            
+            with pd.ExcelWriter(file_name[0]) as writer:
+                nodes_df.to_excel(writer, sheet_name='Nodes')
+                elements_df.to_excel(writer, sheet_name='Elements')
+                materials_df.to_excel(writer, sheet_name='Materials')
+                forces_df.to_excel(writer, sheet_name='Forces')
+                supports_df.to_excel(writer, sheet_name='Supports')
+            
+            print("Saved")
+        except:
+            print("Canceled Dialogue")
 
     def Save_As_Func(self):
         global file_name
-        file_name = QFileDialog.getSaveFileName(self, "Save File", "", "Excel File (*.xlsx);; All Files (*)")
-        self.Save_Func()
-        
+        try:
+            file_name = QFileDialog.getSaveFileName(self, "Save File", "", "Excel File (*.xlsx);; All Files (*)")
+            if file_name != "":
+                self.Solve_Truss_Button.setEnabled(True)
+
+            self.Save_Func()
+
+        except:
+            print("Canceled Dialogue")
+            # self.Solve_Truss_Button.setEnabled(False)
 
     def Open_File_Func(self):
         self.New_File_Func()
@@ -591,9 +718,14 @@ class UI(QMainWindow):
                 self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x_support))
                 self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_support))  
             
+            self.Solve_Truss_Button.setEnabled(True)
         except:
-            pass
+            print("Canceled Dialogue")
 
+    def Quit_Func(self):
+        sys.exit()
+
+###### Navigation Toolbar Customized #######
 class NavigationToolbarCustom(NavigationToolbar):
     # only display the buttons we need
     toolitems = [t for t in NavigationToolbar.toolitems if
@@ -602,5 +734,8 @@ class NavigationToolbarCustom(NavigationToolbar):
 # Initialize the App
 app = QApplication(sys.argv)
 UIWindow = UI()
+# app.setStyleSheet(qdarktheme.load_stylesheet("dark"))
+# app.setStyleSheet(qdarktheme.load_stylesheet("light"))
+
 app.exec_()
 
