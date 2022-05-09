@@ -513,7 +513,7 @@ class Truss_2D:
 
         return displacements_dict
 
-    def Draw_Truss_Displacements(self, linewidth = 2, magnification_factor = 100, figure_size = None, offset = 0.12):
+    def Draw_Truss_Displacements(self, linewidth = 2, magnification_factor = 100, offset = 0.12):
         '''
         Draws the Truss displacements after solving the truss
         
@@ -635,6 +635,8 @@ class Truss_2D:
         normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
         colorparams = forces
         colormap = cm.plasma
+        # colormap = cm.Spectral
+        # colormap = cm.PiYG
 
         # Colorbar setup
         s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
@@ -718,6 +720,7 @@ class Truss_2D:
         normalize  = mpl.colors.Normalize(vmin=min(stresses), vmax=max(stresses))
         colorparams = stresses
         colormap = cm.plasma
+        # colormap = cm.Spectral
 
         # Colorbar setup
         s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)

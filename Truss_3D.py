@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import matplotlib as mpl
-plt.style.use('fivethirtyeight')
+# plt.style.use('fivethirtyeight')
 
 
 class Truss_3D:

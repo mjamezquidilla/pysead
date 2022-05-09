@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1101</width>
-    <height>773</height>
+    <width>1190</width>
+    <height>822</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>PySEAD Truss 2D</string>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
     <property name="sizeConstraint">
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
@@ -62,7 +62,13 @@
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
                  <widget class="QTableWidget" name="Nodes_Table_Widget">
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                  </property>
                   <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sortingEnabled">
                    <bool>true</bool>
                   </property>
                   <property name="rowCount">
@@ -228,6 +234,9 @@
                   <property name="alternatingRowColors">
                    <bool>true</bool>
                   </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
                   <property name="rowCount">
                    <number>0</number>
                   </property>
@@ -389,6 +398,9 @@
                 <item>
                  <widget class="QTableWidget" name="Material_Table_Widget">
                   <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sortingEnabled">
                    <bool>true</bool>
                   </property>
                   <property name="rowCount">
@@ -554,6 +566,9 @@
                   <property name="alternatingRowColors">
                    <bool>true</bool>
                   </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
                   <property name="rowCount">
                    <number>0</number>
                   </property>
@@ -715,6 +730,9 @@
                 <item>
                  <widget class="QTableWidget" name="Support_Table_Widget">
                   <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sortingEnabled">
                    <bool>true</bool>
                   </property>
                   <property name="rowCount">
@@ -894,7 +912,7 @@
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_14">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_10" stretch="2,0">
+            <layout class="QVBoxLayout" name="verticalLayout_10" stretch="10,1,0">
              <item>
               <widget class="QGroupBox" name="groupBox_12">
                <property name="title">
@@ -903,8 +921,33 @@
                <layout class="QHBoxLayout" name="horizontalLayout_16">
                 <item>
                  <widget class="QTableWidget" name="Post_Processing_Table">
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::NoEditTriggers</set>
+                  </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_11">
+               <property name="title">
+                <string>Solver</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item>
+                 <widget class="QPushButton" name="Solve_Truss_Button">
+                  <property name="text">
+                   <string>Solve Truss</string>
                   </property>
                  </widget>
                 </item>
@@ -934,6 +977,9 @@
                   </item>
                   <item>
                    <widget class="QPushButton" name="Reactions_Button">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -947,6 +993,9 @@
                   </item>
                   <item>
                    <widget class="QPushButton" name="Axial_Force_Button">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -960,6 +1009,9 @@
                   </item>
                   <item>
                    <widget class="QPushButton" name="Displacement_Button">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -972,6 +1024,121 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="groupBox_14">
+                  <property name="title">
+                   <string>Plot Modifiers</string>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_17">
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout_2">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label">
+                       <property name="text">
+                        <string>Displacement Factor</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_4">
+                       <property name="text">
+                        <string>Label Offset</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QLabel" name="label_2">
+                       <property name="text">
+                        <string>Arrow Length</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLineEdit" name="Displacement_Factor_LEdit">
+                       <property name="text">
+                        <string>100</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QLabel" name="label_5">
+                       <property name="text">
+                        <string>Arrow Head Size</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="Line_Width_LEdit">
+                       <property name="text">
+                        <string>2</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="Label_Offset_LEdit">
+                       <property name="text">
+                        <string>0.12</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="2">
+                      <widget class="QLabel" name="label_6">
+                       <property name="text">
+                        <string>Arrow Line Width</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QLineEdit" name="Arrow_Length_LEdit">
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_3">
+                       <property name="text">
+                        <string>Line Width</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QLineEdit" name="Arrow_Head_Size_LEdit">
+                       <property name="text">
+                        <string>0.05</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="3">
+                      <widget class="QLineEdit" name="Arrow_Line_Width_LEdit">
+                       <property name="text">
+                        <string>2</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -986,14 +1153,28 @@
      </widget>
     </item>
     <item>
-     <widget class="QFrame" name="Matplotlib_Frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout_14" stretch="1,0">
+      <item>
+       <widget class="QFrame" name="Matplotlib_Frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="Navigation_Frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -1002,7 +1183,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1101</width>
+     <width>1190</width>
      <height>21</height>
     </rect>
    </property>

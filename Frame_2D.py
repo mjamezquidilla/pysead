@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from matplotlib.patches import Arc, RegularPolygon
 from numpy import radians as rad
-plt.style.use('fivethirtyeight')
-plt.rcParams['hatch.color'] = 'white'
+# plt.style.use('fivethirtyeight')
+# plt.rcParams['hatch.color'] = 'white'
 # print("Positive Values for forces: right, up (righthand rule)")
 # print("Negative moment = clockwise, Positive moment = counter-clockwise (righthand rule)")
 # print("For adding Local Member Load: Axial Load is always parallel to the member local axis")
