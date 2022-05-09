@@ -3,7 +3,6 @@ import sys
 # import qdarktheme
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QTableWidget, QPushButton, QFrame, QAction, QTableWidgetItem, QHBoxLayout, QFileDialog, QComboBox
 from PyQt5 import uic, QtCore
-from isort import file
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
@@ -355,7 +354,7 @@ class UI(QMainWindow):
         plt.clf()
         self.Draw_Truss_Setup()
         self.canvas.draw()
-        self.Post_Processing_Table.setRow(0)
+        self.Post_Processing_Table.setRowCount(0)
 
         self.Initialize_Truss_Components()
         self.Truss = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
@@ -515,7 +514,7 @@ class UI(QMainWindow):
 
     def Draw_Truss_Setup(self):
         self.Initialize_Truss_Components()
-        self.Truss = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
+        self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
 
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
@@ -523,7 +522,7 @@ class UI(QMainWindow):
         width_of_arrow = float(self.Arrow_Head_Size_LEdit.text())
         arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
 
-        self.Truss.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
+        self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
 
     def Draw_Reactions(self):
         linewidth = float(self.Line_Width_LEdit.text())
