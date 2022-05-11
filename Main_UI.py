@@ -1,6 +1,5 @@
 # from PyQt5 import QtWidgets
 import sys, os
-# import qdarktheme
 import qdarkstyle
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QTableWidget, QPushButton, QFrame, QAction, QTableWidgetItem, QHBoxLayout, QFileDialog, QComboBox
 from PyQt5 import uic
@@ -525,18 +524,74 @@ class UI(QMainWindow):
         # Delete Highlighted Row
         self.Support_Table_Widget.removeRow(clicked)
 
+        # Supports
+        self.supports = {}
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            self.supports.update({node: [x, y]})
+
+        print(self.supports)
 
     ###### Truss Functions ######
     def Solve_Truss_Func(self):
+        # Update all dictionaries from tables
+        self.Renumber_Nodes_Func()
+        self.Renumber_Bars_Func()
+        
+        self.nodes = {}
+        self.elements = {}
+        self.areas = {}
+        self.forces = {}
+        self.supports = {}
+
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+            self.nodes.update({node: [x_coord,y_coord]})
+
+        # Elements
+        for index in range(self.Element_Table_Widget.rowCount()):
+            bar = int(self.Element_Table_Widget.item(index,0).text())
+            node_1 = int(self.Element_Table_Widget.item(index,1).text())
+            node_2 = int(self.Element_Table_Widget.item(index,2).text())
+            self.elements.update({bar:[node_1, node_2]})
+
+        # Materials
+        for index in range(self.Material_Table_Widget.rowCount()):
+            bar = int(self.Material_Table_Widget.item(index,0).text())
+            area = float(self.Material_Table_Widget.item(index,1).text())
+            elasticity = float(self.Material_Table_Widget.item(index,2).text())
+            self.areas.update({bar: area})
+            self.elasticity.update({bar: elasticity})
+
+        # Forces
+        for index in range(self.Force_Table_Widget.rowCount()):
+            bar = int(self.Force_Table_Widget.item(index,0).text())
+            f_x = float(self.Force_Table_Widget.item(index,1).text())
+            f_y = float(self.Force_Table_Widget.item(index,2).text())
+            self.forces.update({bar: [f_x, f_y]})
+
+        # Supports
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            self.supports.update({node: [x, y]})
+
+        # Update plot
         plt.clf()
         self.Draw_Truss_Setup()
         self.canvas.draw()
         self.Post_Processing_Table.setRowCount(0)
 
-        self.Initialize_Truss_Components()
+        # Solve Truss
         self.Truss = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
         self.Truss.Solve()
 
+        # Save Results
         self.df_displacements = pd.DataFrame.from_dict(self.Truss.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces = pd.DataFrame.from_dict(self.Truss.member_forces_, orient='index', columns=['Force'])
         self.df_reactions = pd.DataFrame.from_dict(self.Truss.reactions_, orient='index', columns=['F_x','F_y'])
@@ -942,8 +997,6 @@ class NavigationToolbarCustom(NavigationToolbar):
 # Initialize the App
 app = QApplication(sys.argv)
 UIWindow = UI()
-# app.setStyleSheet(qdarktheme.load_stylesheet("dark"))
-# app.setStyleSheet(qdarktheme.load_stylesheet("light"))
 app.setStyleSheet(qdarkstyle.load_stylesheet())
 
 app.exec_()
