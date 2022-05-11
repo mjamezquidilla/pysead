@@ -24,7 +24,7 @@ class UI(QMainWindow):
 
 
         # Load the UI file
-        uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
+        uic.loadUi("GUI.ui", self)
 
         # Define our widgets
         # Button Widget
@@ -186,6 +186,8 @@ class UI(QMainWindow):
             self.nodes.update({node: [x_coord, y_coord]})
             self.nodes = {k: v for k, v in sorted(self.nodes.items(), key=lambda item: item[0])}
 
+            # Remove duplicated nodes
+   
             # Remove the table items
             self.Nodes_Table_Widget.setRowCount(0)
 
@@ -205,6 +207,9 @@ class UI(QMainWindow):
                 self.Nodes_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_coord))
 
             self.Renumber_Nodes_Func()
+
+            # Draw Truss
+            self.Draw_Setup()
             print(self.nodes)
 
         
@@ -214,6 +219,7 @@ class UI(QMainWindow):
 
         # Delete Highlighted Row
         self.Nodes_Table_Widget.removeRow(clicked)
+        self.Renumber_Nodes_Func()
         self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
 
         # Reinitialize nodes dictionary and copy all data from table into dictionary        
@@ -304,6 +310,9 @@ class UI(QMainWindow):
 
             self.Renumber_Bars_Func()
 
+            # Draw Truss
+            self.Draw_Setup()
+
             print(self.elements)
             print(self.areas)
             print(self.elasticity)
@@ -364,7 +373,8 @@ class UI(QMainWindow):
             self.areas.update({int(bar): float(area)})
             self.elasticity.update({int(bar): float(elasticity)})
             
-
+        # Draw Truss
+        self.Draw_Setup()
         print(self.elements)
         print(self.areas)
         print(self.elasticity)
@@ -428,6 +438,9 @@ class UI(QMainWindow):
         # self.Force_X_LEdit.setText("")
         # self.Force_Y_LEdit.setText("")
 
+        # Draw Truss
+        self.Draw_Setup()
+
         print(self.forces)
 
     def Remove_Force_Button_Func(self):
@@ -450,29 +463,47 @@ class UI(QMainWindow):
     ###### Support Function ######
     def Add_Support_Button_Func(self):
         # Grabe Item from LEdit Box
-        node = self.Support_Node_LEdit.text()
+        node = int(self.Support_Node_LEdit.text())
         x = self.X_Coord_ComboBox.currentText()
         y = self.Y_Coord_ComboBox.currentText()
 
         if x == "Yes":
-            x = '1'
+            x = 1
         else:
-            x = '0'
+            x = 0
         
         if y == "Yes":
-            y = '1'
+            y = 1
         else:
-            y = '0'
+            y = 0
 
-        # Add Items to Table Widget
-        rowPosition = self.Support_Table_Widget.rowCount()
-        self.Support_Table_Widget.insertRow(rowPosition)
-        self.Support_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
-        self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x))
-        self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y))
+        self.supports.update({node:[x,y]})
+        self.supports = {k: v for k, v in sorted(self.supports.items(), key=lambda item: item[0])}
+        print(self.supports)
+
+        self.Support_Table_Widget.setRowCount(0)
+
+        # Loop all the nodes dictionary and replace/update the table widget
+        for key, item in self.supports.items():
+            node = str(key)
+            x = str(item[0])
+            y = str(item[1])
+
+            # Add Items to Table Widget
+            rowPosition = self.Support_Table_Widget.rowCount()
+
+            # print(rowPosition)
+            self.Support_Table_Widget.insertRow(rowPosition)
+            self.Support_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+            self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x))
+            self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y))
 
         # Clear the Textboxes
         self.Support_Node_LEdit.setText("")
+
+        # Draw Truss
+        self.Draw_Setup()
+
 
     def Remove_Support_Button_Func(self):
         # Grab Item from Highlighted Row
@@ -646,7 +677,6 @@ class UI(QMainWindow):
     ##### Matplotlib Functions #####
 
     def Draw_Truss_Setup(self):
-        self.Initialize_Truss_Components()
         self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
 
         linewidth = float(self.Line_Width_LEdit.text())
