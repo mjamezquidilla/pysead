@@ -1,13 +1,16 @@
 # from PyQt5 import QtWidgets
-import sys
+import sys, os
 # import qdarktheme
+import qdarkstyle
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QTableWidget, QPushButton, QFrame, QAction, QTableWidgetItem, QHBoxLayout, QFileDialog, QComboBox
-from PyQt5 import uic, QtCore
+from PyQt5 import uic
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-from sympy import RealNumber
 from pysead import Truss_2D
+plt.style.use('dark_background_pysead')
+
+os.environ['QT_API'] = 'pyqt5'
 
 class UI(QMainWindow):
     def __init__(self):
@@ -49,6 +52,8 @@ class UI(QMainWindow):
         self.Reactions_Button = self.findChild(QPushButton, "Reactions_Button")
         self.Axial_Force_Button = self.findChild(QPushButton, "Axial_Force_Button")
         self.Displacement_Button = self.findChild(QPushButton, "Displacement_Button")
+
+        self.Save_Figure_Button = self.findChild(QPushButton, "Save_Figure_Button")
 
         # Line Edit Widget
         self.Node_Number_LEdit = self.findChild(QLineEdit, "Node_Number_LEdit")
@@ -99,7 +104,10 @@ class UI(QMainWindow):
         self.New_Menu = self.findChild(QAction, "actionNew")
         self.Open_Menu = self.findChild(QAction, "actionOpen")
         self.Save_As_Menu = self.findChild(QAction, "actionSave_As")
-        self.Quit_Menu = self.findChild(QAction, "actionQuit")
+        self.Quit_Menu = self.findChild(QAction, "actionQuit")\
+
+        self.DarkMode_Menu = self.findChild(QAction, "actionDarkMode")
+        self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
 
         self.PySEAD_Truss_Menu = self.findChild(QAction, "actionPySEAD_Truss")
 
@@ -144,12 +152,17 @@ class UI(QMainWindow):
         self.Reactions_Button.clicked.connect(self.Draw_Truss_Reactions)
         self.Axial_Force_Button.clicked.connect(self.Draw_Truss_Axial_Force_Map)
         self.Displacement_Button.clicked.connect(self.Draw_Truss_Displacement)
+        
+        self.Save_Figure_Button.clicked.connect(self.Save_Figure_Func)
 
         # Menu Commands
         self.New_Menu.triggered.connect(self.New_File_Func)
         self.Open_Menu.triggered.connect(self.Open_File_Func)
         self.Save_As_Menu.triggered.connect(self.Save_As_Func)
         self.Quit_Menu.triggered.connect(self.Quit_Func)
+        
+        self.DarkMode_Menu.triggered.connect(self.DarkMode_Menu_Func)
+        self.LightMode_Menu.triggered.connect(self.LightMode_Menu_Func)
         
         self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
         self.Bar_row_Position = self.Element_Table_Widget.rowCount()
@@ -897,8 +910,28 @@ class UI(QMainWindow):
         except:
             print("Canceled Dialogue")
 
+    def Save_Figure_Func(self):
+        figure_name = QFileDialog.getSaveFileName(self, "Save Figure", "", ".PNG (*.png);; All Files (*)")
+
+        plt.savefig(figure_name[0], transparent=True, pad_inches = 0)
+
+    def DarkMode_Menu_Func(self):
+        app.setStyleSheet(qdarkstyle.load_stylesheet())
+        plt.style.use('dark_background_pysead')
+        plt.clf()
+        self.canvas.draw()
+    
+    def LightMode_Menu_Func(self):
+        app.setStyleSheet("")
+        plt.clf()
+        plt.style.use('fivethirtyeight')
+        
+        self.canvas.draw()
+
     def Quit_Func(self):
         sys.exit()
+
+
 
 ###### Navigation Toolbar Customized #######
 class NavigationToolbarCustom(NavigationToolbar):
@@ -911,6 +944,7 @@ app = QApplication(sys.argv)
 UIWindow = UI()
 # app.setStyleSheet(qdarktheme.load_stylesheet("dark"))
 # app.setStyleSheet(qdarktheme.load_stylesheet("light"))
+app.setStyleSheet(qdarkstyle.load_stylesheet())
 
 app.exec_()
 

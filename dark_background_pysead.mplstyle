@@ -1,0 +1,29 @@
+# Set black background default line colors to e9e9e9.
+
+lines.color: e9e9e9
+patch.edgecolor: e9e9e9
+
+text.color: e9e9e9
+
+axes.facecolor: 19232d
+axes.edgecolor: e9e9e9
+axes.labelcolor: e9e9e9
+axes.prop_cycle: cycler('color', ['8dd3c7', 'feffb3', 'bfbbd9', 'fa8174', '81b1d2', 'fdb462', 'b3de69', 'bc82bd', 'ccebc4', 'ffed6f'])
+
+xtick.color: e9e9e9
+ytick.color: e9e9e9
+
+grid.color: e9e9e9
+
+figure.facecolor: 19232d
+figure.edgecolor: 19232d
+
+savefig.facecolor: 19232d
+savefig.edgecolor: 19232d
+
+### Boxplots
+boxplot.boxprops.color: e9e9e9
+boxplot.capprops.color: e9e9e9
+boxplot.flierprops.color: e9e9e9
+boxplot.flierprops.markeredgecolor: e9e9e9
+boxplot.whiskerprops.color: e9e9e9

@@ -2,6 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib as mpl
+
+# Colors
+global line_color, bg_color, node_color, force_color, support_color
+# line_color = '#5171A5'
+# bg_color = '#e9e9e9'
+# node_color = '#E5446D'
+# force_color = '#d64550'
+# support_color = '#69995d'
+
+line_color = '#5171A5'
+bg_color = '#e9e9e9'
+node_color = '#69995d'
+force_color = '#d64550'
+support_color = '#e5446D'
 class Truss_2D:
     
     def __init__(self, nodes, elements, supports, forces, elasticity, cross_area):
@@ -368,7 +382,7 @@ class Truss_2D:
         return np.round(s_member, 5)
 
 
-    def Draw_Truss_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = True):
+    def Draw_Truss_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, width_of_arrow = 0.05, arrow_line_width = 2, grid = False):
         '''
         Draws the Truss as initialized by the class
         
@@ -386,7 +400,6 @@ class Truss_2D:
         grid: boolean
               activates gridlines. default value is False
         '''
-        
         
         nodes = self.nodes
         elements = self.elements
@@ -406,8 +419,8 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
-
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
+            ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
         # plotting supports
         for support in supports:
 
@@ -418,17 +431,17 @@ class Truss_2D:
             y = nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c=support_color, zorder = 2)
             elif support_x == 0 and support_y == 1:
-                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=support_color, zorder = 2)
             else: 
-                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=force_color, zorder = 2)
     
         # plotting node labels
         # offset = 0.12
         
         for node in nodes:
-            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c=node_color)
             
         # plotting member labels
         for element in elements:
@@ -440,7 +453,7 @@ class Truss_2D:
             middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
-            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = line_color)
             
         # plotting force vectors
         # loop all x-direction forces
@@ -449,43 +462,38 @@ class Truss_2D:
             y = nodes[force][1]
 
             f_x = forces[force][0]
+            f_y = forces[force][1]
 
             # plot arrow x-direction
             if f_x > 0:
                 ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_x, ((x - length_of_arrow), y + 0.1), c='red')
-                ax.scatter(x - length_of_arrow, y, c='white')
+                ax.annotate(f_x, ((x - length_of_arrow), y + 0.1), c=force_color)
+                # ax.scatter(x - length_of_arrow, y, c='white')
             elif f_x < 0:
                 ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_x, ((x + length_of_arrow), y + 0.1), c='red')
-                ax.scatter(x + length_of_arrow,y, c='white')
+                ax.annotate(f_x, ((x + length_of_arrow), y + 0.1), c=force_color)
+                # ax.scatter(x + length_of_arrow,y, c='white')
             else:
                 pass
 
-        # loop all y-direction forces
-        for force in forces:
-            x = nodes[force][0]
-            y = nodes[force][1]
-
-            f_y = forces[force][1]
-
+            # loop all y-direction forces
             # plot arrow y-direction
             if f_y > 0:
                 ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_y, (x + 0.1, (y - length_of_arrow)), c='red') 
-                ax.scatter(x,y - length_of_arrow, c='white')
+                ax.annotate(f_y, (x + 0.1, (y - length_of_arrow)), c=force_color) 
+                # ax.scatter(x,y - length_of_arrow, c='white')
             elif f_y < 0:
                 ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
-                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color='r', zorder = 15,
+                          shape = 'full', head_width = width_of_arrow, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_y, (x + 0.1, (y + length_of_arrow)), c='red')
-                ax.scatter(x,y + length_of_arrow, c='white')
+                ax.annotate(f_y, (x + 0.1, (y + length_of_arrow)), c=force_color)
+                # ax.scatter(x,y + length_of_arrow, c='white')
             else:
                 pass
             
@@ -553,7 +561,8 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linestyle = '--', alpha = 0.10, linewidth = linewidth)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linestyle = '--', alpha = 0.50, linewidth = linewidth)
+            ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10, alpha = 0.50)
     
         # Plotting New nodes
         # plotting nodes and members
@@ -563,7 +572,8 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
+            ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
 
         # plotting supports
         for support in supports:
@@ -575,29 +585,29 @@ class Truss_2D:
             y = new_nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c=support_color, zorder = 2)
             elif support_x == 0 and support_y == 1:
-                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=support_color, zorder = 2)
             else: 
-                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=force_color, zorder = 2)
     
         # plotting node labels
         # offset = 0.12
         
         for node in new_nodes:
-            ax.annotate(node, (new_nodes[node][0]+offset, new_nodes[node][1]+offset), zorder = 10, c='black')
+            ax.annotate(node, (new_nodes[node][0]+offset, new_nodes[node][1]+offset), zorder = 10, c=node_color)
             
         # plotting member labels
-        for element in elements:
-            fromNode = elements[element][0]
-            toNode = elements[element][1]
-            fromPoint = new_nodes[fromNode]
-            toPoint = new_nodes[toNode]
+        # for element in elements:
+        #     fromNode = elements[element][0]
+        #     toNode = elements[element][1]
+        #     fromPoint = new_nodes[fromNode]
+        #     toPoint = new_nodes[toNode]
             
-            middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
-                           abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
+        #     middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
+        #                    abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
-            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+        #     ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = line_color)
 
         plt.gca().axes.get_xaxis().set_visible(False)
         plt.gca().axes.get_yaxis().set_visible(False)
@@ -634,9 +644,11 @@ class Truss_2D:
 
         normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
         colorparams = forces
-        colormap = cm.plasma
+        # colormap = cm.plasma
         # colormap = cm.Spectral
         # colormap = cm.PiYG
+        colormap = cm.viridis
+
 
         # Colorbar setup
         s_map = cm.ScalarMappable(norm=normalize, cmap=colormap)
@@ -657,6 +669,7 @@ class Truss_2D:
             y2 = toPoint[1]
             color = colormap(normalize(forces[i]))
             ax.plot([x1,x2],[y1,y2], marker = 'o', color = color, zorder = 5, linewidth = linewidth)
+            ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
 
         # plotting supports
         for support in supports:
@@ -668,11 +681,11 @@ class Truss_2D:
             y = nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c=support_color, zorder = 2)
             elif support_x == 0 and support_y == 1:
-                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=support_color, zorder = 2)
             else: 
-                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=force_color, zorder = 2)
             
         # plotting member labels
         for element in elements:
@@ -684,7 +697,7 @@ class Truss_2D:
             middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                            abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
             
-            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = line_color)
             
         cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
         cbar.set_label(label='Force: (+) Tension, (-) Compression')    
@@ -741,6 +754,7 @@ class Truss_2D:
             y2 = toPoint[1]
             color = colormap(normalize(stresses[i]))
             ax.plot([x1,x2],[y1,y2], marker = 'o', color = color, zorder = 5, linewidth = linewidth)
+            ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
 
         # plotting supports
         for support in supports:
@@ -752,11 +766,11 @@ class Truss_2D:
             y = nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c=support_color, zorder = 2)
             elif support_x == 0 and support_y == 1:
-                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=support_color, zorder = 2)
             else: 
-                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=force_color, zorder = 2)
             
         # plotting member labels
         if show_member_label == True:
@@ -769,13 +783,13 @@ class Truss_2D:
                 middlePoint = [abs((toPoint[0] - fromPoint[0])/2) + min(fromPoint[0], toPoint[0]), 
                             abs((toPoint[1] - fromPoint[1])/2) + min(fromPoint[1], toPoint[1])]
                 
-                ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+                ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = line_color)
             
         cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
         cbar.set_label(label='Stress: (+) Tension, (-) Compression')    
         # plt.show()
 
-    def Draw_Reactions_(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = False, show_ext_forces = False):
+    def Draw_Reactions_(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = False, show_ext_forces = False, darkmode = False):
         '''
         Draws the Truss as initialized by the class
         
@@ -793,7 +807,8 @@ class Truss_2D:
         grid: boolean
               activates gridlines. default value is False
         '''
-        
+
+
         
         nodes = self.nodes
         elements = self.elements
@@ -812,7 +827,8 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
+            ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
 
         # plotting supports
         for support in supports:
@@ -824,11 +840,11 @@ class Truss_2D:
             y = nodes[support][1]
 
             if support_x == 1 and support_y == 1:
-                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = '^', s = 200, c=support_color, zorder = 2)
             elif support_x == 0 and support_y == 1:
-                ax.scatter(x, y, marker = 'o', s = 200, c='r', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=support_color, zorder = 2)
             else: 
-                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+                ax.scatter(x, y, marker = 'o', s = 200, c=force_color, zorder = 2)
 
         
     
@@ -836,7 +852,7 @@ class Truss_2D:
         # offset = 0.12
         
         for node in nodes:
-            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c=node_color)
             
         # plotting member labels
         # for element in elements:
@@ -865,14 +881,14 @@ class Truss_2D:
                     ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
                             shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                             linewidth = arrow_line_width)
-                    ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
-                    ax.scatter(x - length_of_arrow, y, c='white')
+                    ax.annotate(f_x, ((x - length_of_arrow), y + offset), c=force_color)
+                    # ax.scatter(x - length_of_arrow, y, c='white')
                 elif f_x < 0:
                     ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
                             shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                             linewidth = arrow_line_width)
-                    ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
-                    ax.scatter(x + length_of_arrow,y, c='white')
+                    ax.annotate(f_x, ((x + length_of_arrow), y + offset), c=force_color)
+                    # ax.scatter(x + length_of_arrow,y, c='white')
                 else:
                     pass
 
@@ -881,14 +897,14 @@ class Truss_2D:
                     ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
                             shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                             linewidth = arrow_line_width)
-                    ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
-                    ax.scatter(x,y - length_of_arrow, c='white')
+                    ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c=force_color) 
+                    # ax.scatter(x,y - length_of_arrow, c='white')
                 elif f_y < 0:
                     ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
                             shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                             linewidth = arrow_line_width)
-                    ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
-                    ax.scatter(x,y + length_of_arrow, c='white')
+                    ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c=force_color)
+                    # ax.scatter(x,y + length_of_arrow, c='white')
                 else:
                     pass
 
@@ -905,32 +921,32 @@ class Truss_2D:
             # plot arrow x-direction
             if f_x > 0:
                 ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
-                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='b', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='b')
-                ax.scatter(x - length_of_arrow, y, c='white')
+                ax.annotate(f_x, ((x - length_of_arrow), y + offset), c=force_color)
+                # ax.scatter(x - length_of_arrow, y, c='white')
             elif f_x < 0:
                 ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
-                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='b', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='b')
-                ax.scatter(x + length_of_arrow,y, c='white')
+                ax.annotate(f_x, ((x + length_of_arrow), y + offset), c=force_color)
+                # ax.scatter(x + length_of_arrow,y, c='white')
             else:
                 pass
 
             # plot arrow y-direction
             if f_y > 0:
                 ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
-                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='b', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='b') 
-                ax.scatter(x,y - length_of_arrow, c='white')
+                ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c=force_color) 
+                # ax.scatter(x,y - length_of_arrow, c='white')
             elif f_y < 0:
                 ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
-                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='b', zorder = 15,
+                          shape = 'full', head_width = arrow_head_size, length_includes_head = True, color=force_color, zorder = 15,
                           linewidth = arrow_line_width)
-                ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='b')
-                ax.scatter(x,y + length_of_arrow, c='white')
+                ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c=force_color)
+                # ax.scatter(x,y + length_of_arrow, c='white')
             else:
                 pass
 
