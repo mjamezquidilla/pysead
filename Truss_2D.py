@@ -413,14 +413,26 @@ class Truss_2D:
         ax.set_aspect(aspect='equal')
        
         # plotting nodes and members
+        node_x = []
+        node_y = []
+
+        for node in nodes:
+            node_x.append(nodes[node][0])
+            node_y.append(nodes[node][1])
+        ax.scatter(node_x, node_y, color = line_color, zorder = 10)
+        
+        for node in nodes:
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c=node_color)
+
+        # plotting members
         for element in dict(elements):
             fromPoint, toPoint = self.Extract_Coordinate_Points(element, nodes, elements)
             x1 = fromPoint[0]
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
             ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
         # plotting supports
         for support in supports:
 
@@ -440,8 +452,6 @@ class Truss_2D:
         # plotting node labels
         # offset = 0.12
         
-        for node in nodes:
-            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c=node_color)
             
         # plotting member labels
         for element in elements:
@@ -648,6 +658,7 @@ class Truss_2D:
         # colormap = cm.Spectral
         # colormap = cm.PiYG
         colormap = cm.viridis
+        # colormap = cm.jet
 
 
         # Colorbar setup
@@ -668,8 +679,8 @@ class Truss_2D:
             x2 = toPoint[0]
             y2 = toPoint[1]
             color = colormap(normalize(forces[i]))
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = color, zorder = 5, linewidth = linewidth)
             ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = color, zorder = 5, linewidth = linewidth)
 
         # plotting supports
         for support in supports:
@@ -827,8 +838,8 @@ class Truss_2D:
             y1 = fromPoint[1]
             x2 = toPoint[0]
             y2 = toPoint[1]
-            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
             ax.scatter([x1,x2],[y1,y2], color = node_color, zorder = 10)
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = line_color, zorder = 5, linewidth = linewidth)
 
         # plotting supports
         for support in supports:

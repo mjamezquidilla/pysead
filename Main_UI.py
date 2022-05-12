@@ -1,12 +1,19 @@
 # from PyQt5 import QtWidgets
-import sys, os
-import qdarkstyle
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QTableWidget, QPushButton, QFrame, QAction, QTableWidgetItem, QHBoxLayout, QFileDialog, QComboBox
-from PyQt5 import uic
-import pandas as pd
+import os
+import sys
+
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
+import pandas as pd
+import qdarkstyle
+from matplotlib.backends.backend_qt5agg import \
+    FigureCanvasQTAgg  # , NavigationToolbar2QT as NavigationToolbar
+from PyQt5 import uic
+from PyQt5.QtWidgets import (QAction, QApplication, QComboBox, QFileDialog,
+                             QFrame, QHBoxLayout, QLineEdit, QMainWindow,
+                             QPushButton, QTableWidget, QTableWidgetItem, QStatusBar)
+
 from pysead import Truss_2D
+
 plt.style.use('dark_background_pysead')
 
 os.environ['QT_API'] = 'pyqt5'
@@ -85,7 +92,7 @@ class UI(QMainWindow):
 
         # Frame Widget
         self.Matplotlib_Frame = self.findChild(QFrame,"Matplotlib_Frame")
-        self.Navigation_Frame = self.findChild(QFrame,"Navigation_Frame")
+        # self.Navigation_Frame = self.findChild(QFrame,"Navigation_Frame")
 
         # Put Matplotlib inside Matplotlib Frame
         self.horizontalLayout_Matplotlib = QHBoxLayout(self.Matplotlib_Frame)
@@ -95,9 +102,9 @@ class UI(QMainWindow):
         self.horizontalLayout_Matplotlib.addWidget(self.canvas)
         self.ax = plt.gca()
 
-        self.horizontalLayout_Navigation = QHBoxLayout(self.Navigation_Frame)
-        self.horizontalLayout_Navigation.setObjectName("Navigation_layout")
-        self.horizontalLayout_Navigation.addWidget(NavigationToolbarCustom(self.canvas, self))
+        # self.horizontalLayout_Navigation = QHBoxLayout(self.Navigation_Frame)
+        # self.horizontalLayout_Navigation.setObjectName("Navigation_layout")
+        # self.horizontalLayout_Navigation.addWidget(NavigationToolbarCustom(self.canvas, self))
 
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")
@@ -165,6 +172,10 @@ class UI(QMainWindow):
         
         self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
         self.Bar_row_Position = self.Element_Table_Widget.rowCount()
+
+        # status bar
+        self.statusBar = self.findChild(QStatusBar, "statusbar")
+        self.statusBar.showMessage("Ready")
 
         # Show the App
         self.show()
@@ -793,6 +804,9 @@ class UI(QMainWindow):
         self.elasticity = {}
         self.cross_area = {}
 
+        self.Node_Number_LEdit.setText("1")
+        self.Bar_Number_LEdit.setText("1")
+
     ##### Menu Functions #####
 
     def Save_Func(self):
@@ -991,10 +1005,10 @@ class UI(QMainWindow):
 
 
 ###### Navigation Toolbar Customized #######
-class NavigationToolbarCustom(NavigationToolbar):
-    # only display the buttons we need
-    toolitems = [t for t in NavigationToolbar.toolitems if
-                 t[0] in ("Save",)]
+# class NavigationToolbarCustom(NavigationToolbar):
+#     # only display the buttons we need
+#     toolitems = [t for t in NavigationToolbar.toolitems if
+#                  t[0] in ("Save",)]
 
 # Initialize the App
 app = QApplication(sys.argv)
