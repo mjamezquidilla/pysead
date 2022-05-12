@@ -802,69 +802,69 @@ class UI(QMainWindow):
         forces_dict = {}
         supports_dict = {}
 
-        try:
-            # Nodes    
-            for index in range(self.Nodes_Table_Widget.rowCount()):
-                node = int(self.Nodes_Table_Widget.item(index,0).text())
-                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
-                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
-                nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
-            nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
+        # try:
+        # Nodes    
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+            nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
+        nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
 
-            # Elements
-            for index in range(self.Element_Table_Widget.rowCount()):
-                bar = int(self.Element_Table_Widget.item(index,0).text())
-                node_1 = int(self.Element_Table_Widget.item(index,1).text())
-                node_2 = int(self.Element_Table_Widget.item(index,2).text())
-                elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
-            elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
+        # Elements
+        for index in range(self.Element_Table_Widget.rowCount()):
+            bar = int(self.Element_Table_Widget.item(index,0).text())
+            node_1 = int(self.Element_Table_Widget.item(index,1).text())
+            node_2 = int(self.Element_Table_Widget.item(index,2).text())
+            elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
+        elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
 
-            # Materials
-            for index in range(self.Material_Table_Widget.rowCount()):
-                bar = int(self.Material_Table_Widget.item(index,0).text())
-                area = float(self.Material_Table_Widget.item(index,1).text())
-                elasticity = float(self.Material_Table_Widget.item(index,2).text())
-                materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
-            materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
-            
-            # Forces
-            for index in range(self.Force_Table_Widget.rowCount()):
-                node = int(self.Force_Table_Widget.item(index,0).text())
-                f_x = float(self.Force_Table_Widget.item(index,1).text())
-                f_y = float(self.Force_Table_Widget.item(index,2).text())
-                forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
-            forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Supports
-            for index in range(self.Support_Table_Widget.rowCount()):
-                node = int(self.Support_Table_Widget.item(index,0).text())
-                x = int(self.Support_Table_Widget.item(index,1).text())
-                y = int(self.Support_Table_Widget.item(index,2).text())
-                supports_dict.update({index+1:[int(node), float(x), float(y)]})
-            supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
-            
-            with pd.ExcelWriter(file_name[0]) as writer:
-                nodes_df.to_excel(writer, sheet_name='Nodes')
-                elements_df.to_excel(writer, sheet_name='Elements')
-                materials_df.to_excel(writer, sheet_name='Materials')
-                forces_df.to_excel(writer, sheet_name='Forces')
-                supports_df.to_excel(writer, sheet_name='Supports')
-            
-            print("Saved")
-        except:
-            print("Canceled Dialogue")
+        # Materials
+        for index in range(self.Material_Table_Widget.rowCount()):
+            bar = int(self.Material_Table_Widget.item(index,0).text())
+            area = float(self.Material_Table_Widget.item(index,1).text())
+            elasticity = float(self.Material_Table_Widget.item(index,2).text())
+            materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
+        materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
+        
+        # Forces
+        for index in range(self.Force_Table_Widget.rowCount()):
+            node = int(self.Force_Table_Widget.item(index,0).text())
+            f_x = float(self.Force_Table_Widget.item(index,1).text())
+            f_y = float(self.Force_Table_Widget.item(index,2).text())
+            forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
+        forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Supports
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            supports_dict.update({index+1:[int(node), float(x), float(y)]})
+        supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
+        
+        with pd.ExcelWriter(file_name[0]) as writer:
+            nodes_df.to_excel(writer, sheet_name='Nodes')
+            elements_df.to_excel(writer, sheet_name='Elements')
+            materials_df.to_excel(writer, sheet_name='Materials')
+            forces_df.to_excel(writer, sheet_name='Forces')
+            supports_df.to_excel(writer, sheet_name='Supports')
+        
+        print("Saved")
+        # except:
+        #     print("Canceled Dialogue")
 
     def Save_As_Func(self):
         global file_name
-        try:
-            file_name = QFileDialog.getSaveFileName(self, "Save File", "", "Excel File (*.xlsx);; All Files (*)")
-            if file_name != "":
-                self.Solve_Truss_Button.setEnabled(True)
+        # try:
+        file_name = QFileDialog.getSaveFileName(self, "Save File", "", "Excel File (*.xlsx);; All Files (*)")
+        if file_name != "":
+            self.Solve_Truss_Button.setEnabled(True)
 
-            self.Save_Func()
+        self.Save_Func()
 
-        except:
-            print("Canceled Dialogue")
+        # except:
+            # print("Canceled Dialogue")
             # self.Solve_Truss_Button.setEnabled(False)
 
     def Open_File_Func(self):
@@ -898,8 +898,8 @@ class UI(QMainWindow):
             # Elements
             for index, row in elements_sheet.iterrows():
                 element = str(round(row['Element']))
-                node_1 = str(row['Node_1'])
-                node_2 = str(row['Node_2'])
+                node_1 = str(round(row['Node_1']))
+                node_2 = str(round(row['Node_2']))
 
                 # Add Items to Table Widget
                 rowPosition = self.Element_Table_Widget.rowCount()
@@ -962,6 +962,8 @@ class UI(QMainWindow):
 
             self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
             self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
+
+            print(self.elements)
         except:
             print("Canceled Dialogue")
 
