@@ -126,7 +126,6 @@ class UI(QMainWindow):
         self.Solve_Truss_Button.setShortcut("F5")
         self.Reactions_Button.setShortcut("F6")
         self.Displacement_Button.setShortcut("F7")
-        self.Axial_Force_Button.setShortcut("F8")
 
         # Run Commands
 
@@ -543,6 +542,7 @@ class UI(QMainWindow):
             y = int(self.Support_Table_Widget.item(index,2).text())
             self.supports.update({node: [x, y]})
 
+        self.Draw_Setup()
         print(self.supports)
 
     ###### Truss Functions ######

@@ -657,8 +657,8 @@ class Truss_2D:
         # colormap = cm.plasma
         # colormap = cm.Spectral
         # colormap = cm.PiYG
-        colormap = cm.viridis
-        # colormap = cm.jet
+        # colormap = cm.viridis
+        colormap = cm.cool
 
 
         # Colorbar setup
