@@ -977,7 +977,7 @@ class UI(QMainWindow):
             self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
             self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
 
-            print(self.elements)
+            # print(self.elements)
         except:
             print("Canceled Dialogue")
 
