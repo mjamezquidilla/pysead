@@ -322,8 +322,8 @@ class Truss_2D:
         self.reactions_ = reactions_new_
         
         member_forces_new = {}
-        for i in self.reactions_:
-            P = self.reactions_[i][0]/1000
+        for i in self.member_forces_:
+            P = self.member_forces_[i]/1000
             member_forces_new.update({i:P})
         self.member_forces_ = member_forces_new
 
@@ -685,10 +685,10 @@ class Truss_2D:
         normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
         colorparams = forces
         # colormap = cm.plasma
-        # colormap = cm.Spectral
+        colormap = cm.Spectral
         # colormap = cm.PiYG
         # colormap = cm.viridis
-        colormap = cm.cool
+        # colormap = cm.coolwarm
 
 
         # Colorbar setup
