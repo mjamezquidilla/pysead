@@ -1,5 +1,6 @@
 # from PyQt5 import QtWidgets
 import os
+from re import S
 import sys
 
 import matplotlib.pyplot as plt
@@ -12,6 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from Graphics_Scene import QDMGraphicsScene
+from Graphics_View import QDMGraphicsView
 from pysead import Truss_2D
 
 plt.style.use('dark_background_pysead')
@@ -33,7 +35,8 @@ class UI(QMainWindow):
 
 
         # Load the UI file
-        uic.loadUi("GUI.ui", self)
+        # uic.loadUi("GUI.ui", self)
+        uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
 
         # Define our widgets
         # Button Widget
@@ -92,7 +95,6 @@ class UI(QMainWindow):
 
         # Frame Widget
         self.Matplotlib_Frame = self.findChild(QFrame,"Matplotlib_Frame")
-        # self.Navigation_Frame = self.findChild(QFrame,"Navigation_Frame")
 
         # Put Matplotlib inside Matplotlib Frame
         self.horizontalLayout_Matplotlib = QHBoxLayout(self.Matplotlib_Frame)
@@ -102,15 +104,14 @@ class UI(QMainWindow):
         self.horizontalLayout_Matplotlib.addWidget(self.canvas)
         self.ax = plt.gca()
 
-        # self.horizontalLayout_Navigation = QHBoxLayout(self.Navigation_Frame)
-        # self.horizontalLayout_Navigation.setObjectName("Navigation_layout")
-        # self.horizontalLayout_Navigation.addWidget(NavigationToolbarCustom(self.canvas, self))
+        # Graphics View # TODO
+        self.GraphicsView_Frame = self.findChild(QFrame,"GraphicsView_Frame")
+        self.GraphicsView_Layout = QHBoxLayout(self.GraphicsView_Frame)
+        self.GraphicsView_Layout.setObjectName("Graphics_layout")
 
-        # Graphics View
         self.grScene = QDMGraphicsScene()
-        self.GraphicsView_Widget = self.findChild(QGraphicsView, 'graphicsView')
-        self.GraphicsView_Widget.setScene(self.grScene)
-        self.GraphicsView_Widget.scale(1,-1)
+        self.GraphicsView_Widget = QDMGraphicsView(self.grScene)
+        self.GraphicsView_Layout.addWidget(self.GraphicsView_Widget)
 
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")
@@ -1005,10 +1006,16 @@ class UI(QMainWindow):
         
         self.canvas.draw()
 
+    def Select_Func(self):
+        print('select')
+        self.GraphicsView_Widget.setDragMode(QGraphicsView.RubberBandDrag)
+
+    def Pan_Func(self):
+        print('pan')
+        self.GraphicsView_Widget.setDragMode(QGraphicsView.ScrollHandDrag)
+
     def Quit_Func(self):
         sys.exit()
-
-
 
 ###### Navigation Toolbar Customized #######
 # class NavigationToolbarCustom(NavigationToolbar):

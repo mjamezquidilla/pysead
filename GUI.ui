@@ -45,7 +45,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="Nodes_Tab">
           <attribute name="title">
@@ -1173,50 +1173,12 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
-         <widget class="QGraphicsView" name="graphicsView">
-          <property name="cursor" stdset="0">
-           <cursorShape>ArrowCursor</cursorShape>
+         <widget class="QFrame" name="GraphicsView_Frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOn</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOn</enum>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
-          </property>
-          <property name="sceneRect">
-           <rectf>
-            <x>-32000.000000000000000</x>
-            <y>-32000.000000000000000</y>
-            <width>64000.000000000000000</width>
-            <height>64000.000000000000000</height>
-           </rectf>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="renderHints">
-           <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::SmoothPixmapTransform|QPainter::TextAntialiasing</set>
-          </property>
-          <property name="dragMode">
-           <enum>QGraphicsView::RubberBandDrag</enum>
-          </property>
-          <property name="transformationAnchor">
-           <enum>QGraphicsView::NoAnchor</enum>
-          </property>
-          <property name="resizeAnchor">
-           <enum>QGraphicsView::AnchorViewCenter</enum>
-          </property>
-          <property name="viewportUpdateMode">
-           <enum>QGraphicsView::FullViewportUpdate</enum>
-          </property>
-          <property name="rubberBandSelectionMode">
-           <enum>Qt::IntersectsItemBoundingRect</enum>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
          </widget>
         </item>

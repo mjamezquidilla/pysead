@@ -14,8 +14,8 @@ class QDMGraphicsScene(QGraphicsScene):
         self.color_background = QColor('#19232D')
         self.setBackgroundBrush(self.color_background)
 
-        # self.scene_width, self.scene_height = 100, 100
-        # self.setSceneRect(self.scene_width//2, self.scene_height//2, self.scene_width, self.scene_height)
+        self.scene_width, self.scene_height = 64000, 64000
+        self.setSceneRect(-self.scene_width//2, -self.scene_height//2, self.scene_width, self.scene_height)
 
         self.color_light = QColor('#455364')
         self.pen_light = QPen(self.color_light)
@@ -46,26 +46,25 @@ class QDMGraphicsScene(QGraphicsScene):
         first_top = top - (top % self.grid_size)
         lines_green.append(QLine(left, 0, right, 0))
         lines_red.append(QLine(0, top, 0, bottom))
-        
-        try:
-            for y in range(first_top, bottom, self.grid_size):
-                if (y % (self.grid_size*self.grid_squares) != 0): lines_light.append(QLine(left, y, right, y))
-                else: lines_dark.append(QLine(left, y, right, y))
-            for x in range(first_left, right, self.grid_size):
-                if (x % (self.grid_size*self.grid_squares) != 0): lines_light.append(QLine(x, top, x, bottom))
-                else: lines_dark.append(QLine(x, top, x, bottom))
-                
 
-            painter.setPen(self.pen_light)
-            painter.drawLines(*lines_light)
+        for y in range(first_top, bottom, self.grid_size):
+            if (y % (self.grid_size*self.grid_squares) != 0): lines_light.append(QLine(left, y, right, y))
+            else: lines_dark.append(QLine(left, y, right, y))
+        for x in range(first_left, right, self.grid_size):
+            if (x % (self.grid_size*self.grid_squares) != 0): lines_light.append(QLine(x, top, x, bottom))
+            else: lines_dark.append(QLine(x, top, x, bottom))
+            
 
-            painter.setPen(self.pen_dark)
-            painter.drawLines(*lines_dark)
+        painter.setPen(self.pen_light)
+        painter.drawLines(*lines_light)
 
-            painter.setPen(self.pen_red)
-            painter.drawLines(*lines_red)
+        painter.setPen(self.pen_dark)
+        painter.drawLines(*lines_dark)
 
-            painter.setPen(self.pen_green)
-            painter.drawLines(*lines_green)
-        except:
-            pass
+        painter.setPen(self.pen_red)
+        painter.drawLines(*lines_red)
+
+        painter.setPen(self.pen_green)
+        painter.drawLines(*lines_green)
+  
+ 
