@@ -685,10 +685,11 @@ class Truss_2D:
         normalize  = mpl.colors.Normalize(vmin=min(forces), vmax=max(forces))
         colorparams = forces
         # colormap = cm.plasma
-        colormap = cm.Spectral
+        # colormap = cm.Spectral
         # colormap = cm.PiYG
         # colormap = cm.viridis
-        # colormap = cm.coolwarm
+        colormap = cm.coolwarm
+        # colormap = cm.seismic
 
 
         # Colorbar setup

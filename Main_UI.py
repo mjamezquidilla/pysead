@@ -8,10 +8,10 @@ import qdarkstyle
 from matplotlib.backends.backend_qt5agg import \
     FigureCanvasQTAgg  # , NavigationToolbar2QT as NavigationToolbar
 from PyQt5 import uic
-from PyQt5.QtWidgets import (QAction, QApplication, QComboBox, QFileDialog,
-                             QFrame, QHBoxLayout, QLineEdit, QMainWindow,
-                             QPushButton, QTableWidget, QTableWidgetItem, QStatusBar)
-
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from Graphics_Scene import QDMGraphicsScene
 from pysead import Truss_2D
 
 plt.style.use('dark_background_pysead')
@@ -106,11 +106,17 @@ class UI(QMainWindow):
         # self.horizontalLayout_Navigation.setObjectName("Navigation_layout")
         # self.horizontalLayout_Navigation.addWidget(NavigationToolbarCustom(self.canvas, self))
 
+        # Graphics View
+        self.grScene = QDMGraphicsScene()
+        self.GraphicsView_Widget = self.findChild(QGraphicsView, 'graphicsView')
+        self.GraphicsView_Widget.setScene(self.grScene)
+        self.GraphicsView_Widget.scale(1,-1)
+
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")
         self.Open_Menu = self.findChild(QAction, "actionOpen")
         self.Save_As_Menu = self.findChild(QAction, "actionSave_As")
-        self.Quit_Menu = self.findChild(QAction, "actionQuit")\
+        self.Quit_Menu = self.findChild(QAction, "actionQuit")
 
         self.DarkMode_Menu = self.findChild(QAction, "actionDarkMode")
         self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
@@ -173,7 +179,7 @@ class UI(QMainWindow):
         self.Bar_row_Position = self.Element_Table_Widget.rowCount()
 
         # status bar
-        self.statusBar = self.findChild(QStatusBar, "statusbar")
+        self.statusBar = self.statusBar()
         self.statusBar.showMessage("Ready")
 
         # Show the App
