@@ -1,3 +1,4 @@
+from re import S
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -213,10 +214,18 @@ class Truss_2D:
         nodes = self.nodes
         elements = self.elements
         supports = self.supports
-        forces = self.forces
         elasticity = self.elasticity
         cross_area = self.cross_area
         
+        # Add multiplication factor
+        forces = {}
+        for force in self.forces:
+            x = self.forces[force][0]*1000
+            y = self.forces[force][1]*1000
+            forces.update({force:[x,y]})
+
+
+
         # Step 1: Determine Length and Material Properties of Truss Members
 
         # Step 1.1: Extract coordinates of member per member
@@ -296,6 +305,27 @@ class Truss_2D:
         self.member_forces_ = member_forces
         self.member_stresses_ = member_stresses
         self.K_global_ = K_global
+
+        # Divide multiplication factor
+        displacements_new_ = {}
+        for i in self.displacements_:
+            x = self.displacements_[i][0]/1000
+            y = self.displacements_[i][1]/1000
+            displacements_new_.update({i:[x,y]})
+        self.displacements_ = displacements_new_
+
+        reactions_new_ = {}
+        for i in self.reactions_:
+            fx = self.reactions_[i][0]/1000
+            fy = self.reactions_[i][1]/1000
+            reactions_new_.update({i:[fx,fy]})
+        self.reactions_ = reactions_new_
+        
+        member_forces_new = {}
+        for i in self.reactions_:
+            P = self.reactions_[i][0]/1000
+            member_forces_new.update({i:P})
+        self.member_forces_ = member_forces_new
 
         # Creating a Dictionary of Member Lengths
         member_length_ = {}
