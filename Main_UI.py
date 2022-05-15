@@ -24,7 +24,8 @@ class UI(QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
 
-        #Global Variables
+        # Global Variables
+        # For Trusses Dictionary
         self.nodes = {}
         self.elements = {}
         self.supports = {}
@@ -32,7 +33,32 @@ class UI(QMainWindow):
         self.elasticity = {}
         self.areas = {}
 
+        # For Qt5 GraphicsView Colors
+        self.color_green = QColor('#69995D')
+        self.pen_green = QPen(self.color_green)
+        self.pen_green.setWidth(3)
 
+        self.line_color = QColor('#5171A5')
+        self.bg_color = QColor('#e9e9e9')
+        self.node_color = QColor('#69995d')
+        self.force_color = QColor('#d64550')
+        self.support_color = QColor('#e5446D')
+        
+        self.pen_line = QPen(self.line_color)
+        self.pen_bg = QPen(self.bg_color)
+        self.pen_node = QPen(self.node_color)
+        self.pen_force = QPen(self.force_color)
+        self.pen_support = QPen(self.support_color)
+        
+        self.brush_line = QBrush(self.line_color)
+        self.brush_bg = QBrush(self.bg_color)
+        self.brush_node = QBrush(self.node_color)
+        self.brush_force = QBrush(self.force_color)
+        self.brush_support = QBrush(self.support_color)
+
+        # For Qt5 GraphicsView Properties
+        self.node_size = 20.
+        self.drawing_scale_factor = 100.
 
         # Load the UI file
         # uic.loadUi("GUI.ui", self)
@@ -105,7 +131,7 @@ class UI(QMainWindow):
         self.horizontalLayout_Matplotlib.addWidget(self.canvas)
         self.ax = plt.gca()
 
-        # Graphics View # TODO
+        # TODO Graphics View
         self.GraphicsView_Frame = self.findChild(QFrame,"GraphicsView_Frame")
         self.GraphicsView_Layout = QHBoxLayout(self.GraphicsView_Frame)
         self.GraphicsView_Layout.setObjectName("Graphics_layout")
@@ -114,7 +140,8 @@ class UI(QMainWindow):
         self.GraphicsView_Widget = QDMGraphicsView(self.grScene)
         self.GraphicsView_Layout.addWidget(self.GraphicsView_Widget)
 
-        rect = self.grScene.addRect(0,0,100,100)
+        # rect = self.grScene.addRect(0,0,100,100)
+        # triangle = self.grScene.addPolygon(QPolygonF([QPointF(0,0), QPointF(100,0), QPointF(50,100)]))
 
 
         # Menu Items
@@ -202,15 +229,11 @@ class UI(QMainWindow):
         if self.Node_Number_LEdit.text() == "" or self.X_Coord_LEdit.text() == "" or self.Y_Coord_LEdit.text() == "":
             print("Do not leave nodes textboxes empty")
         else:
+            ### FOR MATPLOTLIB ###
             # Grabe Item from LEdit Box
             node = int(self.Node_Number_LEdit.text())
             x_coord = float(self.X_Coord_LEdit.text())
             y_coord = float(self.Y_Coord_LEdit.text())
-            
-            # self.node_number = int(node) + 1
-
-            # # Add Items to Table Widget
-            # self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
             
             # # Clear the Textboxes
             self.Node_Number_LEdit.setText(str(int(node) + 1))
@@ -221,7 +244,7 @@ class UI(QMainWindow):
             self.nodes.update({node: [x_coord, y_coord]})
             self.nodes = {k: v for k, v in sorted(self.nodes.items(), key=lambda item: item[0])}
 
-            # Remove duplicated nodes
+            # TODO Remove duplicated nodes #
    
             # Remove the table items
             self.Nodes_Table_Widget.setRowCount(0)
@@ -240,12 +263,26 @@ class UI(QMainWindow):
                 self.Nodes_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
                 self.Nodes_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x_coord))
                 self.Nodes_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_coord))
-
+                
+            ### TODO FOR PYQT5 GRAPHICS VIEW ###  
+            for i in dict(self.nodes):
+                self.circle = self.grScene.addEllipse(self.drawing_scale_factor * self.nodes[i][0] - self.node_size/2,
+                                        self.drawing_scale_factor * self.nodes[i][1] - self.node_size/2,
+                                        self.node_size,
+                                        self.node_size, 
+                                        self.pen_node, 
+                                        self.brush_node)
+                # self.grScene.addText(f"{0}".format(i)).setDefaultTextColor(self.node_color)
+                # text.setDefaultTextColor(self.node_color)
+                # text.setFlags(text.ItemIsSelectable)
+                # text.setFlags(text.ItemIsMovable)
+                
+            # Renumber Nodes
             self.Renumber_Nodes_Func()
 
             # Draw Truss
             self.Draw_Setup()
-            print(self.nodes)
+            # print(self.nodes)
 
         
     def Remove_Node_Button_Func(self):
@@ -265,7 +302,10 @@ class UI(QMainWindow):
             y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
             self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
 
-        print(self.nodes)
+        ### TODO For PyQt GraphicsVIew ###
+        # self.grScene.removeItem(self.circle)        
+        
+        # print(self.nodes)
 
     def Renumber_Nodes_Func(self):
         for index in range(self.Nodes_Table_Widget.rowCount()):
