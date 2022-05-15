@@ -45,7 +45,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>5</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="Nodes_Tab">
           <attribute name="title">
@@ -117,6 +117,43 @@
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="X_Coord_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="Node_Number_Label">
+                    <property name="text">
+                     <string>Node Number</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QPushButton" name="Remove_Node_Button">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Remove Selected</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="Renumber_Nodes_Button">
+                    <property name="text">
+                     <string>Renumber Nodes</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="0">
                    <widget class="QLineEdit" name="Node_Number_LEdit">
                     <property name="enabled">
@@ -140,27 +177,10 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="X_Coord_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="0" column="2">
                    <widget class="QLabel" name="Y_Coord_Label">
                     <property name="text">
                      <string>Y Coordinate</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="Node_Number_Label">
-                    <property name="text">
-                     <string>Node Number</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -184,33 +204,6 @@
                    <widget class="QLineEdit" name="Y_Coord_LEdit">
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0" colspan="3">
-                   <widget class="QPushButton" name="Plot_Nodes_Button">
-                    <property name="text">
-                     <string>Plot Nodes</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QPushButton" name="Remove_Node_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Remove Selected</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QPushButton" name="Renumber_Nodes_Button">
-                    <property name="text">
-                     <string>Renumber Nodes</string>
                     </property>
                    </widget>
                   </item>
@@ -293,27 +286,36 @@
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
+                  <item row="1" column="0">
+                   <widget class="QLineEdit" name="Bar_Number_LEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QPushButton" name="Remove_Bar_Button">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Remove Selected</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="0">
                    <widget class="QLabel" name="Bar_Number_Label">
                     <property name="text">
                      <string>Bar Number</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="Node_1_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="Node_1_Label">
-                    <property name="text">
-                     <string>Node 1</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -343,6 +345,20 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="Renumber_Bar_Button">
+                    <property name="text">
+                     <string>Renumber Bars</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="Node_1_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="2">
                    <widget class="QLineEdit" name="Node_2_LEdit">
                     <property name="alignment">
@@ -350,43 +366,13 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLineEdit" name="Bar_Number_LEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="Node_1_Label">
                     <property name="text">
-                     <string>1</string>
+                     <string>Node 1</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0" colspan="3">
-                   <widget class="QPushButton" name="Plot_Nodes_and_Bars_Button">
-                    <property name="text">
-                     <string>Plot Nodes and Bars</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QPushButton" name="Remove_Bar_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Remove Selected</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QPushButton" name="Renumber_Bar_Button">
-                    <property name="text">
-                     <string>Renumber Bars</string>
                     </property>
                    </widget>
                   </item>
@@ -472,10 +458,10 @@
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="Area_Label">
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="Elasticity_LEdit">
                     <property name="text">
-                     <string>Cross-sectional Area</string>
+                     <string>200000000</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -492,10 +478,10 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="Elasticity_LEdit">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="Area_Label">
                     <property name="text">
-                     <string>200000000</string>
+                     <string>Cross-sectional Area</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -514,14 +500,8 @@
                   </item>
                   <item row="2" column="0" colspan="2">
                    <widget class="QPushButton" name="Update_Material_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
                     <property name="text">
-                     <string>Update Selected</string>
+                     <string>Update Material</string>
                     </property>
                    </widget>
                   </item>
@@ -604,6 +584,13 @@
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="Force_Y_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="2">
                    <widget class="QLabel" name="Force_Y_Label">
                     <property name="text">
@@ -614,8 +601,11 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="Force_X_LEdit">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="Force_Node_Number_Label">
+                    <property name="text">
+                     <string>Node Number</string>
+                    </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
@@ -623,23 +613,6 @@
                   </item>
                   <item row="1" column="0">
                    <widget class="QLineEdit" name="Force_Node_Number_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLineEdit" name="Force_Y_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="Force_Node_Number_Label">
-                    <property name="text">
-                     <string>Node Number</string>
-                    </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
@@ -668,13 +641,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="0" colspan="3">
-                   <widget class="QPushButton" name="Plot_Forces_Button">
-                    <property name="text">
-                     <string>Plot Forces</string>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="2" column="0" colspan="2">
                    <widget class="QPushButton" name="Add_Force_Button">
                     <property name="sizePolicy">
@@ -685,6 +651,13 @@
                     </property>
                     <property name="text">
                      <string>Add Force</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="Force_X_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -760,23 +733,13 @@
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_13">
                 <item>
-                 <layout class="QGridLayout" name="Add_Remove_Supports_Grid" rowstretch="0,0,0,0">
+                 <layout class="QGridLayout" name="Add_Remove_Supports_Grid" rowstretch="0,0,0">
                   <property name="leftMargin">
                    <number>5</number>
                   </property>
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="Support_Node_Label">
-                    <property name="text">
-                     <string>Node Number</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="1" column="1">
                    <widget class="QComboBox" name="X_Coord_ComboBox">
                     <property name="sizePolicy">
@@ -807,6 +770,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="Remove_Support_Button">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Remove Selected</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="2">
                    <widget class="QComboBox" name="Y_Coord_ComboBox">
                     <property name="sizePolicy">
@@ -827,26 +803,13 @@
                     </item>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="X_Coord_Support_Label">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="Support_Node_Label">
                     <property name="text">
-                     <string>X Coordinate</string>
+                     <string>Node Number</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QPushButton" name="Remove_Support_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Remove Selected</string>
                     </property>
                    </widget>
                   </item>
@@ -857,10 +820,13 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="0" colspan="3">
-                   <widget class="QPushButton" name="Plot_Supports_Button">
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="X_Coord_Support_Label">
                     <property name="text">
-                     <string>Plot Supports</string>
+                     <string>X Coordinate</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -1137,6 +1103,118 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_3">
+          <attribute name="title">
+           <string>Steel Design</string>
+          </attribute>
+          <widget class="QGroupBox" name="groupBox_15">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>9</y>
+             <width>351</width>
+             <height>101</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>GroupBox</string>
+           </property>
+           <widget class="QWidget" name="gridLayoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>19</x>
+              <y>29</y>
+              <width>311</width>
+              <height>51</height>
+             </rect>
+            </property>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox"/>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="lineEdit"/>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+          <widget class="QGroupBox" name="groupBox_16">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>130</y>
+             <width>331</width>
+             <height>361</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>GroupBox</string>
+           </property>
+           <widget class="QTableWidget" name="tableWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>20</y>
+              <width>311</width>
+              <height>321</height>
+             </rect>
+            </property>
+            <column>
+             <property name="text">
+              <string>BAR</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>FORCES</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>YIELD STRENGTH</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>K</string>
+             </property>
+            </column>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="gridLayoutWidget_2">
+           <property name="geometry">
+            <rect>
+             <x>19</x>
+             <y>519</y>
+             <width>331</width>
+             <height>161</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Design</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -1178,7 +1256,7 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
+           <enum>QFrame::Sunken</enum>
           </property>
          </widget>
         </item>
@@ -1203,6 +1281,8 @@
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport_CSV"/>
     <addaction name="separator"/>
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
@@ -1266,7 +1346,62 @@
     <string>Light</string>
    </property>
   </action>
+  <action name="actionImport_CSV">
+   <property name="text">
+    <string>Import CSV</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>Nodes_Table_Widget</tabstop>
+  <tabstop>X_Coord_LEdit</tabstop>
+  <tabstop>Y_Coord_LEdit</tabstop>
+  <tabstop>Add_Node_Button</tabstop>
+  <tabstop>Remove_Node_Button</tabstop>
+  <tabstop>Renumber_Nodes_Button</tabstop>
+  <tabstop>Element_Table_Widget</tabstop>
+  <tabstop>Node_1_LEdit</tabstop>
+  <tabstop>Node_2_LEdit</tabstop>
+  <tabstop>Add_Bar_Button</tabstop>
+  <tabstop>Remove_Bar_Button</tabstop>
+  <tabstop>Renumber_Bar_Button</tabstop>
+  <tabstop>Material_Table_Widget</tabstop>
+  <tabstop>Area_LEdit</tabstop>
+  <tabstop>Elasticity_LEdit</tabstop>
+  <tabstop>Force_Table_Widget</tabstop>
+  <tabstop>Force_Node_Number_LEdit</tabstop>
+  <tabstop>Force_X_LEdit</tabstop>
+  <tabstop>Force_Y_LEdit</tabstop>
+  <tabstop>Add_Force_Button</tabstop>
+  <tabstop>Remove_Force_Button</tabstop>
+  <tabstop>Support_Table_Widget</tabstop>
+  <tabstop>Support_Node_LEdit</tabstop>
+  <tabstop>X_Coord_ComboBox</tabstop>
+  <tabstop>Y_Coord_ComboBox</tabstop>
+  <tabstop>Add_Support_Button</tabstop>
+  <tabstop>Remove_Support_Button</tabstop>
+  <tabstop>Solve_Truss_Button</tabstop>
+  <tabstop>Setup_Button</tabstop>
+  <tabstop>Reactions_Button</tabstop>
+  <tabstop>Axial_Force_Button</tabstop>
+  <tabstop>Displacement_Button</tabstop>
+  <tabstop>Save_Figure_Button</tabstop>
+  <tabstop>Displacement_Factor_LEdit</tabstop>
+  <tabstop>Line_Width_LEdit</tabstop>
+  <tabstop>Label_Offset_LEdit</tabstop>
+  <tabstop>Arrow_Length_LEdit</tabstop>
+  <tabstop>Arrow_Head_Size_LEdit</tabstop>
+  <tabstop>Arrow_Line_Width_LEdit</tabstop>
+  <tabstop>Post_Processing_Table</tabstop>
+  <tabstop>Bar_Number_LEdit</tabstop>
+  <tabstop>Node_Number_LEdit</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>tabWidget_2</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -1,3 +1,4 @@
+from decimal import Clamped
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -11,16 +12,19 @@ class QDMGraphicsView(QGraphicsView):
         self.initUI()
         
         self.grScene = grScene
-
-        self.zoomInFactor = 1.25
-        self.zoomClamp = False
-        self.zoom = 10
-        self.zoomStep = 1
-        self.zoomRange = [0, 10]
-
-
         self.setScene(self.grScene)
         self.scale(1,-1)
+
+        self.zoomInFactor = 1.25
+        self.zoomClamp = True
+        self.zoom = 10
+        self.zoomStep = 1
+        self.zoomRange = [5, 20]
+
+
+
+
+    def initUI(self):
 
         self.setAlignment(Qt.AlignCenter)
         self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
@@ -31,10 +35,6 @@ class QDMGraphicsView(QGraphicsView):
 
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setDragMode(QGraphicsView.RubberBandDrag)
-
-
-    def initUI(self):
-        pass
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -97,6 +97,13 @@ class QDMGraphicsView(QGraphicsView):
             zoomFactor = zoomOutFactor
             self.zoom -= self.zoomStep
 
+        clamped = False
+        if self.zoom < self.zoomRange[0]: self.zoom, clamped = self.zoomRange[0], True
+        if self.zoom > self.zoomRange[1]: self.zoom, clamped = self.zoomRange[1], True
+
         # set scene scale
-        self.scale(zoomFactor, zoomFactor)
+        if not clamped or self.zoomClamp is False:
+            self.scale(zoomFactor, zoomFactor)
+
+
 

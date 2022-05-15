@@ -8,7 +8,7 @@ class QDMGraphicsScene(QGraphicsScene):
         super().__init__(parent)
 
         # settings
-        self.grid_size = 30
+        self.grid_size = 20
         self.grid_squares = 5
 
         self.color_background = QColor('#19232D')

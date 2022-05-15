@@ -1,6 +1,5 @@
 # from PyQt5 import QtWidgets
 import os
-from re import S
 import sys
 
 import matplotlib.pyplot as plt
@@ -15,6 +14,7 @@ from PyQt5.QtGui import *
 from Graphics_Scene import QDMGraphicsScene
 from Graphics_View import QDMGraphicsView
 from pysead import Truss_2D
+from Import_CSV import Import_CSV
 
 plt.style.use('dark_background_pysead')
 
@@ -37,6 +37,7 @@ class UI(QMainWindow):
         # Load the UI file
         # uic.loadUi("GUI.ui", self)
         uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
+        
 
         # Define our widgets
         # Button Widget
@@ -113,11 +114,15 @@ class UI(QMainWindow):
         self.GraphicsView_Widget = QDMGraphicsView(self.grScene)
         self.GraphicsView_Layout.addWidget(self.GraphicsView_Widget)
 
+        rect = self.grScene.addRect(0,0,100,100)
+
+
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")
         self.Open_Menu = self.findChild(QAction, "actionOpen")
         self.Save_As_Menu = self.findChild(QAction, "actionSave_As")
         self.Quit_Menu = self.findChild(QAction, "actionQuit")
+        self.Import_CSV = self.findChild(QAction, "actionImport_CSV")
 
         self.DarkMode_Menu = self.findChild(QAction, "actionDarkMode")
         self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
@@ -172,6 +177,7 @@ class UI(QMainWindow):
         self.Open_Menu.triggered.connect(self.Open_File_Func)
         self.Save_As_Menu.triggered.connect(self.Save_As_Func)
         self.Quit_Menu.triggered.connect(self.Quit_Func)
+        self.Import_CSV.triggered.connect(self.Import_CSV_Func)
         
         self.DarkMode_Menu.triggered.connect(self.DarkMode_Menu_Func)
         self.LightMode_Menu.triggered.connect(self.LightMode_Menu_Func)
@@ -814,6 +820,8 @@ class UI(QMainWindow):
         self.Node_Number_LEdit.setText("1")
         self.Bar_Number_LEdit.setText("1")
 
+        self.statusBar.showMessage("New File")
+
     ##### Menu Functions #####
 
     def Save_Func(self):
@@ -823,57 +831,57 @@ class UI(QMainWindow):
         forces_dict = {}
         supports_dict = {}
 
-        # try:
-        # Nodes    
-        for index in range(self.Nodes_Table_Widget.rowCount()):
-            node = int(self.Nodes_Table_Widget.item(index,0).text())
-            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
-            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
-            nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
-        nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
+        try:
+            # Nodes    
+            for index in range(self.Nodes_Table_Widget.rowCount()):
+                node = int(self.Nodes_Table_Widget.item(index,0).text())
+                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+                nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
+            nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
 
-        # Elements
-        for index in range(self.Element_Table_Widget.rowCount()):
-            bar = int(self.Element_Table_Widget.item(index,0).text())
-            node_1 = int(self.Element_Table_Widget.item(index,1).text())
-            node_2 = int(self.Element_Table_Widget.item(index,2).text())
-            elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
-        elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
+            # Elements
+            for index in range(self.Element_Table_Widget.rowCount()):
+                bar = int(self.Element_Table_Widget.item(index,0).text())
+                node_1 = int(self.Element_Table_Widget.item(index,1).text())
+                node_2 = int(self.Element_Table_Widget.item(index,2).text())
+                elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
+            elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
 
-        # Materials
-        for index in range(self.Material_Table_Widget.rowCount()):
-            bar = int(self.Material_Table_Widget.item(index,0).text())
-            area = float(self.Material_Table_Widget.item(index,1).text())
-            elasticity = float(self.Material_Table_Widget.item(index,2).text())
-            materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
-        materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
-        
-        # Forces
-        for index in range(self.Force_Table_Widget.rowCount()):
-            node = int(self.Force_Table_Widget.item(index,0).text())
-            f_x = float(self.Force_Table_Widget.item(index,1).text())
-            f_y = float(self.Force_Table_Widget.item(index,2).text())
-            forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
-        forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
-        
-        # Supports
-        for index in range(self.Support_Table_Widget.rowCount()):
-            node = int(self.Support_Table_Widget.item(index,0).text())
-            x = int(self.Support_Table_Widget.item(index,1).text())
-            y = int(self.Support_Table_Widget.item(index,2).text())
-            supports_dict.update({index+1:[int(node), float(x), float(y)]})
-        supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
-        
-        with pd.ExcelWriter(file_name[0]) as writer:
-            nodes_df.to_excel(writer, sheet_name='Nodes')
-            elements_df.to_excel(writer, sheet_name='Elements')
-            materials_df.to_excel(writer, sheet_name='Materials')
-            forces_df.to_excel(writer, sheet_name='Forces')
-            supports_df.to_excel(writer, sheet_name='Supports')
-        
-        print("Saved")
-        # except:
-        #     print("Canceled Dialogue")
+            # Materials
+            for index in range(self.Material_Table_Widget.rowCount()):
+                bar = int(self.Material_Table_Widget.item(index,0).text())
+                area = float(self.Material_Table_Widget.item(index,1).text())
+                elasticity = float(self.Material_Table_Widget.item(index,2).text())
+                materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
+            materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
+            
+            # Forces
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
+            forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Supports
+            for index in range(self.Support_Table_Widget.rowCount()):
+                node = int(self.Support_Table_Widget.item(index,0).text())
+                x = int(self.Support_Table_Widget.item(index,1).text())
+                y = int(self.Support_Table_Widget.item(index,2).text())
+                supports_dict.update({index+1:[int(node), float(x), float(y)]})
+            supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
+            
+            with pd.ExcelWriter(file_name[0]) as writer:
+                nodes_df.to_excel(writer, sheet_name='Nodes')
+                elements_df.to_excel(writer, sheet_name='Elements')
+                materials_df.to_excel(writer, sheet_name='Materials')
+                forces_df.to_excel(writer, sheet_name='Forces')
+                supports_df.to_excel(writer, sheet_name='Supports')
+            
+            print("Saved")
+        except:
+            self.statusBar.showMessage("Save Dialog Canceled") 
 
     def Save_As_Func(self):
         global file_name
@@ -888,19 +896,8 @@ class UI(QMainWindow):
             # print("Canceled Dialogue")
             # self.Solve_Truss_Button.setEnabled(False)
 
-    def Open_File_Func(self):
-        self.New_File_Func()
-        global file_name
-        file_name = QFileDialog.getOpenFileName(self, "Open File", "", "Excel File (*.xlsx);; All Files (*)")
-        # print(file_name[0].split("xlsx"))
-        
+    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_sheet, supports_sheet):
         try:
-            nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
-            elements_sheet = pd.read_excel(file_name[0], sheet_name='Elements')
-            materials_sheet = pd.read_excel(file_name[0], sheet_name='Materials')
-            forces_sheet = pd.read_excel(file_name[0], sheet_name='Forces')
-            supports_sheet = pd.read_excel(file_name[0], sheet_name='Supports')
-
             # Nodes
             for index, row in nodes_sheet.iterrows():
                 node = str(round(row['Node']))
@@ -975,7 +972,24 @@ class UI(QMainWindow):
                 self.Support_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
                 self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x_support))
                 self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_support))  
-            
+            # print(file_name[1])
+        except:
+            self.statusBar.showMessage("Canceled Dialogue")
+
+    def Open_File_Func(self):
+        self.New_File_Func()
+        global file_name
+        file_name = QFileDialog.getOpenFileName(self, "Open File", "", "Excel File (*.xlsx);; All Files (*)")
+        # print(file_name[0].split("xlsx"))
+        try:
+            nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
+            elements_sheet = pd.read_excel(file_name[0], sheet_name='Elements')
+            materials_sheet = pd.read_excel(file_name[0], sheet_name='Materials')
+            forces_sheet = pd.read_excel(file_name[0], sheet_name='Forces')
+            supports_sheet = pd.read_excel(file_name[0], sheet_name='Supports')
+
+            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_sheet, supports_sheet)
+
             self.Solve_Truss_Button.setEnabled(True)
 
             self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
@@ -983,10 +997,8 @@ class UI(QMainWindow):
 
             self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
             self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
-
-            # print(self.elements)
         except:
-            print("Canceled Dialogue")
+            self.statusBar.showMessage("Cancelled Dialog")
 
     def Save_Figure_Func(self):
         figure_name = QFileDialog.getSaveFileName(self, "Save Figure", "", ".PNG (*.png);; All Files (*)")
@@ -1016,6 +1028,39 @@ class UI(QMainWindow):
 
     def Quit_Func(self):
         sys.exit()
+
+
+    ###### Dialog Boxes ######
+    def Import_CSV_Func(self):
+        dialog = Import_CSV()
+        result = dialog.exec_()
+
+        if result:
+            try:
+                Nodes_LEdit = dialog.findChild(QLineEdit, "Nodes_LEdit")
+                Bars_LEdit = dialog.findChild(QLineEdit, "Bars_LEdit")
+                Materials_LEdit = dialog.findChild(QLineEdit, "Materials_LEdit")
+                Forces_LEdit = dialog.findChild(QLineEdit, "Forces_LEdit")
+                Supports_LEdit = dialog.findChild(QLineEdit, "Supports_LEdit")
+                
+                nodes_sheet = pd.read_csv(Nodes_LEdit.text())
+                elements_sheet = pd.read_csv(Bars_LEdit.text())
+                materials_sheet = pd.read_csv(Materials_LEdit.text())
+                forces_sheet = pd.read_csv(Forces_LEdit.text())
+                supports_sheet = pd.read_csv(Supports_LEdit.text())
+
+                self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_sheet, supports_sheet)
+                # self.Solve_Truss_Button.setEnabled(True)
+
+                self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
+                self.Bar_row_Position = self.Element_Table_Widget.rowCount()
+
+                self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
+                self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
+
+                self.Save_As_Func()
+            except:
+                self.statusBar.showMessage("Error Importing CSV")
 
 ###### Navigation Toolbar Customized #######
 # class NavigationToolbarCustom(NavigationToolbar):
