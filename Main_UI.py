@@ -11,8 +11,6 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from Graphics_Scene import QDMGraphicsScene
-from Graphics_View import QDMGraphicsView
 from pysead import Truss_2D
 from Import_CSV import Import_CSV
 
@@ -109,13 +107,6 @@ class UI(QMainWindow):
         self.GraphicsView_Frame = self.findChild(QFrame,"GraphicsView_Frame")
         self.GraphicsView_Layout = QHBoxLayout(self.GraphicsView_Frame)
         self.GraphicsView_Layout.setObjectName("Graphics_layout")
-
-        self.grScene = QDMGraphicsScene()
-        self.GraphicsView_Widget = QDMGraphicsView(self.grScene)
-        self.GraphicsView_Layout.addWidget(self.GraphicsView_Widget)
-
-        rect = self.grScene.addRect(0,0,100,100)
-
 
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")

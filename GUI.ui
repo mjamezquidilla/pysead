@@ -1221,47 +1221,28 @@
      </widget>
     </item>
     <item>
-     <widget class="QTabWidget" name="tabWidget_2">
-      <property name="currentIndex">
-       <number>1</number>
+     <widget class="QFrame" name="frame">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Matplotlib</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_18">
-        <item>
-         <widget class="QFrame" name="Matplotlib_Frame">
-          <property name="cursor">
-           <cursorShape>ArrowCursor</cursorShape>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>QtGraphics (Experimental)</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_13">
-        <item>
-         <widget class="QFrame" name="GraphicsView_Frame">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_15">
+       <item>
+        <widget class="QFrame" name="Matplotlib_Frame">
+         <property name="cursor">
+          <cursorShape>ArrowCursor</cursorShape>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -1396,7 +1377,6 @@
   <tabstop>Bar_Number_LEdit</tabstop>
   <tabstop>Node_Number_LEdit</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>tabWidget_2</tabstop>
   <tabstop>comboBox</tabstop>
   <tabstop>lineEdit</tabstop>
   <tabstop>tableWidget</tabstop>
