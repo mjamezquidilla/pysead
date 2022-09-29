@@ -13,6 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from pysead import Truss_2D
 from Import_CSV import Import_CSV
+from About import About
 
 plt.style.use('dark_background_pysead')
 
@@ -42,18 +43,22 @@ class UI(QMainWindow):
         self.Add_Node_Button = self.findChild(QPushButton, "Add_Node_Button")
         self.Renumber_Nodes_Button = self.findChild(QPushButton, "Renumber_Nodes_Button")
         self.Remove_Node_Button = self.findChild(QPushButton, "Remove_Node_Button")
+        self.Update_Truss_Nodes_Button = self.findChild(QPushButton, "Update_Truss_Nodes_Button")
         
         self.Add_Bar_Button = self.findChild(QPushButton, "Add_Bar_Button")
         self.Renumber_Bar_Button = self.findChild(QPushButton, "Renumber_Bar_Button")
         self.Remove_Bar_Button = self.findChild(QPushButton, "Remove_Bar_Button")
+        self.Update_Truss_Bars_Button = self.findChild(QPushButton, "Update_Truss_Elements_Button")
         
         self.Update_Material_Button = self.findChild(QPushButton, "Update_Material_Button")
         
         self.Add_Force_Button = self.findChild(QPushButton, "Add_Force_Button")
         self.Remove_Force_Button = self.findChild(QPushButton, "Remove_Force_Button")
+        self.Update_Truss_Forces_Button = self.findChild(QPushButton, "Update_Truss_Forces_Button")
         
         self.Add_Support_Button = self.findChild(QPushButton, "Add_Support_Button")
         self.Remove_Support_Button = self.findChild(QPushButton, "Remove_Support_Button")
+        self.Update_Truss_Supports_Button = self.findChild(QPushButton, "Update_Truss_Supports_Button")
         
         self.Solve_Truss_Button = self.findChild(QPushButton, "Solve_Truss_Button")
         self.Setup_Button = self.findChild(QPushButton, "Setup_Button")
@@ -114,6 +119,7 @@ class UI(QMainWindow):
         self.Save_As_Menu = self.findChild(QAction, "actionSave_As")
         self.Quit_Menu = self.findChild(QAction, "actionQuit")
         self.Import_CSV = self.findChild(QAction, "actionImport_CSV")
+        self.About = self.findChild(QAction, "actionPySEAD_Truss")
 
         self.DarkMode_Menu = self.findChild(QAction, "actionDarkMode")
         self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
@@ -137,11 +143,13 @@ class UI(QMainWindow):
         self.Add_Node_Button.clicked.connect(self.Add_Node_Button_Func)
         self.Remove_Node_Button.clicked.connect(self.Remove_Node_Button_Func)
         self.Renumber_Nodes_Button.clicked.connect(self.Renumber_Nodes_Func)
+        self.Update_Truss_Nodes_Button.clicked.connect(self.Draw_Setup)
 
         # Elements
         self.Add_Bar_Button.clicked.connect(self.Add_Bar_Button_Func)
         self.Remove_Bar_Button.clicked.connect(self.Remove_Bar_Button_Func)
         self.Renumber_Bar_Button.clicked.connect(self.Renumber_Bars_Func)
+        self.Update_Truss_Bars_Button.clicked.connect(self.Draw_Setup)
         
         # Materials
         self.Update_Material_Button.clicked.connect(self.Update_Material_Button_Func)
@@ -149,10 +157,12 @@ class UI(QMainWindow):
         # Forces
         self.Add_Force_Button.clicked.connect(self.Add_Force_Button_Func)
         self.Remove_Force_Button.clicked.connect(self.Remove_Force_Button_Func)
+        self.Update_Truss_Forces_Button.clicked.connect(self.Draw_Setup)
 
         # Supports
         self.Add_Support_Button.clicked.connect(self.Add_Support_Button_Func)
         self.Remove_Support_Button.clicked.connect(self.Remove_Support_Button_Func)
+        self.Update_Truss_Supports_Button.clicked.connect(self.Draw_Setup)
 
         # Solve
         self.Solve_Truss_Button.clicked.connect(self.Solve_Truss_Func)
@@ -173,8 +183,11 @@ class UI(QMainWindow):
         self.DarkMode_Menu.triggered.connect(self.DarkMode_Menu_Func)
         self.LightMode_Menu.triggered.connect(self.LightMode_Menu_Func)
         
+        self.About.triggered.connect(self.About_Func)
+        
         self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
         self.Bar_row_Position = self.Element_Table_Widget.rowCount()
+        
 
         # status bar
         self.statusBar = self.statusBar()
@@ -246,7 +259,11 @@ class UI(QMainWindow):
         # Delete Highlighted Row
         self.Nodes_Table_Widget.removeRow(clicked)
         self.Renumber_Nodes_Func()
-        self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
+        
+        if int(self.Node_Number_LEdit.text()) == 2:
+            self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
+        else:
+            pass
 
         # Reinitialize nodes dictionary and copy all data from table into dictionary        
         self.nodes = {}
@@ -257,10 +274,14 @@ class UI(QMainWindow):
             self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
 
         print(self.nodes)
+        
+        # Draw Truss
+        self.Draw_Setup()
+        print(self.nodes)
 
     def Renumber_Nodes_Func(self):
         for index in range(self.Nodes_Table_Widget.rowCount()):
-            # node = int(self.Nodes_Table_Widget.item(index,0).text())
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
             x_coord = self.Nodes_Table_Widget.item(index,1).text()
             y_coord = self.Nodes_Table_Widget.item(index,2).text()
 
@@ -275,7 +296,6 @@ class UI(QMainWindow):
             self.Nodes_Table_Widget.setItem(index, 1, QTableWidgetItem(x_coord))
             self.Nodes_Table_Widget.setItem(index, 2, QTableWidgetItem(y_coord))
             
-
     ###### Elements Function ######
     def Add_Bar_Button_Func(self):
         if self.Bar_Number_LEdit.text() == "" or self.Node_1_LEdit.text() == "" or self.Node_2_LEdit.text() == "":
@@ -404,7 +424,7 @@ class UI(QMainWindow):
         print(self.elements)
         print(self.areas)
         print(self.elasticity)
-
+        
     ###### Materials Function ######
     def Update_Material_Button_Func(self):
         # Grab Item from Highlighted Row
@@ -466,7 +486,6 @@ class UI(QMainWindow):
 
         # Draw Truss
         self.Draw_Setup()
-
         print(self.forces)
 
     def Remove_Force_Button_Func(self):
@@ -485,7 +504,7 @@ class UI(QMainWindow):
             self.forces.update({bar: [f_x, f_y]})
 
         print(self.forces)
-
+        
     ###### Support Function ######
     def Add_Support_Button_Func(self):
         # Grabe Item from LEdit Box
@@ -548,7 +567,8 @@ class UI(QMainWindow):
 
         self.Draw_Setup()
         print(self.supports)
-
+        
+        
     ###### Truss Functions ######
     def Solve_Truss_Func(self):
         # Update all dictionaries from tables
@@ -722,6 +742,52 @@ class UI(QMainWindow):
 
     def Draw_Setup(self):
         # self.Initialize_Plotting()
+        # Update all dictionaries from tables
+        self.Renumber_Nodes_Func()
+        self.Renumber_Bars_Func()
+        
+        self.nodes = {}
+        self.elements = {}
+        self.areas = {}
+        self.forces = {}
+        self.supports = {}
+
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+            self.nodes.update({node: [x_coord,y_coord]})
+
+        # Elements
+        for index in range(self.Element_Table_Widget.rowCount()):
+            bar = int(self.Element_Table_Widget.item(index,0).text())
+            node_1 = int(self.Element_Table_Widget.item(index,1).text())
+            node_2 = int(self.Element_Table_Widget.item(index,2).text())
+            self.elements.update({bar:[node_1, node_2]})
+
+        # Materials
+        for index in range(self.Material_Table_Widget.rowCount()):
+            bar = int(self.Material_Table_Widget.item(index,0).text())
+            area = float(self.Material_Table_Widget.item(index,1).text())
+            elasticity = float(self.Material_Table_Widget.item(index,2).text())
+            self.areas.update({bar: area})
+            self.elasticity.update({bar: elasticity})
+
+        # Forces
+        for index in range(self.Force_Table_Widget.rowCount()):
+            bar = int(self.Force_Table_Widget.item(index,0).text())
+            f_x = float(self.Force_Table_Widget.item(index,1).text())
+            f_y = float(self.Force_Table_Widget.item(index,2).text())
+            self.forces.update({bar: [f_x, f_y]})
+
+        # Supports
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            self.supports.update({node: [x, y]})
+
+        # Update plot
         plt.clf()
         self.Draw_Truss_Setup()
         self.canvas.draw()
@@ -964,6 +1030,8 @@ class UI(QMainWindow):
                 self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x_support))
                 self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_support))  
             # print(file_name[1])
+            
+            self.Draw_Setup()
         except:
             self.statusBar.showMessage("Canceled Dialogue")
 
@@ -1052,6 +1120,10 @@ class UI(QMainWindow):
                 self.Save_As_Func()
             except:
                 self.statusBar.showMessage("Error Importing CSV")
+                
+    def About_Func(self):
+        dialog = About()
+        dialog.exec_()
 
 ###### Navigation Toolbar Customized #######
 # class NavigationToolbarCustom(NavigationToolbar):

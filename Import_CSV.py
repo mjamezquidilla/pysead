@@ -8,7 +8,7 @@ class Import_CSV(QDialog):
         self.statusBar = QStatusBar()
 
     def setupUi(self):
-        uic.loadUi('Import_CSV.ui', self)
+        uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\Import_CSV.ui", self)
 
         # Line Edits
         self.Nodes_LEdit = self.findChild(QLineEdit, "Nodes_LEdit")
