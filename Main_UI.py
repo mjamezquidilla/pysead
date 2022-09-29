@@ -247,6 +247,9 @@ class UI(QMainWindow):
 
             self.Renumber_Nodes_Func()
 
+            # Change LineEdit to maximum number of rows
+            self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
+
             # Draw Truss
             self.Draw_Setup()
             print(self.nodes)
@@ -262,8 +265,6 @@ class UI(QMainWindow):
         
         if int(self.Node_Number_LEdit.text()) == 2:
             self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
-        else:
-            pass
 
         # Reinitialize nodes dictionary and copy all data from table into dictionary        
         self.nodes = {}
@@ -275,13 +276,16 @@ class UI(QMainWindow):
 
         print(self.nodes)
         
+        # Change LineEdit to maximum number of rows
+        self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
+        
         # Draw Truss
         self.Draw_Setup()
         print(self.nodes)
 
     def Renumber_Nodes_Func(self):
         for index in range(self.Nodes_Table_Widget.rowCount()):
-            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            # node = int(self.Nodes_Table_Widget.item(index,0).text())
             x_coord = self.Nodes_Table_Widget.item(index,1).text()
             y_coord = self.Nodes_Table_Widget.item(index,2).text()
 
@@ -356,6 +360,9 @@ class UI(QMainWindow):
 
             self.Renumber_Bars_Func()
 
+            # Change LineEdit to maximum number of rows
+            self.Bar_Number_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
+
             # Draw Truss
             self.Draw_Setup()
 
@@ -397,7 +404,9 @@ class UI(QMainWindow):
         self.Element_Table_Widget.removeRow(clicked)
         self.Material_Table_Widget.removeRow(clicked)
 
-        self.Bar_Number_LEdit.setText(str(int(self.Bar_Number_LEdit.text())-1))
+        if int(self.Bar_Number_LEdit.text()) == 2:
+            self.Bar_Number_LEdit.setText(str(int(self.Bar_Number_LEdit.text())-1))
+        
         self.Renumber_Bars_Func()
 
         self.elements = {}
@@ -418,7 +427,10 @@ class UI(QMainWindow):
             elasticity = float(self.Material_Table_Widget.item(index,2).text())
             self.areas.update({int(bar): float(area)})
             self.elasticity.update({int(bar): float(elasticity)})
-            
+                        
+        # Change LineEdit to maximum number of rows
+        self.Bar_Number_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
+        
         # Draw Truss
         self.Draw_Setup()
         print(self.elements)
