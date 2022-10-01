@@ -326,6 +326,12 @@ class Truss_2D:
             P = self.member_forces_[i]/1000
             member_forces_new.update({i:P})
         self.member_forces_ = member_forces_new
+        
+        member_stresses_new = {}
+        for i in self.member_stresses_:
+            P = self.member_stresses_[i]/1000
+            member_stresses_new.update({i:P})
+        self.member_stresses_ = member_stresses_new
 
         # Creating a Dictionary of Member Lengths
         member_length_ = {}
