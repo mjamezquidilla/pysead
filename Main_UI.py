@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import qdarkstyle
 from matplotlib.backends.backend_qt5agg import \
-    FigureCanvasQTAgg  # , NavigationToolbar2QT as NavigationToolbar
+    FigureCanvasQTAgg # ,NavigationToolbar2QT as NavigationToolbar
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -35,7 +35,8 @@ class UI(QMainWindow):
 
         # Load the UI file
         # uic.loadUi("GUI.ui", self)
-        uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
+        # uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
+        uic.loadUi(self.resource_path("GUI.ui"), self)
         
 
         # Define our widgets
@@ -303,7 +304,7 @@ class UI(QMainWindow):
     ###### Elements Function ######
     def Add_Bar_Button_Func(self):
         if self.Bar_Number_LEdit.text() == "" or self.Node_1_LEdit.text() == "" or self.Node_2_LEdit.text() == "":
-            print("Do not leave nodes textboxes empty")
+            print("Do not leave Bar/Elements textboxes empty")
         else:
             # Grabe Item from LEdit Box
             bar = int(self.Bar_Number_LEdit.text())
@@ -439,66 +440,72 @@ class UI(QMainWindow):
         
     ###### Materials Function ######
     def Update_Material_Button_Func(self):
-        # Grab Item from Highlighted Row
-        clicked_row = self.Material_Table_Widget.currentRow()
+        try:
+            # Grab Item from Highlighted Row
+            clicked_row = self.Material_Table_Widget.currentRow()
 
-        # Delete Highlighted Row
-        self.Material_Table_Widget.removeRow(clicked_row)
+            # Delete Highlighted Row
+            self.Material_Table_Widget.removeRow(clicked_row)
 
-        # Grab Items from Columns of the Selected Row
-        bar = self.Element_Table_Widget.item(clicked_row,0).text()
-        area = self.Area_LEdit.text()
-        elasticity = self.Elasticity_LEdit.text()
+            # Grab Items from Columns of the Selected Row
+            bar = self.Element_Table_Widget.item(clicked_row,0).text()
+            area = self.Area_LEdit.text()
+            elasticity = self.Elasticity_LEdit.text()
 
-        # Add Items to Table Widget
-        self.Material_Table_Widget.insertRow(clicked_row)
-        self.Material_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(bar))
-        self.Material_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(area))
-        self.Material_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(elasticity))
+            # Add Items to Table Widget
+            self.Material_Table_Widget.insertRow(clicked_row)
+            self.Material_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(bar))
+            self.Material_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(area))
+            self.Material_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(elasticity))
 
-    # def Remove_Material_Button_Func(self):
-    #     # Grab Item from Highlighted Row
-    #     clicked = self.Material_Table_Widget.currentRow()
+        # def Remove_Material_Button_Func(self):
+        #     # Grab Item from Highlighted Row
+        #     clicked = self.Material_Table_Widget.currentRow()
 
-    #     # Delete Highlighted Row
-    #     self.Material_Table_Widget.removeRow(clicked)
-    #     self.Element_Table_Widget.removeRow(clicked)
+        #     # Delete Highlighted Row
+        #     self.Material_Table_Widget.removeRow(clicked)
+        #     self.Element_Table_Widget.removeRow(clicked)
+        except:
+            pass
 
     ###### Forces Function ######
     def Add_Force_Button_Func(self):
-        # Grabe Item from LEdit Box
-        node = int(self.Force_Node_Number_LEdit.text())
-        f_x = float(self.Force_X_LEdit.text())
-        f_y = float(self.Force_Y_LEdit.text())
+        if self.Force_Node_Number_LEdit.text() == "" or self.Force_X_LEdit.text() == "" or self.Force_Y_LEdit.text() == "":
+            print("Do not leave Force textboxes empty")
+        else:
+            # Grabe Item from LEdit Box
+            node = int(self.Force_Node_Number_LEdit.text())
+            f_x = float(self.Force_X_LEdit.text())
+            f_y = float(self.Force_Y_LEdit.text())
 
-        self.forces.update({node:[f_x,f_y]})
-        self.forces = {k: v for k, v in sorted(self.forces.items(), key=lambda item: item[0])}
+            self.forces.update({node:[f_x,f_y]})
+            self.forces = {k: v for k, v in sorted(self.forces.items(), key=lambda item: item[0])}
 
-        self.Force_Table_Widget.setRowCount(0)
+            self.Force_Table_Widget.setRowCount(0)
 
-        # Loop all the nodes dictionary and replace/update the table widget
-        for key, item in self.forces.items():
-            node = str(key)
-            f_x = str(item[0])
-            f_y = str(item[1])
+            # Loop all the nodes dictionary and replace/update the table widget
+            for key, item in self.forces.items():
+                node = str(key)
+                f_x = str(item[0])
+                f_y = str(item[1])
 
-            # Add Items to Table Widget
-            rowPosition = self.Force_Table_Widget.rowCount()
+                # Add Items to Table Widget
+                rowPosition = self.Force_Table_Widget.rowCount()
 
-            # print(rowPosition)
-            self.Force_Table_Widget.insertRow(rowPosition)
-            self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
-            self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
-            self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                # print(rowPosition)
+                self.Force_Table_Widget.insertRow(rowPosition)
+                self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
-        # Clear the Textboxes
-        self.Force_Node_Number_LEdit.setText("")
-        # self.Force_X_LEdit.setText("")
-        # self.Force_Y_LEdit.setText("")
+            # Clear the Textboxes
+            self.Force_Node_Number_LEdit.setText("")
+            # self.Force_X_LEdit.setText("")
+            # self.Force_Y_LEdit.setText("")
 
-        # Draw Truss
-        self.Draw_Setup()
-        print(self.forces)
+            # Draw Truss
+            self.Draw_Setup()
+            print(self.forces)
 
     def Remove_Force_Button_Func(self):
         # Grab Item from Highlighted Row
@@ -519,47 +526,50 @@ class UI(QMainWindow):
         
     ###### Support Function ######
     def Add_Support_Button_Func(self):
-        # Grabe Item from LEdit Box
-        node = int(self.Support_Node_LEdit.text())
-        x = self.X_Coord_ComboBox.currentText()
-        y = self.Y_Coord_ComboBox.currentText()
-
-        if x == "Yes":
-            x = 1
+        if self.Support_Node_LEdit.text() == "":
+            print("Do not leave Force textboxes empty")
         else:
-            x = 0
-        
-        if y == "Yes":
-            y = 1
-        else:
-            y = 0
+            # Grabe Item from LEdit Box
+            node = int(self.Support_Node_LEdit.text())
+            x = self.X_Coord_ComboBox.currentText()
+            y = self.Y_Coord_ComboBox.currentText()
 
-        self.supports.update({node:[x,y]})
-        self.supports = {k: v for k, v in sorted(self.supports.items(), key=lambda item: item[0])}
-        print(self.supports)
+            if x == "Yes":
+                x = 1
+            else:
+                x = 0
+            
+            if y == "Yes":
+                y = 1
+            else:
+                y = 0
 
-        self.Support_Table_Widget.setRowCount(0)
+            self.supports.update({node:[x,y]})
+            self.supports = {k: v for k, v in sorted(self.supports.items(), key=lambda item: item[0])}
+            print(self.supports)
 
-        # Loop all the nodes dictionary and replace/update the table widget
-        for key, item in self.supports.items():
-            node = str(key)
-            x = str(item[0])
-            y = str(item[1])
+            self.Support_Table_Widget.setRowCount(0)
 
-            # Add Items to Table Widget
-            rowPosition = self.Support_Table_Widget.rowCount()
+            # Loop all the nodes dictionary and replace/update the table widget
+            for key, item in self.supports.items():
+                node = str(key)
+                x = str(item[0])
+                y = str(item[1])
 
-            # print(rowPosition)
-            self.Support_Table_Widget.insertRow(rowPosition)
-            self.Support_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
-            self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x))
-            self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y))
+                # Add Items to Table Widget
+                rowPosition = self.Support_Table_Widget.rowCount()
 
-        # Clear the Textboxes
-        self.Support_Node_LEdit.setText("")
+                # print(rowPosition)
+                self.Support_Table_Widget.insertRow(rowPosition)
+                self.Support_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                self.Support_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(x))
+                self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y))
 
-        # Draw Truss
-        self.Draw_Setup()
+            # Clear the Textboxes
+            self.Support_Node_LEdit.setText("")
+
+            # Draw Truss
+            self.Draw_Setup()
 
 
     def Remove_Support_Button_Func(self):
@@ -1136,6 +1146,16 @@ class UI(QMainWindow):
     def About_Func(self):
         dialog = About()
         dialog.exec_()
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+    
+        return os.path.join(base_path, relative_path)
 
 ###### Navigation Toolbar Customized #######
 # class NavigationToolbarCustom(NavigationToolbar):

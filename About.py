@@ -8,6 +8,7 @@ class About(QDialog):
         self.statusBar = QStatusBar()
 
     def setupUi(self):
-        uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\About.ui", self)
+        # uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\About.ui", self)
+        uic.loadUi("About.ui", self)
 
         self.show()
