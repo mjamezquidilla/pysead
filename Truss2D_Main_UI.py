@@ -36,7 +36,7 @@ class UI(QMainWindow):
         # Load the UI file
         # uic.loadUi("GUI.ui", self)
         # uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
-        uic.loadUi(self.resource_path("GUI.ui"), self)
+        uic.loadUi(self.resource_path("Truss2D_GUI.ui"), self)
         
 
         # Define our widgets
@@ -136,6 +136,7 @@ class UI(QMainWindow):
         self.Solve_Truss_Button.setShortcut("F5")
         self.Reactions_Button.setShortcut("F6")
         self.Displacement_Button.setShortcut("F7")
+        self.Axial_Force_Button.setShortcut("F8")
 
         # Run Commands
 

@@ -68,4 +68,3 @@ class Import_CSV(QDialog):
             self.Supports_LEdit.setText(file_name[0])
         except:
             self.statusBar.showMessage("Canceled Dialog")
-
