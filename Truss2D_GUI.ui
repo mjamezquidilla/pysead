@@ -63,7 +63,7 @@
                 <item>
                  <widget class="QTableWidget" name="Nodes_Table_Widget">
                   <property name="editTriggers">
-                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                   <set>QAbstractItemView::AllEditTriggers</set>
                   </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>
@@ -239,7 +239,7 @@
                 <item>
                  <widget class="QTableWidget" name="Element_Table_Widget">
                   <property name="editTriggers">
-                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                   <set>QAbstractItemView::AllEditTriggers</set>
                   </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>
@@ -415,7 +415,7 @@
                 <item>
                  <widget class="QTableWidget" name="Material_Table_Widget">
                   <property name="editTriggers">
-                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                   <set>QAbstractItemView::AllEditTriggers</set>
                   </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>
@@ -528,13 +528,311 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="Load_Cases">
+          <attribute name="title">
+           <string>Load Cases</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,3" rowminimumheight="1,2">
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBox_15">
+             <property name="title">
+              <string>Load Cases</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
+               <widget class="QTableWidget" name="LoadCase_Table_Widget">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="editTriggers">
+                 <set>QAbstractItemView::AllEditTriggers</set>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <attribute name="horizontalHeaderMinimumSectionSize">
+                 <number>50</number>
+                </attribute>
+                <attribute name="horizontalHeaderDefaultSectionSize">
+                 <number>250</number>
+                </attribute>
+                <attribute name="verticalHeaderDefaultSectionSize">
+                 <number>30</number>
+                </attribute>
+                <row>
+                 <property name="text">
+                  <string>LC1</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC2</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC3</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC4</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC5</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC6</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC7</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC8</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC9</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>LC10</string>
+                 </property>
+                </row>
+                <column>
+                 <property name="text">
+                  <string>NAME</string>
+                 </property>
+                </column>
+                <item row="0" column="0">
+                 <property name="text">
+                  <string>DEAD</string>
+                 </property>
+                </item>
+                <item row="1" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="2" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="3" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="4" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="5" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="6" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="7" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="8" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="9" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="groupBox_16">
+             <property name="title">
+              <string>Load Combination Table</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_15">
+              <item>
+               <widget class="QTableWidget" name="Load_Combo_Table_Widget">
+                <property name="editTriggers">
+                 <set>QAbstractItemView::AllEditTriggers</set>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <row>
+                 <property name="text">
+                  <string>1</string>
+                 </property>
+                </row>
+                <column>
+                 <property name="text">
+                  <string>NAME</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 1</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 2</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 3</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 4</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 5</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 6</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 7</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 8</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 9</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>LC 10</string>
+                 </property>
+                </column>
+                <item row="0" column="0">
+                 <property name="text">
+                  <string>1.0 DL</string>
+                 </property>
+                </item>
+                <item row="0" column="1">
+                 <property name="text">
+                  <string>1.0</string>
+                 </property>
+                </item>
+                <item row="0" column="2">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="3">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="4">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="5">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="6">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="7">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="8">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="9">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+                <item row="0" column="10">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="Remove_Load_Combo_Button">
+                  <property name="text">
+                   <string>Remove Combo</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QPushButton" name="Add_Load_Combo_Button">
+                  <property name="text">
+                   <string>Add Combo</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="Forces_Tab">
           <attribute name="title">
            <string>Forces</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_7" stretch="2,0">
+            <layout class="QVBoxLayout" name="verticalLayout_7" stretch="2,0,0">
              <item>
               <widget class="QGroupBox" name="groupBox_7">
                <property name="title">
@@ -544,7 +842,7 @@
                 <item>
                  <widget class="QTableWidget" name="Force_Table_Widget">
                   <property name="editTriggers">
-                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                   <set>QAbstractItemView::AllEditTriggers</set>
                   </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>
@@ -585,6 +883,87 @@
               </widget>
              </item>
              <item>
+              <widget class="QGroupBox" name="groupBox_17">
+               <property name="title">
+                <string>Add Force to Load Case</string>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_18">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_8">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_7">
+                    <property name="text">
+                     <string>Load Case Index</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="LoadCaseComboBox_Widget">
+                    <item>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>3</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>4</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>5</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>6</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>7</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>8</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>9</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>10</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" colspan="2">
+                   <widget class="QPushButton" name="Show_Load_Case_Table_Button">
+                    <property name="text">
+                     <string>Show Case Forces</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
               <widget class="QGroupBox" name="groupBox_8">
                <property name="title">
                 <string>Add / Update / Remove Forces</string>
@@ -598,6 +977,20 @@
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="Force_Y_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="3">
+                   <widget class="QPushButton" name="Update_Truss_Forces_Button">
+                    <property name="text">
+                     <string>Update Truss based on Forces Table</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="2">
                    <widget class="QLabel" name="Force_Y_Label">
                     <property name="text">
@@ -615,25 +1008,24 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="Remove_Force_Button">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Remove Selected</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="0">
                    <widget class="QLabel" name="Force_Node_Number_Label">
                     <property name="text">
                      <string>Node Number</string>
                     </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLineEdit" name="Force_Y_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLineEdit" name="Force_Node_Number_LEdit">
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
@@ -649,23 +1041,10 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="0" colspan="3">
-                   <widget class="QPushButton" name="Update_Truss_Forces_Button">
-                    <property name="text">
-                     <string>Update Truss based on Forces Table</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QPushButton" name="Remove_Force_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Remove Selected</string>
+                  <item row="1" column="0">
+                   <widget class="QLineEdit" name="Force_Node_Number_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -707,7 +1086,7 @@
                 <item>
                  <widget class="QTableWidget" name="Support_Table_Widget">
                   <property name="editTriggers">
-                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                   <set>QAbstractItemView::AllEditTriggers</set>
                   </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>
@@ -937,6 +1316,60 @@
                 <string>Show Truss</string>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_11">
+                <item>
+                 <widget class="QComboBox" name="Load_Combination_Combo_Box">
+                  <item>
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>2</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>3</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>4</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>5</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>6</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>7</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>8</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>9</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>10</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
                 <item>
                  <layout class="QGridLayout" name="gridLayout_3">
                   <item row="1" column="1">

@@ -3,6 +3,7 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import qdarkstyle
 from matplotlib.backends.backend_qt5agg import \
@@ -28,8 +29,19 @@ class UI(QMainWindow):
         self.elements = {}
         self.supports = {}
         self.forces = {}
+        self.forces_LC1 = {}
+        self.forces_LC2 = {}
+        self.forces_LC3 = {}
+        self.forces_LC4 = {}
+        self.forces_LC5 = {}
+        self.forces_LC6 = {}
+        self.forces_LC7 = {}
+        self.forces_LC8 = {}
+        self.forces_LC9 = {}
+        self.forces_LC10 = {}
         self.elasticity = {}
         self.areas = {}
+        self.load_case_index = 0
 
 
 
@@ -53,6 +65,11 @@ class UI(QMainWindow):
         
         self.Update_Material_Button = self.findChild(QPushButton, "Update_Material_Button")
         
+        # self.Add_Load_Case_Button = self.findChild(QPushButton, "Add_Load_Case_Button")
+        # self.Remove_Load_Case_Button = self.findChild(QPushButton, "Remove_Load_Case_Button")
+        self.Add_Load_Combo_Button = self.findChild(QPushButton, "Add_Load_Combo_Button")
+        self.Remove_Load_Combo_Button = self.findChild(QPushButton, "Remove_Load_Combo_Button")
+        
         self.Add_Force_Button = self.findChild(QPushButton, "Add_Force_Button")
         self.Remove_Force_Button = self.findChild(QPushButton, "Remove_Force_Button")
         self.Update_Truss_Forces_Button = self.findChild(QPushButton, "Update_Truss_Forces_Button")
@@ -61,6 +78,7 @@ class UI(QMainWindow):
         self.Remove_Support_Button = self.findChild(QPushButton, "Remove_Support_Button")
         self.Update_Truss_Supports_Button = self.findChild(QPushButton, "Update_Truss_Supports_Button")
         
+        self.Show_Load_Case_Table_Button = self.findChild(QPushButton, "Show_Load_Case_Table_Button")
         self.Solve_Truss_Button = self.findChild(QPushButton, "Solve_Truss_Button")
         self.Setup_Button = self.findChild(QPushButton, "Setup_Button")
         self.Reactions_Button = self.findChild(QPushButton, "Reactions_Button")
@@ -88,11 +106,17 @@ class UI(QMainWindow):
         # Combo Box
         self.X_Coord_ComboBox = self.findChild(QComboBox, "X_Coord_ComboBox")
         self.Y_Coord_ComboBox = self.findChild(QComboBox, "Y_Coord_ComboBox")
+        self.Load_Case_ComboBox = self.findChild(QComboBox, "LoadCaseComboBox_Widget")
+        self.Load_Combination_Combo_Box = self.findChild(QComboBox, "Load_Combination_Combo_Box")
 
         # Table Widget
         self.Nodes_Table_Widget = self.findChild(QTableWidget, "Nodes_Table_Widget")
         self.Element_Table_Widget = self.findChild(QTableWidget, "Element_Table_Widget")
         self.Material_Table_Widget = self.findChild(QTableWidget, "Material_Table_Widget")
+        
+        self.Load_Case_Table_Widget = self.findChild(QTableWidget, "LoadCase_Table_Widget")
+        self.Load_Combo_Table_Widget = self.findChild(QTableWidget, "Load_Combo_Table_Widget")
+        
         self.Force_Table_Widget = self.findChild(QTableWidget, "Force_Table_Widget")
         self.Support_Table_Widget = self.findChild(QTableWidget, "Support_Table_Widget")
         
@@ -109,7 +133,7 @@ class UI(QMainWindow):
         self.horizontalLayout_Matplotlib.addWidget(self.canvas)
         self.ax = plt.gca()
 
-        # Graphics View # TODO
+        # Graphics View # TODO Graphics View
         self.GraphicsView_Frame = self.findChild(QFrame,"GraphicsView_Frame")
         self.GraphicsView_Layout = QHBoxLayout(self.GraphicsView_Frame)
         self.GraphicsView_Layout.setObjectName("Graphics_layout")
@@ -155,6 +179,13 @@ class UI(QMainWindow):
         
         # Materials
         self.Update_Material_Button.clicked.connect(self.Update_Material_Button_Func)
+        
+        # Load Case and Load Combinations
+        # self.Add_Load_Case_Button.clicked.connect(self.Add_Load_Case_Button_Func)
+        # self.Remove_Load_Case_Button.clicked.connect(self.Remove_Load_Case_Button_Func)
+        self.Show_Load_Case_Table_Button.clicked.connect(self.Show_Load_Case_Table_Button_Func)
+        self.Add_Load_Combo_Button.clicked.connect(self.Add_Load_Combination_Button_Func)
+        self.Remove_Load_Combo_Button.clicked.connect(self.Remove_Load_Combination_Button_Func)
 
         # Forces
         self.Add_Force_Button.clicked.connect(self.Add_Force_Button_Func)
@@ -469,6 +500,99 @@ class UI(QMainWindow):
         except:
             pass
 
+    ###### Load Cases and Load Combinations Function ######
+    # def Add_Load_Case_Button_Func(self):
+    #     self.Load_Case_Table_Widget.insertRow(self.Load_Case_Table_Widget.rowCount())
+        
+    # def Remove_Load_Case_Button_Func(self):
+    #     print("Remove Load Case")
+        
+    def Add_Load_Combination_Button_Func(self):
+        rowPosition = (self.Load_Combo_Table_Widget.rowCount())
+        self.Load_Combo_Table_Widget.insertRow(rowPosition)
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 3, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 4, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 5, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 6, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 7, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 8, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 9, QTableWidgetItem("0"))
+        self.Load_Combo_Table_Widget.setItem(rowPosition, 10, QTableWidgetItem("0"))
+        
+    def Remove_Load_Combination_Button_Func(self):
+        # Grab Item from Highlighted Row
+        clicked = self.Load_Combo_Table_Widget.currentRow()
+
+        # Delete Highlighted Row
+        self.Load_Combo_Table_Widget.removeRow(clicked)
+        
+    def Show_Load_Case_Table_Button_Func(self):
+        # load_case_index = self.Load_Case_ComboBox.currentIndex()
+        # print(load_case_index)
+        if self.Load_Case_ComboBox.currentIndex() == 0:
+            self.forces = self.forces_LC1
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+            self.Load_Combination_Combo_Box.setCurrentIndex(0)
+        elif self.Load_Case_ComboBox.currentIndex() == 1:
+            self.forces = self.forces_LC2
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+            self.Load_Combination_Combo_Box.setCurrentIndex(1)
+        elif self.Load_Case_ComboBox.currentIndex() == 2:
+            self.forces = self.forces_LC3
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+            self.Load_Combination_Combo_Box.setCurrentIndex(2)
+        elif self.Load_Case_ComboBox.currentIndex() == 3:
+            self.forces = self.forces_LC4
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+            self.Load_Combination_Combo_Box.setCurrentIndex(3)
+        elif self.Load_Case_ComboBox.currentIndex() == 4:
+            self.forces = self.forces_LC5
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+            self.Load_Combination_Combo_Box.setCurrentIndex(4)
+        elif self.Load_Case_ComboBox.currentIndex() == 5:
+            self.forces = self.forces_LC6
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+            self.Load_Combination_Combo_Box.setCurrentIndex(5)
+        elif self.Load_Case_ComboBox.currentIndex() == 6:
+            self.forces = self.forces_LC7
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+            self.Load_Combination_Combo_Box.setCurrentIndex(6)
+        elif self.Load_Case_ComboBox.currentIndex() == 7:
+            self.forces = self.forces_LC8
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+            self.Load_Combination_Combo_Box.setCurrentIndex(7)
+        elif self.Load_Case_ComboBox.currentIndex() == 8:
+            self.forces = self.forces_LC9
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
+            self.Load_Combination_Combo_Box.setCurrentIndex(8)
+        elif self.Load_Case_ComboBox.currentIndex() == 9:
+            self.forces = self.forces_LC10
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
+            self.Load_Combination_Combo_Box.setCurrentIndex(9)
+
+        self.Force_Table_Widget.setRowCount(0)
+                    
+        # Loop all the force dictionary and replace/update the table widget
+        for key, item in self.forces.items():
+            node = str(key)
+            f_x = str(item[0])
+            f_y = str(item[1])
+
+            # Add Items to Table Widget
+            rowPosition = self.Force_Table_Widget.rowCount()
+
+            # print(rowPosition)
+            self.Force_Table_Widget.insertRow(rowPosition)
+            self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+            self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+            self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+        
+        # Draw Truss
+        self.Draw_Setup()
+
+
     ###### Forces Function ######
     def Add_Force_Button_Func(self):
         if self.Force_Node_Number_LEdit.text() == "" or self.Force_X_LEdit.text() == "" or self.Force_Y_LEdit.text() == "":
@@ -479,34 +603,235 @@ class UI(QMainWindow):
             f_x = float(self.Force_X_LEdit.text())
             f_y = float(self.Force_Y_LEdit.text())
 
-            self.forces.update({node:[f_x,f_y]})
-            self.forces = {k: v for k, v in sorted(self.forces.items(), key=lambda item: item[0])}
+            if self.Load_Case_ComboBox.currentIndex() == 0:
+                self.forces_LC1.update({node:[f_x,f_y]})
+                self.forces_LC1 = {k: v for k, v in sorted(self.forces_LC1.items(), key=lambda item: item[0])}
 
-            self.Force_Table_Widget.setRowCount(0)
+                self.Force_Table_Widget.setRowCount(0)
 
-            # Loop all the nodes dictionary and replace/update the table widget
-            for key, item in self.forces.items():
-                node = str(key)
-                f_x = str(item[0])
-                f_y = str(item[1])
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC1.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
 
-                # Add Items to Table Widget
-                rowPosition = self.Force_Table_Widget.rowCount()
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
 
-                # print(rowPosition)
-                self.Force_Table_Widget.insertRow(rowPosition)
-                self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
-                self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
-                self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    
+            elif self.Load_Case_ComboBox.currentIndex() == 1:
+                self.forces_LC2.update({node:[f_x,f_y]})
+                self.forces_LC2 = {k: v for k, v in sorted(self.forces_LC2.items(), key=lambda item: item[0])}
 
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC2.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+
+                    
+            elif self.Load_Case_ComboBox.currentIndex() == 2:
+                self.forces_LC3.update({node:[f_x,f_y]})
+                self.forces_LC3 = {k: v for k, v in sorted(self.forces_LC3.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC3.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    
+            elif self.Load_Case_ComboBox.currentIndex() == 3:
+                self.forces_LC4.update({node:[f_x,f_y]})
+                self.forces_LC4 = {k: v for k, v in sorted(self.forces_LC4.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC4.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+
+            elif self.Load_Case_ComboBox.currentIndex() == 4:
+                self.forces_LC5.update({node:[f_x,f_y]})
+                self.forces_LC5 = {k: v for k, v in sorted(self.forces_LC5.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC5.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    
+            elif self.Load_Case_ComboBox.currentIndex() == 5:
+                self.forces_LC6.update({node:[f_x,f_y]})
+                self.forces_LC6 = {k: v for k, v in sorted(self.forces_LC6.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC6.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    
+            elif self.Load_Case_ComboBox.currentIndex() == 6:
+                self.forces_LC7.update({node:[f_x,f_y]})
+                self.forces_LC7 = {k: v for k, v in sorted(self.forces_LC7.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC7.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    
+            elif self.Load_Case_ComboBox.currentIndex() == 7:
+                self.forces_LC8.update({node:[f_x,f_y]})
+                self.forces_LC8 = {k: v for k, v in sorted(self.forces_LC8.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC8.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+
+            elif self.Load_Case_ComboBox.currentIndex() == 8:
+                self.forces_LC9.update({node:[f_x,f_y]})
+                self.forces_LC9 = {k: v for k, v in sorted(self.forces_LC9.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC9.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+
+            elif self.Load_Case_ComboBox.currentIndex() == 9:
+                self.forces_LC10.update({node:[f_x,f_y]})
+                self.forces_LC10 = {k: v for k, v in sorted(self.forces_LC10.items(), key=lambda item: item[0])}
+
+                self.Force_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.forces_LC10.items():
+                    node = str(key)
+                    f_x = str(item[0])
+                    f_y = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Force_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Force_Table_Widget.insertRow(rowPosition)
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                    self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+                    
+            else:
+                print("error")
+                                       
             # Clear the Textboxes
             self.Force_Node_Number_LEdit.setText("")
             # self.Force_X_LEdit.setText("")
             # self.Force_Y_LEdit.setText("")
+            
+            print("LC1")
+            print(self.forces_LC1)
+            print("LC2")
+            print(self.forces_LC2)
+            print("LC3")
+            print(self.forces_LC3)
 
             # Draw Truss
             self.Draw_Setup()
-            print(self.forces)
+            # print(self.forces_LC1)
 
     def Remove_Force_Button_Func(self):
         # Grab Item from Highlighted Row
@@ -516,14 +841,14 @@ class UI(QMainWindow):
         self.Force_Table_Widget.removeRow(clicked)
 
         # Forces
-        self.forces = {}
+        self.forces_LC1 = {}
         for index in range(self.Force_Table_Widget.rowCount()):
             bar = int(self.Force_Table_Widget.item(index,0).text())
             f_x = float(self.Force_Table_Widget.item(index,1).text())
             f_y = float(self.Force_Table_Widget.item(index,2).text())
-            self.forces.update({bar: [f_x, f_y]})
+            self.forces_LC1.update({bar: [f_x, f_y]})
 
-        print(self.forces)
+        print(self.forces_LC1)
         
     ###### Support Function ######
     def Add_Support_Button_Func(self):
@@ -601,9 +926,13 @@ class UI(QMainWindow):
         self.nodes = {}
         self.elements = {}
         self.areas = {}
-        self.forces = {}
+        
+        self.load_combo = {}
+
         self.supports = {}
 
+
+        # Nodes
         for index in range(self.Nodes_Table_Widget.rowCount()):
             node = int(self.Nodes_Table_Widget.item(index,0).text())
             x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
@@ -625,19 +954,29 @@ class UI(QMainWindow):
             self.areas.update({bar: area})
             self.elasticity.update({bar: elasticity})
 
-        # Forces
-        for index in range(self.Force_Table_Widget.rowCount()):
-            bar = int(self.Force_Table_Widget.item(index,0).text())
-            f_x = float(self.Force_Table_Widget.item(index,1).text())
-            f_y = float(self.Force_Table_Widget.item(index,2).text())
-            self.forces.update({bar: [f_x, f_y]})
-
         # Supports
         for index in range(self.Support_Table_Widget.rowCount()):
             node = int(self.Support_Table_Widget.item(index,0).text())
             x = int(self.Support_Table_Widget.item(index,1).text())
             y = int(self.Support_Table_Widget.item(index,2).text())
             self.supports.update({node: [x, y]})
+            
+        # Load Combination
+        for index in range(self.Load_Combo_Table_Widget.rowCount()):
+            Combo_Name = str(self.Load_Combo_Table_Widget.item(index,0).text())
+            LC1 = float(self.Load_Combo_Table_Widget.item(index,1).text())
+            LC2 = float(self.Load_Combo_Table_Widget.item(index,2).text())
+            LC3 = float(self.Load_Combo_Table_Widget.item(index,3).text())
+            LC4 = float(self.Load_Combo_Table_Widget.item(index,4).text())
+            LC5 = float(self.Load_Combo_Table_Widget.item(index,5).text())
+            LC6 = float(self.Load_Combo_Table_Widget.item(index,6).text())
+            LC7 = float(self.Load_Combo_Table_Widget.item(index,7).text())
+            LC8 = float(self.Load_Combo_Table_Widget.item(index,8).text())
+            LC9 = float(self.Load_Combo_Table_Widget.item(index,9).text())
+            LC10 = float(self.Load_Combo_Table_Widget.item(index,10).text())
+            self.load_combo.update({Combo_Name: [LC1, LC2, LC3, LC4, LC5, LC6, LC7, LC8, LC9, LC10]})
+            
+        
 
         # Update plot
         plt.clf()
@@ -645,19 +984,143 @@ class UI(QMainWindow):
         self.canvas.draw()
         self.Post_Processing_Table.setRowCount(0)
 
-        # Solve Truss
-        self.Truss = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
-        self.Truss.Solve()
+        # Solve Trusses TODO
+        self.Truss_LC1 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+        self.Truss_LC1.Solve()
+        
+        self.Truss_LC2 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+        self.Truss_LC2.Solve()
+        
+        self.Truss_LC3 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+        self.Truss_LC3.Solve()
+        
+        self.Truss_LC4 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+        self.Truss_LC4.Solve()
+        
+        self.Truss_LC5 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+        self.Truss_LC5.Solve()
+        
+        self.Truss_LC6 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+        self.Truss_LC6.Solve()
+        
+        self.Truss_LC7 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+        self.Truss_LC7.Solve()
+        
+        self.Truss_LC8 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+        self.Truss_LC8.Solve()
+        
+        self.Truss_LC9 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
+        self.Truss_LC9.Solve()
+        
+        self.Truss_LC10 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
+        self.Truss_LC10.Solve()
 
-        # Save Results
-        self.df_displacements = pd.DataFrame.from_dict(self.Truss.displacements_, orient='index', columns=['X','Y'])
-        self.df_member_forces = pd.DataFrame.from_dict(self.Truss.member_forces_, orient='index', columns=['Force'])
-        self.df_reactions = pd.DataFrame.from_dict(self.Truss.reactions_, orient='index', columns=['F_x','F_y'])
+        # Save Results TODO
+        # Load Case 1
+        self.df_displacements_LC1 = pd.DataFrame.from_dict(self.Truss_LC1.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC1 = pd.DataFrame.from_dict(self.Truss_LC1.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC1 = pd.DataFrame.from_dict(self.Truss_LC1.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 2
+        self.df_displacements_LC2 = pd.DataFrame.from_dict(self.Truss_LC2.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC2 = pd.DataFrame.from_dict(self.Truss_LC2.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC2 = pd.DataFrame.from_dict(self.Truss_LC2.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 3
+        self.df_displacements_LC3 = pd.DataFrame.from_dict(self.Truss_LC3.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC3 = pd.DataFrame.from_dict(self.Truss_LC3.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC3 = pd.DataFrame.from_dict(self.Truss_LC3.reactions_, orient='index', columns=['F_x','F_y'])
+            
+        # Load Case 4
+        self.df_displacements_LC4 = pd.DataFrame.from_dict(self.Truss_LC4.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC4 = pd.DataFrame.from_dict(self.Truss_LC4.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC4 = pd.DataFrame.from_dict(self.Truss_LC4.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 5
+        self.df_displacements_LC5 = pd.DataFrame.from_dict(self.Truss_LC5.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC5 = pd.DataFrame.from_dict(self.Truss_LC5.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC5 = pd.DataFrame.from_dict(self.Truss_LC5.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 6
+        self.df_displacements_LC6 = pd.DataFrame.from_dict(self.Truss_LC6.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC6 = pd.DataFrame.from_dict(self.Truss_LC6.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC6 = pd.DataFrame.from_dict(self.Truss_LC6.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 7
+        self.df_displacements_LC7 = pd.DataFrame.from_dict(self.Truss_LC7.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC7 = pd.DataFrame.from_dict(self.Truss_LC7.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC7 = pd.DataFrame.from_dict(self.Truss_LC7.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 8
+        self.df_displacements_LC8 = pd.DataFrame.from_dict(self.Truss_LC8.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC8 = pd.DataFrame.from_dict(self.Truss_LC8.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC8 = pd.DataFrame.from_dict(self.Truss_LC8.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 9
+        self.df_displacements_LC9 = pd.DataFrame.from_dict(self.Truss_LC9.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC9 = pd.DataFrame.from_dict(self.Truss_LC9.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC9 = pd.DataFrame.from_dict(self.Truss_LC9.reactions_, orient='index', columns=['F_x','F_y'])
+
+        # Load Case 10
+        self.df_displacements_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.displacements_, orient='index', columns=['X','Y'])
+        self.df_member_forces_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.member_forces_, orient='index', columns=['Force'])
+        self.df_reactions_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.reactions_, orient='index', columns=['F_x','F_y'])
 
         with pd.ExcelWriter(file_name[0].split(".xlsx")[0] + "_Solved.xlsx") as writer:
-            self.df_reactions.to_excel(writer, sheet_name='Reactions')
-            self.df_displacements.to_excel(writer, sheet_name='Displacements')
-            self.df_member_forces.to_excel(writer, sheet_name='Member Forces')
+            self.df_reactions_LC1.to_excel(writer, sheet_name='Reactions_LC1')
+            self.df_displacements_LC1.to_excel(writer, sheet_name='Displacements_LC1')
+            self.df_member_forces_LC1.to_excel(writer, sheet_name='Member Forces_LC1')
+            
+            self.df_reactions_LC2.to_excel(writer, sheet_name='Reactions_LC2')
+            self.df_displacements_LC2.to_excel(writer, sheet_name='Displacements_LC2')
+            self.df_member_forces_LC2.to_excel(writer, sheet_name='Member Forces_LC2')
+            
+            self.df_reactions_LC3.to_excel(writer, sheet_name='Reactions_LC3')
+            self.df_displacements_LC3.to_excel(writer, sheet_name='Displacements_LC3')
+            self.df_member_forces_LC3.to_excel(writer, sheet_name='Member Forces_LC3')
+            
+            self.df_reactions_LC4.to_excel(writer, sheet_name='Reactions_LC4')
+            self.df_displacements_LC4.to_excel(writer, sheet_name='Displacements_LC4')
+            self.df_member_forces_LC4.to_excel(writer, sheet_name='Member Forces_LC4')
+            
+            self.df_reactions_LC5.to_excel(writer, sheet_name='Reactions_LC5')
+            self.df_displacements_LC5.to_excel(writer, sheet_name='Displacements_LC5')
+            self.df_member_forces_LC5.to_excel(writer, sheet_name='Member Forces_LC5')
+            
+            self.df_reactions_LC6.to_excel(writer, sheet_name='Reactions_LC6')
+            self.df_displacements_LC6.to_excel(writer, sheet_name='Displacements_LC6')
+            self.df_member_forces_LC6.to_excel(writer, sheet_name='Member Forces_LC6')
+            
+            self.df_reactions_LC7.to_excel(writer, sheet_name='Reactions_LC7')
+            self.df_displacements_LC7.to_excel(writer, sheet_name='Displacements_LC7')
+            self.df_member_forces_LC7.to_excel(writer, sheet_name='Member Forces_LC7')
+            
+            self.df_reactions_LC8.to_excel(writer, sheet_name='Reactions_LC8')
+            self.df_displacements_LC8.to_excel(writer, sheet_name='Displacements_LC8')
+            self.df_member_forces_LC8.to_excel(writer, sheet_name='Member Forces_LC8')
+            
+            self.df_reactions_LC9.to_excel(writer, sheet_name='Reactions_LC9')
+            self.df_displacements_LC9.to_excel(writer, sheet_name='Displacements_LC9')
+            self.df_member_forces_LC9.to_excel(writer, sheet_name='Member Forces_LC9')
+            
+            self.df_reactions_LC10.to_excel(writer, sheet_name='Reactions_LC10')
+            self.df_displacements_LC10.to_excel(writer, sheet_name='Displacements_LC10')
+            self.df_member_forces_LC10.to_excel(writer, sheet_name='Member Forces_LC10')
+
+        # Combination of Load Combinations #TODO Combo loads
+        
+        # get list from Table Widget into ComboBox
+        # for name in self.load_combo.keys():
+            # self.Load_Combination_Combo_Box.addItem(name)
+        
+        # reactions
+        
+        
+        # member forces
+        
+        
+        
+        
 
         self.Reactions_Button.setEnabled(True)
         self.Displacement_Button.setEnabled(True)
@@ -668,7 +1131,7 @@ class UI(QMainWindow):
 
         print("Truss Solved")
 
-    def Draw_Truss_Axial_Force_Map(self):
+    def Draw_Truss_Axial_Force_Map(self): #TODO draw force map depending on load case
         plt.clf()
         self.Draw_Axial()
         self.canvas.draw()
@@ -679,26 +1142,197 @@ class UI(QMainWindow):
 
         global file_name
 
-        try:
-            reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces')
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC1')
 
-            # Reactions
-            for index, row in reaction_sheet.iterrows():
-                bar = str(row[0])
-                force = str(row['Force'])
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
 
-                # Add Items to Table Widget
-                rowPosition = self.Post_Processing_Table.rowCount()
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
 
-                # print(rowPosition)
-                self.Post_Processing_Table.insertRow(rowPosition)
-                self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
-                self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
-        
-        except:
-            pass
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC2')
 
-    def Draw_Truss_Displacement(self):
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC3')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC4')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC5')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC6')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC7')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC8')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC9')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+            
+        else:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member Forces_LC10')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    bar = str(row[0])
+                    force = str(row['Force'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
+            except:
+                pass
+
+    def Draw_Truss_Displacement(self): #TODO draw truss dislacements depending on load case
         plt.clf()
         self.Draw_Displacements()
         self.canvas.draw()
@@ -709,28 +1343,217 @@ class UI(QMainWindow):
 
         global file_name
 
-        try:
-            reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements')
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC1')
 
-            # Reactions
-            for index, row in reaction_sheet.iterrows():
-                node = str(row[0])
-                X = str(row['X'])
-                Y = str(row['Y'])
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
 
-                # Add Items to Table Widget
-                rowPosition = self.Post_Processing_Table.rowCount()
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
 
-                # print(rowPosition)
-                self.Post_Processing_Table.insertRow(rowPosition)
-                self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
-                self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
-                self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
-        
-        except:
-            pass
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
 
-    def Draw_Truss_Reactions(self):
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC2')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC3')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC4')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC5')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC6')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC7')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC8')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC9')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 9:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Displacements_LC10')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    X = str(row['X'])
+                    Y = str(row['Y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(X))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(Y))
+            except:
+                pass
+
+    def Draw_Truss_Reactions(self): #TODO draw reactions depending on load case
         plt.clf()
         self.Draw_Reactions()
         self.canvas.draw()
@@ -741,27 +1564,215 @@ class UI(QMainWindow):
 
         global file_name
 
-        try:
-            reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions')
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC1')
 
-            # Reactions
-            for index, row in reaction_sheet.iterrows():
-                node = str(row[0])
-                F_x = str(row['F_x'])
-                F_y = str(row['F_y'])
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
 
-                # Add Items to Table Widget
-                rowPosition = self.Post_Processing_Table.rowCount()
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
 
-                # print(rowPosition)
-                self.Post_Processing_Table.insertRow(rowPosition)
-                self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
-                self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
-                self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
             
-        except:
-            pass
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC2')
 
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC3')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC4')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC5')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC6')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC7')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC8')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC9')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
+            
+        elif self.Load_Combination_Combo_Box.currentIndex() == 9:
+            try:
+                reaction_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Reactions_LC10')
+
+                # Reactions
+                for index, row in reaction_sheet.iterrows():
+                    node = str(row[0])
+                    F_x = str(row['F_x'])
+                    F_y = str(row['F_y'])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Post_Processing_Table.rowCount()
+
+                    # print(rowPosition)
+                    self.Post_Processing_Table.insertRow(rowPosition)
+                    self.Post_Processing_Table.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(F_x))
+                    self.Post_Processing_Table.setItem(rowPosition, 2, QTableWidgetItem(F_y))
+            except:
+                pass
 
     def Draw_Setup(self):
         # self.Initialize_Plotting()
@@ -796,7 +1807,38 @@ class UI(QMainWindow):
             self.areas.update({bar: area})
             self.elasticity.update({bar: elasticity})
 
-        # Forces
+        # Forces #TODO Fix if Load ComboBox should be equal to Load CaseBox
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+            self.Load_Case_ComboBox.setCurrentIndex(0)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+            self.Load_Case_ComboBox.setCurrentIndex(1)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+            self.Load_Case_ComboBox.setCurrentIndex(2)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+            self.Load_Case_ComboBox.setCurrentIndex(3)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+            self.Load_Case_ComboBox.setCurrentIndex(4)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+            self.Load_Case_ComboBox.setCurrentIndex(5)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+            self.Load_Case_ComboBox.setCurrentIndex(6)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+            self.Load_Case_ComboBox.setCurrentIndex(7)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
+            self.Load_Case_ComboBox.setCurrentIndex(8)
+        else:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
+            self.Load_Case_ComboBox.setCurrentIndex(9)
+            
         for index in range(self.Force_Table_Widget.rowCount()):
             bar = int(self.Force_Table_Widget.item(index,0).text())
             f_x = float(self.Force_Table_Widget.item(index,1).text())
@@ -812,45 +1854,7 @@ class UI(QMainWindow):
 
         # Update plot
         plt.clf()
-        self.Draw_Truss_Setup()
-        self.canvas.draw()
-
-    def Initialize_Truss_Components(self):
-        nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
-        elements_sheet = pd.read_excel(file_name[0], sheet_name='Elements')
-        materials_sheet = pd.read_excel(file_name[0], sheet_name='Materials')
-        forces_sheet = pd.read_excel(file_name[0], sheet_name='Forces')
-        supports_sheet = pd.read_excel(file_name[0], sheet_name='Supports')
-
-        self.nodes = {}
-        for i in range(len(nodes_sheet)):
-            self.nodes.update({nodes_sheet['Node'][i]: [nodes_sheet['x_coord'][i], nodes_sheet['y_coord'][i]]})
-
-        self.elements = {}
-        for i in range(len(elements_sheet)):
-            self.elements.update({elements_sheet['Element'][i]: [elements_sheet['Node_1'][i], elements_sheet['Node_2'][i]]})
-
-        self.areas = {}
-        for i in range(len(materials_sheet)):
-            self.areas.update({materials_sheet['Element'][i]: materials_sheet['Area'][i]})
-
-        self.elasticity = {}
-        for i in range(len(materials_sheet)):
-            self.elasticity.update({materials_sheet['Element'][i]: materials_sheet['Elasticity'][i]})
-
-        self.forces = {}
-        for i in range(len(forces_sheet)):
-            self.forces.update({forces_sheet['Node'][i]: [forces_sheet['F_x'][i], forces_sheet['F_y'][i]]})
-
-        self.supports = {}
-        for i in range(len(supports_sheet)):
-            self.supports.update({supports_sheet['Node'][i]: [supports_sheet['X'][i], supports_sheet['Y'][i]]})
-
-    ##### Matplotlib Functions #####
-
-    def Draw_Truss_Setup(self):
-        self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces)
-
+        
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         length_of_arrow = float(self.Arrow_Length_LEdit.text())
@@ -858,16 +1862,105 @@ class UI(QMainWindow):
         arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
 
         self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
+        
+        
+        self.canvas.draw()
 
-    def Draw_Reactions(self):
+    # def Initialize_Truss_Components(self):
+    #     nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
+    #     elements_sheet = pd.read_excel(file_name[0], sheet_name='Elements')
+    #     materials_sheet = pd.read_excel(file_name[0], sheet_name='Materials')
+    #     forces_sheet = pd.read_excel(file_name[0], sheet_name='Forces')
+    #     supports_sheet = pd.read_excel(file_name[0], sheet_name='Supports')
+
+    #     self.nodes = {}
+    #     for i in range(len(nodes_sheet)):
+    #         self.nodes.update({nodes_sheet['Node'][i]: [nodes_sheet['x_coord'][i], nodes_sheet['y_coord'][i]]})
+
+    #     self.elements = {}
+    #     for i in range(len(elements_sheet)):
+    #         self.elements.update({elements_sheet['Element'][i]: [elements_sheet['Node_1'][i], elements_sheet['Node_2'][i]]})
+
+    #     self.areas = {}
+    #     for i in range(len(materials_sheet)):
+    #         self.areas.update({materials_sheet['Element'][i]: materials_sheet['Area'][i]})
+
+    #     self.elasticity = {}
+    #     for i in range(len(materials_sheet)):
+    #         self.elasticity.update({materials_sheet['Element'][i]: materials_sheet['Elasticity'][i]})
+
+    #     self.forces_LC1 = {}
+    #     for i in range(len(forces_sheet)):
+    #         self.forces_LC1.update({forces_sheet['Node'][i]: [forces_sheet['F_x'][i], forces_sheet['F_y'][i]]})
+
+    #     self.supports = {}
+    #     for i in range(len(supports_sheet)):
+    #         self.supports.update({supports_sheet['Node'][i]: [supports_sheet['X'][i], supports_sheet['Y'][i]]})
+
+    ##### Matplotlib Functions #####
+
+    def Draw_Truss_Setup(self): #TODO Fix if Load ComboBox should be equal to Load CaseBox
+        
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
+        else:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
+        
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         length_of_arrow = float(self.Arrow_Length_LEdit.text())
         width_of_arrow = float(self.Arrow_Head_Size_LEdit.text())
         arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
-        self.Truss.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
 
-    def Draw_Displacements(self):
+        plt.clf()
+        self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
+        self.canvas.draw()
+
+    def Draw_Reactions(self): #TODO Draw Reactions based on Load Combination
+        linewidth = float(self.Line_Width_LEdit.text())
+        offset = float(self.Label_Offset_LEdit.text())
+        length_of_arrow = float(self.Arrow_Length_LEdit.text())
+        width_of_arrow = float(self.Arrow_Head_Size_LEdit.text())
+        arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
+        
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.Truss_LC1.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.Truss_LC2.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.Truss_LC3.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.Truss_LC4.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.Truss_LC5.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.Truss_LC6.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.Truss_LC7.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.Truss_LC8.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.Truss_LC9.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+        else:
+            self.Truss_LC10.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+
+    def Draw_Displacements(self): #TODO Draw Displacements based on Load Combinations
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         # length_of_arrow = float(self.Arrow_Length_LEdit.text())
@@ -875,10 +1968,49 @@ class UI(QMainWindow):
         # arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
         magnification_factor = float(self.Displacement_Factor_LEdit.text())
 
-        self.Truss.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
-    
-    def Draw_Axial(self):
-        self.Truss.Draw_Truss_Axial_Force_Map()
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.Truss_LC1.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.Truss_LC2.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.Truss_LC3.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.Truss_LC4.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.Truss_LC5.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.Truss_LC6.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.Truss_LC7.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.Truss_LC8.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.Truss_LC9.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+        else:
+            self.Truss_LC10.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+
+    def Draw_Axial(self): # TODO draw force map depending on load combination
+            
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.Truss_LC1.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.Truss_LC2.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.Truss_LC3.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.Truss_LC4.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.Truss_LC5.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.Truss_LC6.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.Truss_LC7.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.Truss_LC8.Draw_Truss_Axial_Force_Map()
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.Truss_LC9.Draw_Truss_Axial_Force_Map()
+        else:
+            self.Truss_LC10.Draw_Truss_Axial_Force_Map()
 
     def New_File_Func(self):
         self.Nodes_Table_Widget.setRowCount(0)
@@ -893,7 +2025,7 @@ class UI(QMainWindow):
         self.nodes = {}
         self.elements = {}
         self.supports = {}
-        self.forces = {}
+        self.forces_LC1 = {}
         self.elasticity = {}
         self.cross_area = {}
 
@@ -908,7 +2040,16 @@ class UI(QMainWindow):
         nodes_dict = {}
         elements_dict = {}
         materials_dict = {}
-        forces_dict = {}
+        forces_LC1_dict = {}
+        forces_LC2_dict = {}
+        forces_LC3_dict = {}
+        forces_LC4_dict = {}
+        forces_LC5_dict = {}
+        forces_LC6_dict = {}
+        forces_LC7_dict = {}
+        forces_LC8_dict = {}
+        forces_LC9_dict = {}
+        forces_LC10_dict = {}
         supports_dict = {}
 
         try:
@@ -937,12 +2078,105 @@ class UI(QMainWindow):
             materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
             
             # Forces
-            for index in range(self.Force_Table_Widget.rowCount()):
-                node = int(self.Force_Table_Widget.item(index,0).text())
-                f_x = float(self.Force_Table_Widget.item(index,1).text())
-                f_y = float(self.Force_Table_Widget.item(index,2).text())
-                forces_dict.update({index+1:[int(node), float(f_x), float(f_y)]})
-            forces_df = pd.DataFrame.from_dict(forces_dict, orient='index', columns=['Node','F_x','F_y'])
+            # Load Case 1
+            index = 1
+            for key, item in self.forces_LC1.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC1_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC1_df = pd.DataFrame.from_dict(forces_LC1_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 2
+            index = 1
+            for key, item in self.forces_LC2.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC2_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC2_df = pd.DataFrame.from_dict(forces_LC2_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 3
+            index = 1
+            for key, item in self.forces_LC3.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC3_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC3_df = pd.DataFrame.from_dict(forces_LC3_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+            # Load Case 4
+            index = 1
+            for key, item in self.forces_LC4.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC4_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC4_df = pd.DataFrame.from_dict(forces_LC4_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 5
+            index = 1
+            for key, item in self.forces_LC5.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC5_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC5_df = pd.DataFrame.from_dict(forces_LC5_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 6
+            index = 1
+            for key, item in self.forces_LC6.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC6_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC6_df = pd.DataFrame.from_dict(forces_LC6_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 7
+            index = 1
+            for key, item in self.forces_LC7.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC7_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC7_df = pd.DataFrame.from_dict(forces_LC7_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 8
+            index = 1
+            for key, item in self.forces_LC8.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC8_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC8_df = pd.DataFrame.from_dict(forces_LC8_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 9
+            index = 1
+            for key, item in self.forces_LC9.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC9_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC9_df = pd.DataFrame.from_dict(forces_LC9_dict, orient='index', columns=['Node','F_x','F_y'])
+            
+            # Load Case 10
+            index = 1
+            for key, item in self.forces_LC10.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC10_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC10_df = pd.DataFrame.from_dict(forces_LC10_dict, orient='index', columns=['Node','F_x','F_y'])
             
             # Supports
             for index in range(self.Support_Table_Widget.rowCount()):
@@ -956,8 +2190,17 @@ class UI(QMainWindow):
                 nodes_df.to_excel(writer, sheet_name='Nodes')
                 elements_df.to_excel(writer, sheet_name='Elements')
                 materials_df.to_excel(writer, sheet_name='Materials')
-                forces_df.to_excel(writer, sheet_name='Forces')
                 supports_df.to_excel(writer, sheet_name='Supports')
+                forces_LC1_df.to_excel(writer, sheet_name='Forces_LC1')
+                forces_LC2_df.to_excel(writer, sheet_name='Forces_LC2')
+                forces_LC3_df.to_excel(writer, sheet_name='Forces_LC3')
+                forces_LC4_df.to_excel(writer, sheet_name='Forces_LC4')
+                forces_LC5_df.to_excel(writer, sheet_name='Forces_LC5')
+                forces_LC6_df.to_excel(writer, sheet_name='Forces_LC6')
+                forces_LC7_df.to_excel(writer, sheet_name='Forces_LC7')
+                forces_LC8_df.to_excel(writer, sheet_name='Forces_LC8')
+                forces_LC9_df.to_excel(writer, sheet_name='Forces_LC9')
+                forces_LC10_df.to_excel(writer, sheet_name='Forces_LC10')
             
             print("Saved")
         except:
@@ -976,7 +2219,7 @@ class UI(QMainWindow):
             # print("Canceled Dialogue")
             # self.Solve_Truss_Button.setEnabled(False)
 
-    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_sheet, supports_sheet):
+    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet):
         try:
             # Nodes
             for index, row in nodes_sheet.iterrows():
@@ -1024,7 +2267,8 @@ class UI(QMainWindow):
                 self.Material_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(elasticity))
 
             # Forces
-            for index, row in forces_sheet.iterrows():
+            # Add Load Case 1 in Table
+            for index, row in forces_LC1_sheet.iterrows():
                 node = str(round(row['Node']))
                 f_x = str(row['F_x'])
                 f_y = str(row['F_y'])
@@ -1067,10 +2311,80 @@ class UI(QMainWindow):
             nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
             elements_sheet = pd.read_excel(file_name[0], sheet_name='Elements')
             materials_sheet = pd.read_excel(file_name[0], sheet_name='Materials')
-            forces_sheet = pd.read_excel(file_name[0], sheet_name='Forces')
             supports_sheet = pd.read_excel(file_name[0], sheet_name='Supports')
+            forces_LC1_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC1')
+            forces_LC2_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC2')
+            forces_LC3_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC3')
+            forces_LC4_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC4')
+            forces_LC5_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC5')
+            forces_LC6_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC6')
+            forces_LC7_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC7')
+            forces_LC8_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC8')
+            forces_LC9_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC9')
+            forces_LC10_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC10')
+            
+            # Save Dataframes into Dictionaries
+            for _, row in forces_LC1_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC1.update({int(node): [float(f_x), float(f_y)]})
+            
+            for _, row in forces_LC2_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC2.update({int(node): [float(f_x), float(f_y)]})
+            
+            for _, row in forces_LC3_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC3.update({int(node): [float(f_x), float(f_y)]}) 
+                
+            for _, row in forces_LC4_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC4.update({int(node): [float(f_x), float(f_y)]})               
+                
+            for _, row in forces_LC5_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC5.update({int(node): [float(f_x), float(f_y)]})     
+                    
+            for _, row in forces_LC6_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC6.update({int(node): [float(f_x), float(f_y)]})   
+                
+            for _, row in forces_LC7_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC7.update({int(node): [float(f_x), float(f_y)]})        
+                
+            for _, row in forces_LC8_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC8.update({int(node): [float(f_x), float(f_y)]})   
+                
+            for _, row in forces_LC9_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC9.update({int(node): [float(f_x), float(f_y)]})           
 
-            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_sheet, supports_sheet)
+            for _, row in forces_LC10_sheet.iterrows():
+                node = row['Node']
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_LC10.update({int(node): [float(f_x), float(f_y)]}) 
+                
+            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet)
 
             self.Solve_Truss_Button.setEnabled(True)
 
