@@ -1022,8 +1022,12 @@ class UI(QMainWindow):
         self.df_displacements_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.reactions_, orient='index', columns=['F_x','F_y'])
+        
+        self.df_member_lengths = pd.DataFrame.from_dict(self.Truss_LC1.member_lengths_, orient='index', columns=['Length'])
 
         with pd.ExcelWriter(file_name[0].split(".xlsx")[0] + "_Solved.xlsx") as writer:
+            self.df_member_lengths.to_excel(writer, sheet_name='Member_Lengths')
+            
             self.df_reactions_LC1.to_excel(writer, sheet_name='Reactions_LC1')
             self.df_displacements_LC1.to_excel(writer, sheet_name='Displacements_LC1')
             self.df_member_forces_LC1.to_excel(writer, sheet_name='Member Forces_LC1')
@@ -1063,6 +1067,8 @@ class UI(QMainWindow):
             self.df_reactions_LC10.to_excel(writer, sheet_name='Reactions_LC10')
             self.df_displacements_LC10.to_excel(writer, sheet_name='Displacements_LC10')
             self.df_member_forces_LC10.to_excel(writer, sheet_name='Member Forces_LC10')
+            
+
 
         self.Reactions_Button.setEnabled(True)
         self.Displacement_Button.setEnabled(True)
@@ -1085,8 +1091,8 @@ class UI(QMainWindow):
         self.Draw_Axial()
         self.canvas.draw()
 
-        self.Post_Processing_Table.setColumnCount(2)
-        self.Post_Processing_Table.setHorizontalHeaderLabels(['BAR', 'FORCE'])
+        self.Post_Processing_Table.setColumnCount(3)
+        self.Post_Processing_Table.setHorizontalHeaderLabels(['BAR', 'FORCE', 'LENGTH'])
         self.Post_Processing_Table.setRowCount(0)
 
         global file_name
@@ -1280,6 +1286,11 @@ class UI(QMainWindow):
                     self.Post_Processing_Table.setItem(rowPosition, 1, QTableWidgetItem(force))
             except:
                 pass
+            
+        # Member Lengths
+        member_lengths_sheet = pd.read_excel(file_name[0].split(".xlsx")[0] + "_Solved.xlsx", sheet_name='Member_Lengths')
+        for index, row in member_lengths_sheet.iterrows():
+            self.Post_Processing_Table.setItem(index, 2, QTableWidgetItem(str(row['Length'])))
 
     def Draw_Truss_Displacement(self):
         plt.clf()
