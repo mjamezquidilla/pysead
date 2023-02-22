@@ -42,6 +42,7 @@ class UI(QMainWindow):
         self.elasticity = {}
         self.areas = {}
         self.load_case_index = 0
+        
 
 
 
@@ -102,6 +103,8 @@ class UI(QMainWindow):
         self.Arrow_Length_LEdit = self.findChild(QLineEdit, "Arrow_Length_LEdit")
         self.Arrow_Head_Size_LEdit = self.findChild(QLineEdit, "Arrow_Head_Size_LEdit")
         self.Arrow_Line_Width_LEdit = self.findChild(QLineEdit, "Arrow_Line_Width_LEdit")
+        self.DPI_LEdit = self.findChild(QLineEdit, "DPI_LEdit")
+        self.Font_Size_LEdit = self.findChild(QLineEdit, "Font_Size_LEdit")
 
         # Combo Box
         self.X_Coord_ComboBox = self.findChild(QComboBox, "X_Coord_ComboBox")
@@ -128,6 +131,7 @@ class UI(QMainWindow):
         self.horizontalLayout_Matplotlib = QHBoxLayout(self.Matplotlib_Frame)
         self.horizontalLayout_Matplotlib.setObjectName("Matplotlib_layout")
         self.figure = plt.figure(dpi=75)
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
         self.canvas = FigureCanvasQTAgg(self.figure)
         self.horizontalLayout_Matplotlib.addWidget(self.canvas)
         self.ax = plt.gca()
@@ -935,11 +939,7 @@ class UI(QMainWindow):
             y = int(self.Support_Table_Widget.item(index,2).text())
             self.supports.update({node: [x, y]})
             
-        # Update plot
-        plt.clf()
-        self.Draw_Truss_Setup()
-        self.canvas.draw()
-        self.Post_Processing_Table.setRowCount(0)
+
 
         # Solve Trusses TODO
         self.Truss_LC1 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
@@ -1070,6 +1070,12 @@ class UI(QMainWindow):
 
         # save_file_name = file_name[0].split('xlsx')[0]
         # plt.savefig(save_file_name+'setup.png', dpi=300)
+
+        # Update plot to Show Reactions
+        plt.clf()
+        # self.Post_Processing_Table.setRowCount(0)
+        self.Draw_Truss_Reactions()
+        self.canvas.draw()
 
         print("Truss Solved")
         self.statusBar.showMessage("Truss Solved")
@@ -1804,6 +1810,7 @@ class UI(QMainWindow):
         width_of_arrow = float(self.Arrow_Head_Size_LEdit.text())
         arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
 
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
         self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
         
         
@@ -1843,6 +1850,7 @@ class UI(QMainWindow):
     ##### Matplotlib Functions #####
 
     def Draw_Truss_Setup(self):
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
         
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
@@ -1872,10 +1880,12 @@ class UI(QMainWindow):
         arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
 
         plt.clf()
-        self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
+        
+        # self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
         self.canvas.draw()
 
     def Draw_Reactions(self):
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         length_of_arrow = float(self.Arrow_Length_LEdit.text())
@@ -1904,6 +1914,7 @@ class UI(QMainWindow):
             self.Truss_LC10.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
 
     def Draw_Displacements(self):
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         # length_of_arrow = float(self.Arrow_Length_LEdit.text())
@@ -1933,6 +1944,7 @@ class UI(QMainWindow):
             self.Truss_LC10.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
 
     def Draw_Axial(self):
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
             
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_LC1.Draw_Truss_Axial_Force_Map()
@@ -2368,8 +2380,22 @@ class UI(QMainWindow):
     def Save_Figure_Func(self):
         figure_name = QFileDialog.getSaveFileName(self, "Save Figure", "", ".PNG (*.png);; All Files (*)")
 
-        plt.savefig(figure_name[0], transparent=True, pad_inches = 0)
+        DPI = float(self.DPI_LEdit.text())
+        # height = self.figure.get_figheight()
+        # width = self.figure.get_figheight()
+        
+        # print(height)
+        # print(width)
+        
+        # self.figure.set_figheight(4)  
+        # self.figure.set_figwidth(8)
+        
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
+        plt.savefig(figure_name[0], dpi = DPI, transparent=True, pad_inches = 0)
 
+        # self.figure.set_figheight(height)
+        # self.figure.set_figwidth(width) 
+        
     def DarkMode_Menu_Func(self):
         app.setStyleSheet(qdarkstyle.load_stylesheet())
         plt.style.use('dark_background_pysead')
@@ -2388,7 +2414,7 @@ class UI(QMainWindow):
         self.GraphicsView_Widget.setDragMode(QGraphicsView.RubberBandDrag)
 
     def Pan_Func(self):
-        print('pan')
+        print('pan').text
         self.GraphicsView_Widget.setDragMode(QGraphicsView.ScrollHandDrag)
 
     def Quit_Func(self):

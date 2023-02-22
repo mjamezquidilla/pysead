@@ -45,7 +45,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>6</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="Nodes_Tab">
           <attribute name="title">
@@ -1231,8 +1231,32 @@
                 </item>
                 <item>
                  <layout class="QGridLayout" name="gridLayout_3">
-                  <item row="1" column="1">
-                   <widget class="QPushButton" name="Displacement_Button">
+                  <item row="2" column="0" colspan="2">
+                   <widget class="QPushButton" name="Save_Figure_Button">
+                    <property name="text">
+                     <string>Save Figure</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="DPI_LEdit">
+                    <property name="text">
+                     <string>300</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_9">
+                    <property name="text">
+                     <string>Figure Resolution (DPI)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QPushButton" name="Reactions_Button">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -1243,7 +1267,7 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Displacement</string>
+                     <string>Reactions</string>
                     </property>
                    </widget>
                   </item>
@@ -1276,8 +1300,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QPushButton" name="Reactions_Button">
+                  <item row="1" column="1">
+                   <widget class="QPushButton" name="Displacement_Button">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -1288,14 +1312,24 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Reactions</string>
+                     <string>Displacement</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="0" colspan="2">
-                   <widget class="QPushButton" name="Save_Figure_Button">
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="label_10">
                     <property name="text">
-                     <string>Save Figure</string>
+                     <string>Font Size</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="Font_Size_LEdit">
+                    <property name="text">
+                     <string>12</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -1309,24 +1343,13 @@
                   <layout class="QHBoxLayout" name="horizontalLayout_17">
                    <item>
                     <layout class="QGridLayout" name="gridLayout_2">
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label">
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="Line_Width_LEdit">
                        <property name="text">
-                        <string>Displacement Factor</string>
+                        <string>2</string>
                        </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_4">
-                       <property name="text">
-                        <string>Label Offset</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="2">
-                      <widget class="QLabel" name="label_2">
-                       <property name="text">
-                        <string>Arrow Length</string>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
                        </property>
                       </widget>
                      </item>
@@ -1340,44 +1363,10 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="2">
-                      <widget class="QLabel" name="label_5">
-                       <property name="text">
-                        <string>Arrow Head Size</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QLineEdit" name="Line_Width_LEdit">
-                       <property name="text">
-                        <string>2</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="2" column="1">
                       <widget class="QLineEdit" name="Label_Offset_LEdit">
                        <property name="text">
                         <string>0</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="2">
-                      <widget class="QLabel" name="label_6">
-                       <property name="text">
-                        <string>Arrow Line Width</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="3">
-                      <widget class="QLineEdit" name="Arrow_Length_LEdit">
-                       <property name="text">
-                        <string>1</string>
                        </property>
                        <property name="alignment">
                         <set>Qt::AlignCenter</set>
@@ -1401,6 +1390,27 @@
                        </property>
                       </widget>
                      </item>
+                     <item row="1" column="2">
+                      <widget class="QLabel" name="label_5">
+                       <property name="text">
+                        <string>Arrow Head Size</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="2">
+                      <widget class="QLabel" name="label_6">
+                       <property name="text">
+                        <string>Arrow Line Width</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label">
+                       <property name="text">
+                        <string>Displacement Factor</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item row="2" column="3">
                       <widget class="QLineEdit" name="Arrow_Line_Width_LEdit">
                        <property name="text">
@@ -1408,6 +1418,30 @@
                        </property>
                        <property name="alignment">
                         <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QLineEdit" name="Arrow_Length_LEdit">
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QLabel" name="label_2">
+                       <property name="text">
+                        <string>Arrow Length</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_4">
+                       <property name="text">
+                        <string>Label Offset</string>
                        </property>
                       </widget>
                      </item>
@@ -1573,7 +1607,6 @@
   <tabstop>Reactions_Button</tabstop>
   <tabstop>Axial_Force_Button</tabstop>
   <tabstop>Displacement_Button</tabstop>
-  <tabstop>Save_Figure_Button</tabstop>
   <tabstop>Displacement_Factor_LEdit</tabstop>
   <tabstop>Line_Width_LEdit</tabstop>
   <tabstop>Label_Offset_LEdit</tabstop>
