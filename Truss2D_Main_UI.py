@@ -115,7 +115,6 @@ class UI(QMainWindow):
         self.Material_Table_Widget = self.findChild(QTableWidget, "Material_Table_Widget")
         
         self.Load_Case_Table_Widget = self.findChild(QTableWidget, "LoadCase_Table_Widget")
-        self.Load_Combo_Table_Widget = self.findChild(QTableWidget, "Load_Combo_Table_Widget")
         
         self.Force_Table_Widget = self.findChild(QTableWidget, "Force_Table_Widget")
         self.Support_Table_Widget = self.findChild(QTableWidget, "Support_Table_Widget")
@@ -184,8 +183,6 @@ class UI(QMainWindow):
         # self.Add_Load_Case_Button.clicked.connect(self.Add_Load_Case_Button_Func)
         # self.Remove_Load_Case_Button.clicked.connect(self.Remove_Load_Case_Button_Func)
         self.Show_Load_Case_Table_Button.clicked.connect(self.Show_Load_Case_Table_Button_Func)
-        self.Add_Load_Combo_Button.clicked.connect(self.Add_Load_Combination_Button_Func)
-        self.Remove_Load_Combo_Button.clicked.connect(self.Remove_Load_Combination_Button_Func)
 
         # Forces
         self.Add_Force_Button.clicked.connect(self.Add_Force_Button_Func)
@@ -506,27 +503,6 @@ class UI(QMainWindow):
         
     # def Remove_Load_Case_Button_Func(self):
     #     print("Remove Load Case")
-        
-    def Add_Load_Combination_Button_Func(self):
-        rowPosition = (self.Load_Combo_Table_Widget.rowCount())
-        self.Load_Combo_Table_Widget.insertRow(rowPosition)
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 3, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 4, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 5, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 6, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 7, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 8, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 9, QTableWidgetItem("0"))
-        self.Load_Combo_Table_Widget.setItem(rowPosition, 10, QTableWidgetItem("0"))
-        
-    def Remove_Load_Combination_Button_Func(self):
-        # Grab Item from Highlighted Row
-        clicked = self.Load_Combo_Table_Widget.currentRow()
-
-        # Delete Highlighted Row
-        self.Load_Combo_Table_Widget.removeRow(clicked)
         
     def Show_Load_Case_Table_Button_Func(self):
         # load_case_index = self.Load_Case_ComboBox.currentIndex()
@@ -927,8 +903,6 @@ class UI(QMainWindow):
         self.elements = {}
         self.areas = {}
         
-        self.load_combo = {}
-
         self.supports = {}
 
 
@@ -961,23 +935,6 @@ class UI(QMainWindow):
             y = int(self.Support_Table_Widget.item(index,2).text())
             self.supports.update({node: [x, y]})
             
-        # Load Combination
-        for index in range(self.Load_Combo_Table_Widget.rowCount()):
-            Combo_Name = str(self.Load_Combo_Table_Widget.item(index,0).text())
-            LC1 = float(self.Load_Combo_Table_Widget.item(index,1).text())
-            LC2 = float(self.Load_Combo_Table_Widget.item(index,2).text())
-            LC3 = float(self.Load_Combo_Table_Widget.item(index,3).text())
-            LC4 = float(self.Load_Combo_Table_Widget.item(index,4).text())
-            LC5 = float(self.Load_Combo_Table_Widget.item(index,5).text())
-            LC6 = float(self.Load_Combo_Table_Widget.item(index,6).text())
-            LC7 = float(self.Load_Combo_Table_Widget.item(index,7).text())
-            LC8 = float(self.Load_Combo_Table_Widget.item(index,8).text())
-            LC9 = float(self.Load_Combo_Table_Widget.item(index,9).text())
-            LC10 = float(self.Load_Combo_Table_Widget.item(index,10).text())
-            self.load_combo.update({Combo_Name: [LC1, LC2, LC3, LC4, LC5, LC6, LC7, LC8, LC9, LC10]})
-            
-        
-
         # Update plot
         plt.clf()
         self.Draw_Truss_Setup()
@@ -1107,21 +1064,6 @@ class UI(QMainWindow):
             self.df_displacements_LC10.to_excel(writer, sheet_name='Displacements_LC10')
             self.df_member_forces_LC10.to_excel(writer, sheet_name='Member Forces_LC10')
 
-        # Combination of Load Combinations #TODO Combo loads
-        
-        # get list from Table Widget into ComboBox
-        # for name in self.load_combo.keys():
-            # self.Load_Combination_Combo_Box.addItem(name)
-        
-        # reactions
-        
-        
-        # member forces
-        
-        
-        
-        
-
         self.Reactions_Button.setEnabled(True)
         self.Displacement_Button.setEnabled(True)
         self.Axial_Force_Button.setEnabled(True)
@@ -1130,8 +1072,9 @@ class UI(QMainWindow):
         # plt.savefig(save_file_name+'setup.png', dpi=300)
 
         print("Truss Solved")
+        self.statusBar.showMessage("Truss Solved")
 
-    def Draw_Truss_Axial_Force_Map(self): #TODO draw force map depending on load case
+    def Draw_Truss_Axial_Force_Map(self):
         plt.clf()
         self.Draw_Axial()
         self.canvas.draw()
@@ -1332,7 +1275,7 @@ class UI(QMainWindow):
             except:
                 pass
 
-    def Draw_Truss_Displacement(self): #TODO draw truss dislacements depending on load case
+    def Draw_Truss_Displacement(self):
         plt.clf()
         self.Draw_Displacements()
         self.canvas.draw()
@@ -1553,7 +1496,7 @@ class UI(QMainWindow):
             except:
                 pass
 
-    def Draw_Truss_Reactions(self): #TODO draw reactions depending on load case
+    def Draw_Truss_Reactions(self):
         plt.clf()
         self.Draw_Reactions()
         self.canvas.draw()
@@ -1807,7 +1750,7 @@ class UI(QMainWindow):
             self.areas.update({bar: area})
             self.elasticity.update({bar: elasticity})
 
-        # Forces #TODO Fix if Load ComboBox should be equal to Load CaseBox
+        # Forces
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
             self.Load_Case_ComboBox.setCurrentIndex(0)
@@ -1899,7 +1842,7 @@ class UI(QMainWindow):
 
     ##### Matplotlib Functions #####
 
-    def Draw_Truss_Setup(self): #TODO Fix if Load ComboBox should be equal to Load CaseBox
+    def Draw_Truss_Setup(self):
         
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
@@ -1932,7 +1875,7 @@ class UI(QMainWindow):
         self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
         self.canvas.draw()
 
-    def Draw_Reactions(self): #TODO Draw Reactions based on Load Combination
+    def Draw_Reactions(self):
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         length_of_arrow = float(self.Arrow_Length_LEdit.text())
@@ -1960,7 +1903,7 @@ class UI(QMainWindow):
         else:
             self.Truss_LC10.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
 
-    def Draw_Displacements(self): #TODO Draw Displacements based on Load Combinations
+    def Draw_Displacements(self):
         linewidth = float(self.Line_Width_LEdit.text())
         offset = float(self.Label_Offset_LEdit.text())
         # length_of_arrow = float(self.Arrow_Length_LEdit.text())
@@ -1989,7 +1932,7 @@ class UI(QMainWindow):
         else:
             self.Truss_LC10.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
 
-    def Draw_Axial(self): # TODO draw force map depending on load combination
+    def Draw_Axial(self):
             
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_LC1.Draw_Truss_Axial_Force_Map()
@@ -2019,6 +1962,10 @@ class UI(QMainWindow):
         self.Force_Table_Widget.setRowCount(0)
         self.Support_Table_Widget.setRowCount(0)
         self.Post_Processing_Table.setRowCount(0)
+        
+        for i in range(10):
+            self.Load_Case_Table_Widget.setItem(i, 0, QTableWidgetItem(""))
+        
         plt.clf()
         self.canvas.draw()
 
@@ -2033,6 +1980,9 @@ class UI(QMainWindow):
         self.Bar_Number_LEdit.setText("1")
 
         self.statusBar.showMessage("New File")
+        
+        title = "PySEAD Truss 2D"
+        self.setWindowTitle(title)
 
     ##### Menu Functions #####
 
@@ -2051,160 +2001,167 @@ class UI(QMainWindow):
         forces_LC9_dict = {}
         forces_LC10_dict = {}
         supports_dict = {}
+        load_case_dict = {}
 
-        try:
-            # Nodes    
-            for index in range(self.Nodes_Table_Widget.rowCount()):
-                node = int(self.Nodes_Table_Widget.item(index,0).text())
-                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
-                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
-                nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
-            nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
+        # try:
+        # Nodes    
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+            nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
+        nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
 
-            # Elements
-            for index in range(self.Element_Table_Widget.rowCount()):
-                bar = int(self.Element_Table_Widget.item(index,0).text())
-                node_1 = int(self.Element_Table_Widget.item(index,1).text())
-                node_2 = int(self.Element_Table_Widget.item(index,2).text())
-                elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
-            elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
+        # Elements
+        for index in range(self.Element_Table_Widget.rowCount()):
+            bar = int(self.Element_Table_Widget.item(index,0).text())
+            node_1 = int(self.Element_Table_Widget.item(index,1).text())
+            node_2 = int(self.Element_Table_Widget.item(index,2).text())
+            elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
+        elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
 
-            # Materials
-            for index in range(self.Material_Table_Widget.rowCount()):
-                bar = int(self.Material_Table_Widget.item(index,0).text())
-                area = float(self.Material_Table_Widget.item(index,1).text())
-                elasticity = float(self.Material_Table_Widget.item(index,2).text())
-                materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
-            materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
-            
-            # Forces
-            # Load Case 1
-            index = 1
-            for key, item in self.forces_LC1.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC1_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC1_df = pd.DataFrame.from_dict(forces_LC1_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 2
-            index = 1
-            for key, item in self.forces_LC2.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC2_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC2_df = pd.DataFrame.from_dict(forces_LC2_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 3
-            index = 1
-            for key, item in self.forces_LC3.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC3_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC3_df = pd.DataFrame.from_dict(forces_LC3_dict, orient='index', columns=['Node','F_x','F_y'])
+        # Materials
+        for index in range(self.Material_Table_Widget.rowCount()):
+            bar = int(self.Material_Table_Widget.item(index,0).text())
+            area = float(self.Material_Table_Widget.item(index,1).text())
+            elasticity = float(self.Material_Table_Widget.item(index,2).text())
+            materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
+        materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
         
-            # Load Case 4
-            index = 1
-            for key, item in self.forces_LC4.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC4_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC4_df = pd.DataFrame.from_dict(forces_LC4_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 5
-            index = 1
-            for key, item in self.forces_LC5.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC5_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC5_df = pd.DataFrame.from_dict(forces_LC5_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 6
-            index = 1
-            for key, item in self.forces_LC6.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC6_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC6_df = pd.DataFrame.from_dict(forces_LC6_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 7
-            index = 1
-            for key, item in self.forces_LC7.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC7_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC7_df = pd.DataFrame.from_dict(forces_LC7_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 8
-            index = 1
-            for key, item in self.forces_LC8.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC8_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC8_df = pd.DataFrame.from_dict(forces_LC8_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 9
-            index = 1
-            for key, item in self.forces_LC9.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC9_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC9_df = pd.DataFrame.from_dict(forces_LC9_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Load Case 10
-            index = 1
-            for key, item in self.forces_LC10.items():
-                node = key
-                f_x = item[0]
-                f_y = item[1]
-                forces_LC10_dict.update({index:[int(node), float(f_x), float(f_y)]})
-                index+=1
-            forces_LC10_df = pd.DataFrame.from_dict(forces_LC10_dict, orient='index', columns=['Node','F_x','F_y'])
-            
-            # Supports
-            for index in range(self.Support_Table_Widget.rowCount()):
-                node = int(self.Support_Table_Widget.item(index,0).text())
-                x = int(self.Support_Table_Widget.item(index,1).text())
-                y = int(self.Support_Table_Widget.item(index,2).text())
-                supports_dict.update({index+1:[int(node), float(x), float(y)]})
-            supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
-            
-            with pd.ExcelWriter(file_name[0]) as writer:
-                nodes_df.to_excel(writer, sheet_name='Nodes')
-                elements_df.to_excel(writer, sheet_name='Elements')
-                materials_df.to_excel(writer, sheet_name='Materials')
-                supports_df.to_excel(writer, sheet_name='Supports')
-                forces_LC1_df.to_excel(writer, sheet_name='Forces_LC1')
-                forces_LC2_df.to_excel(writer, sheet_name='Forces_LC2')
-                forces_LC3_df.to_excel(writer, sheet_name='Forces_LC3')
-                forces_LC4_df.to_excel(writer, sheet_name='Forces_LC4')
-                forces_LC5_df.to_excel(writer, sheet_name='Forces_LC5')
-                forces_LC6_df.to_excel(writer, sheet_name='Forces_LC6')
-                forces_LC7_df.to_excel(writer, sheet_name='Forces_LC7')
-                forces_LC8_df.to_excel(writer, sheet_name='Forces_LC8')
-                forces_LC9_df.to_excel(writer, sheet_name='Forces_LC9')
-                forces_LC10_df.to_excel(writer, sheet_name='Forces_LC10')
-            
-            print("Saved")
-        except:
-            self.statusBar.showMessage("Save Dialog Canceled") 
+        # Load Cases
+        for index in range(self.Load_Case_Table_Widget.rowCount()):
+            load_case_dict.update({index+1:str(self.Load_Case_Table_Widget.item(index,0).text())})
+        load_cases_df = pd.DataFrame.from_dict(load_case_dict, orient='index', columns=['Load Case Name'])
+        
+        # Forces
+        # Load Case 1
+        index = 1
+        for key, item in self.forces_LC1.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC1_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC1_df = pd.DataFrame.from_dict(forces_LC1_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 2
+        index = 1
+        for key, item in self.forces_LC2.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC2_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC2_df = pd.DataFrame.from_dict(forces_LC2_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 3
+        index = 1
+        for key, item in self.forces_LC3.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC3_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC3_df = pd.DataFrame.from_dict(forces_LC3_dict, orient='index', columns=['Node','F_x','F_y'])
+    
+        # Load Case 4
+        index = 1
+        for key, item in self.forces_LC4.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC4_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC4_df = pd.DataFrame.from_dict(forces_LC4_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 5
+        index = 1
+        for key, item in self.forces_LC5.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC5_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC5_df = pd.DataFrame.from_dict(forces_LC5_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 6
+        index = 1
+        for key, item in self.forces_LC6.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC6_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC6_df = pd.DataFrame.from_dict(forces_LC6_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 7
+        index = 1
+        for key, item in self.forces_LC7.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC7_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC7_df = pd.DataFrame.from_dict(forces_LC7_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 8
+        index = 1
+        for key, item in self.forces_LC8.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC8_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC8_df = pd.DataFrame.from_dict(forces_LC8_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 9
+        index = 1
+        for key, item in self.forces_LC9.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC9_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC9_df = pd.DataFrame.from_dict(forces_LC9_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 10
+        index = 1
+        for key, item in self.forces_LC10.items():
+            node = key
+            f_x = item[0]
+            f_y = item[1]
+            forces_LC10_dict.update({index:[int(node), float(f_x), float(f_y)]})
+            index+=1
+        forces_LC10_df = pd.DataFrame.from_dict(forces_LC10_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Supports
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            supports_dict.update({index+1:[int(node), float(x), float(y)]})
+        supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
+        
+        with pd.ExcelWriter(file_name[0]) as writer:
+            nodes_df.to_excel(writer, sheet_name='Nodes')
+            elements_df.to_excel(writer, sheet_name='Elements')
+            materials_df.to_excel(writer, sheet_name='Materials')
+            supports_df.to_excel(writer, sheet_name='Supports')
+            load_cases_df.to_excel(writer, sheet_name='Load_Cases')
+            forces_LC1_df.to_excel(writer, sheet_name='Forces_LC1')
+            forces_LC2_df.to_excel(writer, sheet_name='Forces_LC2')
+            forces_LC3_df.to_excel(writer, sheet_name='Forces_LC3')
+            forces_LC4_df.to_excel(writer, sheet_name='Forces_LC4')
+            forces_LC5_df.to_excel(writer, sheet_name='Forces_LC5')
+            forces_LC6_df.to_excel(writer, sheet_name='Forces_LC6')
+            forces_LC7_df.to_excel(writer, sheet_name='Forces_LC7')
+            forces_LC8_df.to_excel(writer, sheet_name='Forces_LC8')
+            forces_LC9_df.to_excel(writer, sheet_name='Forces_LC9')
+            forces_LC10_df.to_excel(writer, sheet_name='Forces_LC10')
+        
+        print("Saved")
+        # except:
+        #     self.statusBar.showMessage("Save Dialog Canceled") 
 
     def Save_As_Func(self):
         global file_name
@@ -2214,12 +2171,15 @@ class UI(QMainWindow):
             self.Solve_Truss_Button.setEnabled(True)
 
         self.Save_Func()
+        
+        title = "PySEAD Truss 2D - " + file_name[0]
+        self.setWindowTitle(title)
 
         # except:
             # print("Canceled Dialogue")
             # self.Solve_Truss_Button.setEnabled(False)
 
-    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet):
+    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet, load_cases_sheet):
         try:
             # Nodes
             for index, row in nodes_sheet.iterrows():
@@ -2265,6 +2225,11 @@ class UI(QMainWindow):
                 self.Material_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(element))
                 self.Material_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(area))
                 self.Material_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(elasticity))
+                
+            # Load Cases
+            for index, row in load_cases_sheet.iterrows():
+                load_case = str(row['Load Case Name'])
+                self.Load_Case_Table_Widget.setItem(index, 0, QTableWidgetItem(str(load_case)))
 
             # Forces
             # Add Load Case 1 in Table
@@ -2322,6 +2287,7 @@ class UI(QMainWindow):
             forces_LC8_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC8')
             forces_LC9_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC9')
             forces_LC10_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC10')
+            load_cases_sheet = pd.read_excel(file_name[0], sheet_name='Load_Cases')
             
             # Save Dataframes into Dictionaries
             for _, row in forces_LC1_sheet.iterrows():
@@ -2384,7 +2350,7 @@ class UI(QMainWindow):
                 f_y = row['F_y']
                 self.forces_LC10.update({int(node): [float(f_x), float(f_y)]}) 
                 
-            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet)
+            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet, load_cases_sheet)
 
             self.Solve_Truss_Button.setEnabled(True)
 
@@ -2393,6 +2359,9 @@ class UI(QMainWindow):
 
             self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
             self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
+            
+            title = "PySEAD Truss 2D - " + file_name[0]
+            self.setWindowTitle(title)
         except:
             self.statusBar.showMessage("Cancelled Dialog")
 
