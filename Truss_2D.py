@@ -309,34 +309,34 @@ class Truss_2D:
         # Divide multiplication factor
         displacements_new_ = {}
         for i in self.displacements_:
-            x = self.displacements_[i][0]/1000
-            y = self.displacements_[i][1]/1000
+            x = round(self.displacements_[i][0]/1000,5)
+            y = round(self.displacements_[i][1]/1000,5)
             displacements_new_.update({i:[x,y]})
         self.displacements_ = displacements_new_
 
         reactions_new_ = {}
         for i in self.reactions_:
-            fx = self.reactions_[i][0]/1000
-            fy = self.reactions_[i][1]/1000
+            fx = round(self.reactions_[i][0]/1000,5)
+            fy = round(self.reactions_[i][1]/1000,5)
             reactions_new_.update({i:[fx,fy]})
         self.reactions_ = reactions_new_
         
         member_forces_new = {}
         for i in self.member_forces_:
-            P = self.member_forces_[i]/1000
+            P = round(self.member_forces_[i]/1000,5)
             member_forces_new.update({i:P})
         self.member_forces_ = member_forces_new
         
         member_stresses_new = {}
         for i in self.member_stresses_:
-            P = self.member_stresses_[i]/1000
+            P = round(self.member_stresses_[i]/1000,5)
             member_stresses_new.update({i:P})
         self.member_stresses_ = member_stresses_new
 
         # Creating a Dictionary of Member Lengths
         member_length_ = {}
         for key, length in enumerate(L):
-            member_length_.update({key+1: length})
+            member_length_.update({key+1: round(length,5)})
 
         self.member_lengths_ = member_length_
         
