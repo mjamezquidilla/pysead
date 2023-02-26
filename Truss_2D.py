@@ -269,6 +269,15 @@ class Truss_2D:
         K_new = self.__Apply_Boundary_Conditions(__Support_Vector, K_global)
 
         # Step 5: Reduce Force Vector
+        # Step 5.1: Remove Forces that share same keys with Support Dictionary
+        # shared_key = []
+        # for key in self.forces.keys():
+        #     if key in self.supports:
+        #         shared_key.append(key)
+        # for key in shared_key:
+        #     forces.pop(key)
+        
+        # Step 5.2: Solve for Force Vector
         f_new = self.__Assemble_Force_Vector(forces, __Support_Vector, nodes)
 
         # Step 6: Solve for Displacement
@@ -277,7 +286,7 @@ class Truss_2D:
         # Step 7: Create Global Displacement Vector
         global_displacements = self.__Truss_Global_Displacement(displacements, __Support_Vector, nodes)
 
-        # Step 8: Solve for Reactions 
+        # Step 8: Solve for Reactions
         reactions = self.__Solve_Reactions(K_global, global_displacements)
 
         # Step 9: Solve Member Displacements
@@ -307,6 +316,7 @@ class Truss_2D:
         self.K_global_ = K_global
 
         # Divide multiplication factor
+        # Displacement
         displacements_new_ = {}
         for i in self.displacements_:
             x = round(self.displacements_[i][0]/1000,5)
@@ -314,19 +324,34 @@ class Truss_2D:
             displacements_new_.update({i:[x,y]})
         self.displacements_ = displacements_new_
 
+        # Reactions
         reactions_new_ = {}
         for i in self.reactions_:
             fx = round(self.reactions_[i][0]/1000,5)
             fy = round(self.reactions_[i][1]/1000,5)
             reactions_new_.update({i:[fx,fy]})
         self.reactions_ = reactions_new_
+            
+        # Add Node forces to Reactions in Dictionary
+        shared_keys = []
+        for key in self.forces.keys():
+            if key in self.reactions_:
+                shared_keys.append(key)
         
+        reactions = {}
+        for key in shared_keys:
+            reactions.update({key:[x + y for x, y in zip(self.forces[key], self.reactions_[key])]})
+            
+        self.reactions_ = reactions
+        
+        # Member Forces
         member_forces_new = {}
         for i in self.member_forces_:
             P = round(self.member_forces_[i]/1000,5)
             member_forces_new.update({i:P})
         self.member_forces_ = member_forces_new
         
+        # Member Stresses
         member_stresses_new = {}
         for i in self.member_stresses_:
             P = round(self.member_stresses_[i]/1000,5)
