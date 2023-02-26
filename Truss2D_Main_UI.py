@@ -16,6 +16,11 @@ from pysead import Truss_2D
 from Import_CSV import Import_CSV
 from About import About
 
+# PyInstaller Splash Screen
+if getattr(sys, 'frozen', False):
+    import pyi_splash
+
+
 plt.style.use('dark_background_pysead')
 
 os.environ['QT_API'] = 'pyqt5'
@@ -1939,7 +1944,7 @@ class UI(QMainWindow):
 
         plt.clf()
         
-        # self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
+        self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
         self.canvas.draw()
 
     def Draw_Reactions(self):
@@ -2535,6 +2540,12 @@ class UI(QMainWindow):
 app = QApplication(sys.argv)
 UIWindow = UI()
 app.setStyleSheet(qdarkstyle.load_stylesheet())
+
+if getattr(sys, 'frozen', False):
+    # Close the splash screen. It does not matter when the call
+    # to this function is made, the splash screen remains open until
+    # this function is called or the Python program is terminated.
+    pyi_splash.close()
 
 app.exec_()
 
