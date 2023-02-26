@@ -1766,44 +1766,91 @@ class UI(QMainWindow):
             elasticity = float(self.Material_Table_Widget.item(index,2).text())
             self.areas.update({bar: area})
             self.elasticity.update({bar: elasticity})
-
+            
         # Forces
+
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC1.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
             self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC2.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
             self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC3.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
             self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC4.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
             self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC5.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
             self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC6.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
             self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC7.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
             self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC8.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
             self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC9.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
             self.Load_Case_ComboBox.setCurrentIndex(8)
         else:
+            for index in range(self.Force_Table_Widget.rowCount()):
+                node = int(self.Force_Table_Widget.item(index,0).text())
+                f_x = float(self.Force_Table_Widget.item(index,1).text())
+                f_y = float(self.Force_Table_Widget.item(index,2).text())
+                self.forces_LC10.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
             self.Load_Case_ComboBox.setCurrentIndex(9)
             
-        for index in range(self.Force_Table_Widget.rowCount()):
-            bar = int(self.Force_Table_Widget.item(index,0).text())
-            f_x = float(self.Force_Table_Widget.item(index,1).text())
-            f_y = float(self.Force_Table_Widget.item(index,2).text())
-            self.forces.update({bar: [f_x, f_y]})
+
 
         # Supports
         for index in range(self.Support_Table_Widget.rowCount()):
