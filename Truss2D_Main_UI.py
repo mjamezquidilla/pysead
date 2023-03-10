@@ -6,24 +6,41 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import qdarkstyle
-from matplotlib.backends.backend_qt5agg import \
+from matplotlib.backends.backend_qtagg import \
     FigureCanvasQTAgg # ,NavigationToolbar2QT as NavigationToolbar
-from PyQt5 import uic
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+
+# Using PyQt6
+from PyQt6 import uic
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
+from PyQt6.QtGui import *
+
+# PySEAD Modules
 from pysead import Truss_2D
 from Import_CSV import Import_CSV
 from About import About
+
+# Material Theme
+from qt_material import apply_stylesheet
+extra = {
+    # Density Scale
+    'density_scale': '-2',
+    'PyQt6': True,
+    'windows': True
+}
+
+
+
 
 # PyInstaller Splash Screen
 if getattr(sys, 'frozen', False):
     import pyi_splash
 
 
-plt.style.use('dark_background_pysead')
+plt.style.use('dark_background_pysead_materialdark')
 
-os.environ['QT_API'] = 'pyqt5'
+os.environ['QT_API'] = 'pyqt6'
+
 
 class UI(QMainWindow):
     def __init__(self):
@@ -48,14 +65,9 @@ class UI(QMainWindow):
         self.areas = {}
         self.load_case_index = 0
         
-
-
-
         # Load the UI file
-        # uic.loadUi("GUI.ui", self)
-        # uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\GUI.ui", self)
+        # PyQt5
         uic.loadUi(self.resource_path("Truss2D_GUI.ui"), self)
-        
 
         # Define our widgets
         # Button Widget
@@ -155,7 +167,9 @@ class UI(QMainWindow):
         self.About = self.findChild(QAction, "actionPySEAD_Truss")
 
         self.DarkMode_Menu = self.findChild(QAction, "actionDarkMode")
-        self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
+        # self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
+        self.MaterialDark_Menu = self.findChild(QAction, "actionMaterial_Dark")
+        self.MaterialLight_Menu = self.findChild(QAction, "actionMaterial_Light")
 
         self.PySEAD_Truss_Menu = self.findChild(QAction, "actionPySEAD_Truss")
 
@@ -220,7 +234,9 @@ class UI(QMainWindow):
         self.Import_CSV.triggered.connect(self.Import_CSV_Func)
         
         self.DarkMode_Menu.triggered.connect(self.DarkMode_Menu_Func)
-        self.LightMode_Menu.triggered.connect(self.LightMode_Menu_Func)
+        # self.LightMode_Menu.triggered.connect(self.LightMode_Menu_Func)
+        self.MaterialDark_Menu.triggered.connect(self.MaterialDark_Menu_Func)
+        self.MaterialLight_Menu.triggered.connect(self.MaterialLight_Menu_Func)
         
         self.About.triggered.connect(self.About_Func)
         
@@ -2461,12 +2477,29 @@ class UI(QMainWindow):
         
     def DarkMode_Menu_Func(self):
         app.setStyleSheet(qdarkstyle.load_stylesheet())
+        # apply_stylesheet(app, theme='dark_cyan.xml', extra=extra)
         plt.style.use('dark_background_pysead')
         plt.clf()
         self.canvas.draw()
     
-    def LightMode_Menu_Func(self):
-        app.setStyleSheet("")
+    # def LightMode_Menu_Func(self):
+    #     app.setStyleSheet("")
+    #     # apply_stylesheet(app, theme='light_blue.xml', extra = extra)
+    #     plt.clf()
+    #     plt.style.use('fivethirtyeight')
+        
+    #     self.canvas.draw()
+        
+    def MaterialDark_Menu_Func(self):
+        apply_stylesheet(app, theme='dark_blue.xml', extra = extra, css_file='custom.css')
+        plt.clf()
+        plt.style.use('dark_background_pysead_materialdark')
+        
+        self.canvas.draw()
+        
+    def MaterialLight_Menu_Func(self):
+        apply_stylesheet(app, theme='light_blue.xml', invert_secondary = True, extra = extra)
+        # app.setStyleSheet("")
         plt.clf()
         plt.style.use('fivethirtyeight')
         
@@ -2487,7 +2520,7 @@ class UI(QMainWindow):
     ###### Dialog Boxes ######
     def Import_CSV_Func(self):
         dialog = Import_CSV()
-        result = dialog.exec_()
+        result = dialog.exec()
 
         if result:
             try:
@@ -2518,7 +2551,7 @@ class UI(QMainWindow):
                 
     def About_Func(self):
         dialog = About()
-        dialog.exec_()
+        dialog.exec()
 
     def resource_path(self, relative_path):
         """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -2529,23 +2562,28 @@ class UI(QMainWindow):
             base_path = os.path.abspath(".")
     
         return os.path.join(base_path, relative_path)
-
+    
 ###### Navigation Toolbar Customized #######
 # class NavigationToolbarCustom(NavigationToolbar):
 #     # only display the buttons we need
 #     toolitems = [t for t in NavigationToolbar.toolitems if
 #                  t[0] in ("Save",)]
 
-# Initialize the App
-app = QApplication(sys.argv)
-UIWindow = UI()
-app.setStyleSheet(qdarkstyle.load_stylesheet())
 
-if getattr(sys, 'frozen', False):
-    # Close the splash screen. It does not matter when the call
-    # to this function is made, the splash screen remains open until
-    # this function is called or the Python program is terminated.
-    pyi_splash.close()
+if __name__ == "__main__":
+    # Initialize the App
+    # sys.argv += ['--style', 'Material']
+    app = QApplication(sys.argv)
+    apply_stylesheet(app, theme='dark_blue.xml', extra = extra, css_file='custom.css')
+    UIWindow = UI()
+    UIWindow.show()
+    # app.setStyleSheet(qdarkstyle.load_stylesheet())
 
-app.exec_()
+    if getattr(sys, 'frozen', False):
+        # Close the splash screen. It does not matter when the call
+        # to this function is made, the splash screen remains open until
+        # this function is called or the Python program is terminated.
+        pyi_splash.close()
 
+    sys.exit(app.exec())
+    
