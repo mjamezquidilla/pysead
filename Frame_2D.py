@@ -136,7 +136,7 @@ class Member_2D:
         self.__Release_Node_Coordinates()
 
 
-    def Add_Load_Axial_Uniform(self, w): #TODO OKAY
+    def Add_Load_Axial_Uniform(self, w): # OKAY!
         L = self.length
         beginning_axial = w * L / 2
         end_axial = w * L / 2
@@ -152,7 +152,7 @@ class Member_2D:
         self.axial += axial_values        
 
 
-    def Add_Self_Weight(self, unit_weight): # OKAY
+    def Add_Self_Weight(self, unit_weight): # OKAY!
         w = unit_weight * self.area
 
         nodes = self.nodes
@@ -212,7 +212,7 @@ class Member_2D:
     #     self.axial += axial_values
 
 
-    def Add_Load_Point(self, P, a): #TODO Recheck values for all quadrants
+    def Add_Load_Point(self, P, a): # OKAY
         L = self.length
         beginning_moment = P * (L-a)**2 * a / L**2
         end_moment = -P * a**2 * (L-a)/L**2
@@ -268,7 +268,7 @@ class Member_2D:
         self.moment += moment_values        
 
 
-    def Add_Load_Full_Uniform(self, w): #OKAY!
+    def Add_Load_Full_Uniform(self, w): # OKAY!
         L = self.length
         
         coordinates = []
@@ -324,51 +324,50 @@ class Member_2D:
         self.shear += shear_values
         self.moment += moment_values
         
-        if x2 >= x1 and y2 >= y1: # 0 to 90 degrees
-            pass
-        elif x1 >= x2 and y2 >= y1: # 91 to 180 degrees
-            self.shear = -self.shear
-            self.moment = -self.moment
-        elif x1 >= x2 and y1 >= y2: # 181 to 270 degrees
-            pass
-        else: # 271 to 360 degrees
-            pass
+        # if x2 >= x1 and y2 >= y1: # 0 to 90 degrees
+        #     pass
+        # elif x1 >= x2 and y2 >= y1: # 91 to 180 degrees
+        #     pass
+        # elif x1 >= x2 and y1 >= y2: # 181 to 270 degrees
+        #     pass
+        # else: # 271 to 360 degrees
+        #     pass
 
 
-    def Add_Load_Moment(self,M,a): #TODO Recheck values for all quadrants
-        L = self.length
-        b = L - a
-        beginning_moment = M * b * (2*a-b) / L**2
-        end_moment = M * a * (2*b-a) / L**2
+    # def Add_Load_Moment(self,M,a): #TODO Recheck values for all quadrants
+    #     L = self.length
+    #     b = L - a
+    #     beginning_moment = M * b * (2*a-b) / L**2
+    #     end_moment = M * a * (2*b-a) / L**2
 
-        if self.moment_release_left == 1 and self.moment_release_right == 0:
-            end_moment = end_moment - 1 / 2 * beginning_moment
-            self.forces[self.node_list[1]][2] += end_moment
-        elif self.moment_release_left == 0 and self.moment_release_right == 1:
-            beginning_moment = beginning_moment - 1 / 2 * end_moment
-            self.forces[self.node_list[0]][2] += beginning_moment
-        elif self.moment_release_right == 1 and self.moment_release_right == 1:
-            pass
-        else:
-            self.forces[self.node_list[0]][2] += beginning_moment
-            self.forces[self.node_list[1]][2] += end_moment
+    #     if self.moment_release_left == 1 and self.moment_release_right == 0:
+    #         end_moment = end_moment - 1 / 2 * beginning_moment
+    #         self.forces[self.node_list[1]][2] += end_moment
+    #     elif self.moment_release_left == 0 and self.moment_release_right == 1:
+    #         beginning_moment = beginning_moment - 1 / 2 * end_moment
+    #         self.forces[self.node_list[0]][2] += beginning_moment
+    #     elif self.moment_release_right == 1 and self.moment_release_right == 1:
+    #         pass
+    #     else:
+    #         self.forces[self.node_list[0]][2] += beginning_moment
+    #         self.forces[self.node_list[1]][2] += end_moment
 
         
-        # Moment Values
-        if self.moment_release_left == 1:
-            beginning_moment = 0
-        moment_values = self.x_array.copy()
-        for index, _ in enumerate(moment_values):
-            moment_values[index] = beginning_moment
-        self.moment += moment_values
+    #     # Moment Values
+    #     if self.moment_release_left == 1:
+    #         beginning_moment = 0
+    #     moment_values = self.x_array.copy()
+    #     for index, _ in enumerate(moment_values):
+    #         moment_values[index] = beginning_moment
+    #     self.moment += moment_values
 
 
     def Add_Load_Partial_Uniform(self, w, a, b): #TODO Recheck values for all quadrants
         L = self.length
-        beginning_moment = w * L**2 / 12 * (6*(b/L)**2 - 8*(b/L)**3 + 3*(b/L)**4)
-        end_moment = -w * L**2 / 12 * (6*(a/L)**2 - 8*(a/L)**3 + 3*(a/L)**4)
-        beginning_shear = w * (b-a) / L * ((b-a)/2 + (L-b))
-        end_shear = w * (b-a) / L * ((b-a)/2 + a)
+        beginning_moment = w*L**2/12 * (6*(b/L)**2 - 8*(b/L)**3 + 3*(b/L)**4) - w*L**2/12 * (6*(a/L)**2 - 8*(a/L)**3 + 3*(a/L)**4)
+        end_moment =  - w*L**2/12 * (4*(b/L)**3 - 3*(b/L)**4) + w*L**2/12 * (4*(a/L)**3 - 3*(a/L)**4)
+        beginning_shear = w * (b-a) / L * ((b-a)/2 + (L-b)) 
+        end_shear = w * (b-a) / L * ((b-a)/2 + a) 
 
         if self.moment_release_left == 1 and self.moment_release_right == 0:
             beginning_shear = (beginning_shear - 3 / (2*L) * beginning_moment)
@@ -408,16 +407,16 @@ class Member_2D:
         self.shear += shear_values
 
         # Moment Values
-        if self.moment_release_left == 1:
-            beginning_moment = 0
+        # if self.moment_release_left == 1:
+        #     beginning_moment = 0
         moment_values = self.x_array.copy()
-        for index, moment_value in enumerate(moment_values):
+        for index, moment_value in enumerate(moment_values): #TODO FIX MOMENT VALUES
             if moment_value < a:
-                moment_values[index] = beginning_shear * moment_value
+                moment_values[index] = beginning_moment - beginning_shear * moment_value
             elif moment_value >= a and moment_value < b :
-                moment_values[index] = beginning_shear * moment_value - w*(moment_value - a)**2 / 2
+                moment_values[index] = beginning_moment - beginning_shear * moment_value + w*(moment_value - a)**2 / 2
             else:
-                moment_values[index] = beginning_shear * moment_value - w * (b - a) * ((b-a)/2 + (moment_value - b))
+                moment_values[index] = beginning_moment - beginning_shear * moment_value + w * (b - a) * ((b-a)/2 + (moment_value - b))
 
         self.moment += moment_values
 
@@ -499,7 +498,7 @@ class Member_2D:
         plt.show()
 
 
-    def Resolve_Forces_into_Components(self): # TODO OKAY FOR FULL UNIFORM LOAD. NOT SURE ON EVERYTHING ELSE...
+    def Resolve_Forces_into_Components(self): # OKAY!
         # solve for angle
         nodes = self.nodes
 
@@ -558,8 +557,8 @@ class Member_2D:
             self.resolved_forces[self.node_list[0]][2] = - M_1
             self.resolved_forces[self.node_list[1]][2] = - M_2
         elif x1 >= x2 and y2 >= y1: # 91 to 180 degrees
-            self.resolved_forces[self.node_list[0]][2] = M_1
-            self.resolved_forces[self.node_list[1]][2] = M_2
+            self.resolved_forces[self.node_list[0]][2] = - M_1
+            self.resolved_forces[self.node_list[1]][2] = - M_2
         elif x1 >= x2 and y1 >= y2: # 181 to 270 degrees
             self.resolved_forces[self.node_list[0]][2] = - M_1
             self.resolved_forces[self.node_list[1]][2] = - M_2
@@ -647,10 +646,10 @@ class Member_2D:
         plt.show()
 
     def Summary(self): # OKAY
-        self.moment_max = np.max(self.moment)
-        self.moment_min = np.min(self.moment)
-        self.moment_at_left = self.moment[0]
-        self.moment_at_right = self.moment[-1]
+        self.moment_max = -np.max(self.moment)
+        self.moment_min = -np.min(self.moment)
+        self.moment_at_left = -self.moment[0]
+        self.moment_at_right = -self.moment[-1]
         
         self.shear_max = np.max(self.shear)
         self.shear_min = np.min(self.shear)
