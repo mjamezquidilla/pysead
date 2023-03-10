@@ -219,7 +219,7 @@ class UI(QMainWindow):
 
         # Solve
         self.Solve_Truss_Button.clicked.connect(self.Solve_Truss_Func)
-        self.Setup_Button.clicked.connect(self.Draw_Setup)
+        self.Setup_Button.clicked.connect(self.Draw_Truss_Setup)
         self.Reactions_Button.clicked.connect(self.Draw_Truss_Reactions)
         self.Axial_Force_Button.clicked.connect(self.Draw_Truss_Axial_Force_Map)
         self.Displacement_Button.clicked.connect(self.Draw_Truss_Displacement)
@@ -534,43 +534,43 @@ class UI(QMainWindow):
         # print(load_case_index)
         if self.Load_Case_ComboBox.currentIndex() == 0:
             self.forces = self.forces_LC1
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
             self.Load_Combination_Combo_Box.setCurrentIndex(0)
         elif self.Load_Case_ComboBox.currentIndex() == 1:
             self.forces = self.forces_LC2
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
             self.Load_Combination_Combo_Box.setCurrentIndex(1)
         elif self.Load_Case_ComboBox.currentIndex() == 2:
             self.forces = self.forces_LC3
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
             self.Load_Combination_Combo_Box.setCurrentIndex(2)
         elif self.Load_Case_ComboBox.currentIndex() == 3:
             self.forces = self.forces_LC4
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
             self.Load_Combination_Combo_Box.setCurrentIndex(3)
         elif self.Load_Case_ComboBox.currentIndex() == 4:
             self.forces = self.forces_LC5
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
             self.Load_Combination_Combo_Box.setCurrentIndex(4)
         elif self.Load_Case_ComboBox.currentIndex() == 5:
             self.forces = self.forces_LC6
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
             self.Load_Combination_Combo_Box.setCurrentIndex(5)
         elif self.Load_Case_ComboBox.currentIndex() == 6:
             self.forces = self.forces_LC7
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
             self.Load_Combination_Combo_Box.setCurrentIndex(6)
         elif self.Load_Case_ComboBox.currentIndex() == 7:
             self.forces = self.forces_LC8
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
             self.Load_Combination_Combo_Box.setCurrentIndex(7)
         elif self.Load_Case_ComboBox.currentIndex() == 8:
             self.forces = self.forces_LC9
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
             self.Load_Combination_Combo_Box.setCurrentIndex(8)
         elif self.Load_Case_ComboBox.currentIndex() == 9:
             self.forces = self.forces_LC10
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
+            # self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
             self.Load_Combination_Combo_Box.setCurrentIndex(9)
 
         self.Force_Table_Widget.setRowCount(0)
@@ -823,13 +823,6 @@ class UI(QMainWindow):
             # self.Force_X_LEdit.setText("")
             # self.Force_Y_LEdit.setText("")
             
-            print("LC1")
-            print(self.forces_LC1)
-            print("LC2")
-            print(self.forces_LC2)
-            print("LC3")
-            print(self.forces_LC3)
-
             # Draw Truss
             self.Draw_Setup()
             # print(self.forces_LC1)
@@ -1932,36 +1925,55 @@ class UI(QMainWindow):
         plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
         
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+            self.forces = self.forces_LC1
+            self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+            self.forces = self.forces_LC2
+            self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+            self.forces = self.forces_LC3
+            self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+            self.forces = self.forces_LC4
+            self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+            self.forces = self.forces_LC5
+            self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+            self.forces = self.forces_LC6
+            self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+            self.forces = self.forces_LC7
+            self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+            self.forces = self.forces_LC8
+            self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
-        else:
-            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
-        
-        linewidth = float(self.Line_Width_LEdit.text())
-        offset = float(self.Label_Offset_LEdit.text())
-        length_of_arrow = float(self.Arrow_Length_LEdit.text())
-        width_of_arrow = float(self.Arrow_Head_Size_LEdit.text())
-        arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
+            self.forces = self.forces_LC9
+            self.Load_Case_ComboBox.setCurrentIndex(8)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 9:
+            self.forces = self.forces_LC10
+            self.Load_Case_ComboBox.setCurrentIndex(9)
 
-        plt.clf()
+        self.Force_Table_Widget.setRowCount(0)
+                    
+        # Loop all the force dictionary and replace/update the table widget
+        for key, item in self.forces.items():
+            node = str(key)
+            f_x = str(item[0])
+            f_y = str(item[1])
+
+            # Add Items to Table Widget
+            rowPosition = self.Force_Table_Widget.rowCount()
+
+            # print(rowPosition)
+            self.Force_Table_Widget.insertRow(rowPosition)
+            self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+            self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+            self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
         
-        self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
-        self.canvas.draw()
+        # Draw Truss
+        self.Draw_Setup()
 
     def Draw_Reactions(self):
         plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
@@ -1973,24 +1985,61 @@ class UI(QMainWindow):
         
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_LC1.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC1
+            self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
             self.Truss_LC2.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC2
+            self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
             self.Truss_LC3.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC3
+            self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
             self.Truss_LC4.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC4
+            self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
             self.Truss_LC5.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC5
+            self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
             self.Truss_LC6.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC6
+            self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
             self.Truss_LC7.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC7
+            self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
             self.Truss_LC8.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.df_member_forces_LC8
+            self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
             self.Truss_LC9.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC9
+            self.Load_Case_ComboBox.setCurrentIndex(8)
         else:
             self.Truss_LC10.Draw_Reactions_(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, arrow_head_size = width_of_arrow, arrow_line_width = arrow_line_width)
+            self.forces = self.forces_LC10
+            self.Load_Case_ComboBox.setCurrentIndex(9)
+            
+        self.Force_Table_Widget.setRowCount(0)
+                    
+        # Loop all the force dictionary and replace/update the table widget
+        for key, item in self.forces.items():
+            node = str(key)
+            f_x = str(item[0])
+            f_y = str(item[1])
+
+            # Add Items to Table Widget
+            rowPosition = self.Force_Table_Widget.rowCount()
+
+            # print(rowPosition)
+            self.Force_Table_Widget.insertRow(rowPosition)
+            self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+            self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+            self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
     def Draw_Displacements(self):
         plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
@@ -2003,48 +2052,122 @@ class UI(QMainWindow):
 
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_LC1.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC1
+            self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
             self.Truss_LC2.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC2
+            self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
             self.Truss_LC3.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC3
+            self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
             self.Truss_LC4.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC4
+            self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
             self.Truss_LC5.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC5
+            self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
             self.Truss_LC6.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC6
+            self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
             self.Truss_LC7.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC7
+            self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
             self.Truss_LC8.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC8
+            self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
             self.Truss_LC9.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC9
+            self.Load_Case_ComboBox.setCurrentIndex(8)
         else:
             self.Truss_LC10.Draw_Truss_Displacements(linewidth = linewidth, magnification_factor = magnification_factor, offset = offset)
+            self.forces = self.forces_LC10
+            self.Load_Case_ComboBox.setCurrentIndex(9)
+            
+        self.Force_Table_Widget.setRowCount(0)
+                    
+        # Loop all the force dictionary and replace/update the table widget
+        for key, item in self.forces.items():
+            node = str(key)
+            f_x = str(item[0])
+            f_y = str(item[1])
+
+            # Add Items to Table Widget
+            rowPosition = self.Force_Table_Widget.rowCount()
+
+            # print(rowPosition)
+            self.Force_Table_Widget.insertRow(rowPosition)
+            self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+            self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+            self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
     def Draw_Axial(self):
         plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
             
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.Truss_LC1.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC1
+            self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
             self.Truss_LC2.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC2
+            self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
             self.Truss_LC3.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC3
+            self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
             self.Truss_LC4.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC4
+            self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
             self.Truss_LC5.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC5
+            self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
             self.Truss_LC6.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC6
+            self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
             self.Truss_LC7.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC7
+            self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
             self.Truss_LC8.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC8
+            self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
             self.Truss_LC9.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC9
+            self.Load_Case_ComboBox.setCurrentIndex(8)
         else:
             self.Truss_LC10.Draw_Truss_Axial_Force_Map()
+            self.forces = self.forces_LC10
+            self.Load_Case_ComboBox.setCurrentIndex(9)
+            
+        self.Force_Table_Widget.setRowCount(0)
+                    
+        # Loop all the force dictionary and replace/update the table widget
+        for key, item in self.forces.items():
+            node = str(key)
+            f_x = str(item[0])
+            f_y = str(item[1])
+
+            # Add Items to Table Widget
+            rowPosition = self.Force_Table_Widget.rowCount()
+
+            # print(rowPosition)
+            self.Force_Table_Widget.insertRow(rowPosition)
+            self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+            self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+            self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
     def New_File_Func(self):
         self.Nodes_Table_Widget.setRowCount(0)
