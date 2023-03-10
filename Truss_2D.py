@@ -337,12 +337,15 @@ class Truss_2D:
         for key in self.forces.keys():
             if key in self.reactions_:
                 shared_keys.append(key)
-        
-        reactions = {}
-        for key in shared_keys:
-            reactions.update({key:[x + y for x, y in zip(self.forces[key], self.reactions_[key])]})
-            
-        self.reactions_ = reactions
+                
+        if shared_keys:        
+            reactions = {}
+            for key in shared_keys:
+                reactions.update({key:[x + y for x, y in zip(self.forces[key], self.reactions_[key])]})
+                
+            self.reactions_ = reactions
+        else:
+            pass
         
         # Member Forces
         member_forces_new = {}
