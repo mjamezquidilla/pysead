@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import qdarkstyle
 from matplotlib.backends.backend_qtagg import \
-    FigureCanvasQTAgg # ,NavigationToolbar2QT as NavigationToolbar
+    FigureCanvasQTAgg ,NavigationToolbar2QT as NavigationToolbar
 
 # Using PyQt6
 from PyQt6 import uic
@@ -145,18 +145,20 @@ class UI(QMainWindow):
         self.Matplotlib_Frame = self.findChild(QFrame,"Matplotlib_Frame")
 
         # Put Matplotlib inside Matplotlib Frame
-        self.horizontalLayout_Matplotlib = QHBoxLayout(self.Matplotlib_Frame)
-        self.horizontalLayout_Matplotlib.setObjectName("Matplotlib_layout")
+        self.verticalLayout_Matplotlib = QVBoxLayout(self.Matplotlib_Frame)
+        self.verticalLayout_Matplotlib.setObjectName("Matplotlib_layout")
         self.figure = plt.figure(dpi=75)
-        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
+        # self.figure.tight_layout()
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text()), 'figure.autolayout': True})
         self.canvas = FigureCanvasQTAgg(self.figure)
-        self.horizontalLayout_Matplotlib.addWidget(self.canvas)
+        self.verticalLayout_Matplotlib.addWidget(self.canvas)
+        self.verticalLayout_Matplotlib.addWidget(NavigationToolbar(self.canvas, self))
         self.ax = plt.gca()
 
         # Graphics View # TODO Graphics View
-        self.GraphicsView_Frame = self.findChild(QFrame,"GraphicsView_Frame")
-        self.GraphicsView_Layout = QHBoxLayout(self.GraphicsView_Frame)
-        self.GraphicsView_Layout.setObjectName("Graphics_layout")
+        # self.GraphicsView_Frame = self.findChild(QFrame,"GraphicsView_Frame")
+        # self.GraphicsView_Layout = QHBoxLayout(self.GraphicsView_Frame)
+        # self.GraphicsView_Layout.setObjectName("Graphics_layout")
 
         # Menu Items
         self.New_Menu = self.findChild(QAction, "actionNew")
@@ -329,14 +331,11 @@ class UI(QMainWindow):
             y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
             self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
 
-        print(self.nodes)
-        
         # Change LineEdit to maximum number of rows
         self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
         
         # Draw Truss
         self.Draw_Setup()
-        print(self.nodes)
 
     def Renumber_Nodes_Func(self):
         for index in range(self.Nodes_Table_Widget.rowCount()):
@@ -354,6 +353,14 @@ class UI(QMainWindow):
             self.Nodes_Table_Widget.setItem(index, 0, QTableWidgetItem(str(index+1)))
             self.Nodes_Table_Widget.setItem(index, 1, QTableWidgetItem(x_coord))
             self.Nodes_Table_Widget.setItem(index, 2, QTableWidgetItem(y_coord))
+            
+            # Reinitialize nodes dictionary and copy all data from table into dictionary        
+            self.nodes = {}
+            for index in range(self.Nodes_Table_Widget.rowCount()):
+                node = int(self.Nodes_Table_Widget.item(index,0).text())
+                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+                self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
             
     ###### Elements Function ######
     def Add_Bar_Button_Func(self):
@@ -421,9 +428,6 @@ class UI(QMainWindow):
             # Draw Truss
             self.Draw_Setup()
 
-            print(self.elements)
-            print(self.areas)
-            print(self.elasticity)
 
     def Renumber_Bars_Func(self):
         for index in range(self.Element_Table_Widget.rowCount()):
@@ -1887,6 +1891,7 @@ class UI(QMainWindow):
         
         
         self.canvas.draw()
+        self.figure.tight_layout()
 
     # def Initialize_Truss_Components(self):
     #     nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
@@ -2112,43 +2117,43 @@ class UI(QMainWindow):
         plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
             
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
-            self.Truss_LC1.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC1.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC1
             self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
-            self.Truss_LC2.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC2.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC2
             self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
-            self.Truss_LC3.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC3.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC3
             self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
-            self.Truss_LC4.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC4.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC4
             self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
-            self.Truss_LC5.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC5.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC5
             self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
-            self.Truss_LC6.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC6.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC6
             self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
-            self.Truss_LC7.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC7.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC7
             self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
-            self.Truss_LC8.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC8.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC8
             self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
-            self.Truss_LC9.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC9.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC9
             self.Load_Case_ComboBox.setCurrentIndex(8)
         else:
-            self.Truss_LC10.Draw_Truss_Axial_Force_Map()
+            self.Truss_LC10.Draw_Truss_Axial_Force_Map(color_bar_orientation = 'horizontal')
             self.forces = self.forces_LC10
             self.Load_Case_ComboBox.setCurrentIndex(9)
             
@@ -2187,6 +2192,15 @@ class UI(QMainWindow):
         self.elements = {}
         self.supports = {}
         self.forces_LC1 = {}
+        self.forces_LC2 = {}
+        self.forces_LC3 = {}
+        self.forces_LC4 = {}
+        self.forces_LC5 = {}
+        self.forces_LC6 = {}
+        self.forces_LC7 = {}
+        self.forces_LC8 = {}
+        self.forces_LC9 = {}
+        self.forces_LC10 = {}
         self.elasticity = {}
         self.cross_area = {}
 
@@ -2614,14 +2628,14 @@ class UI(QMainWindow):
     #     self.canvas.draw()
         
     def MaterialDark_Menu_Func(self):
-        apply_stylesheet(app, theme='dark_blue.xml', extra = extra, css_file='custom.css')
+        apply_stylesheet(app, theme='dark_cyan.xml', extra = extra, css_file='custom.css')
         plt.clf()
         plt.style.use('dark_background_pysead_materialdark')
         
         self.canvas.draw()
         
     def MaterialLight_Menu_Func(self):
-        apply_stylesheet(app, theme='light_blue.xml', invert_secondary = True, extra = extra)
+        apply_stylesheet(app, theme='light_cyan.xml', invert_secondary = True, extra = extra)
         # app.setStyleSheet("")
         plt.clf()
         plt.style.use('fivethirtyeight')
@@ -2687,17 +2701,17 @@ class UI(QMainWindow):
         return os.path.join(base_path, relative_path)
     
 ###### Navigation Toolbar Customized #######
-# class NavigationToolbarCustom(NavigationToolbar):
-#     # only display the buttons we need
-#     toolitems = [t for t in NavigationToolbar.toolitems if
-#                  t[0] in ("Save",)]
+class NavigationToolbarCustom(NavigationToolbar):
+    # only display the buttons we need
+    toolitems = [t for t in NavigationToolbar.toolitems if
+                 t[0] in ("Save","Pan","Zoom", "Home")]
 
 
 if __name__ == "__main__":
     # Initialize the App
     # sys.argv += ['--style', 'Material']
     app = QApplication(sys.argv)
-    apply_stylesheet(app, theme='dark_blue.xml', extra = extra, css_file='custom.css')
+    apply_stylesheet(app, theme='dark_cyan.xml', extra = extra, css_file='custom.css')
     UIWindow = UI()
     UIWindow.show()
     # app.setStyleSheet(qdarkstyle.load_stylesheet())
