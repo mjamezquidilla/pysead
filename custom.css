@@ -4,7 +4,12 @@ QLineEdit {{
     background-color: {QTMATERIAL_SECONDARYCOLOR};
   }}
 
-  QComboBox {{
+QComboBox {{
+    color: {QTMATERIAL_SECONDARYTEXTCOLOR};
+    background-color: {QTMATERIAL_SECONDARYCOLOR};
+  }}
+
+QSpinBox {{
     color: {QTMATERIAL_SECONDARYTEXTCOLOR};
     background-color: {QTMATERIAL_SECONDARYCOLOR};
   }}

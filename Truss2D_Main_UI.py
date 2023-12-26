@@ -6,14 +6,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import qdarkstyle
-from matplotlib.backends.backend_qtagg import \
-    FigureCanvasQTAgg ,NavigationToolbar2QT as NavigationToolbar
 
 # Using PyQt6
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
+
+# Using PySide6
+# from PySide6.QtUiTools import QUiLoader
+# from PySide6.QtWidgets import *
+# from PySide6.QtCore import *
+# from PySide6.QtGui import *
+# os.environ["PYSIDE_DESIGNER_PLUGINS"]="."
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 
 # PySEAD Modules
 from pysead import Truss_2D
@@ -29,9 +36,6 @@ extra = {
     'windows': True
 }
 
-
-
-
 # PyInstaller Splash Screen
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -39,7 +43,7 @@ if getattr(sys, 'frozen', False):
 
 plt.style.use('dark_background_pysead_materialdark')
 
-os.environ['QT_API'] = 'pyqt6'
+os.environ['QT_API'] = 'PyQt6'
 
 
 class UI(QMainWindow):
@@ -68,6 +72,17 @@ class UI(QMainWindow):
         # Load the UI file
         # PyQt5
         uic.loadUi(self.resource_path("Truss2D_GUI.ui"), self)
+        
+        # PySide6
+        # ui_file = QFile(self.resource_path("Truss2D_GUI.ui"))
+        # # if not ui_en(QFile.read)
+        # loader = QUiLoader()
+        # uic = loader.load(ui_file, self)
+        # ui_file.close()
+        # if not uic:
+        #     print(loader.errorString())
+        #     sys.exit(-1)
+        # uic.show()
 
         # Define our widgets
         # Button Widget
@@ -251,7 +266,7 @@ class UI(QMainWindow):
         self.statusBar.showMessage("Ready")
 
         # Show the App
-        self.show()
+        # self.show()
     
     def clicked(self):
         type(file_name[0])
@@ -313,29 +328,32 @@ class UI(QMainWindow):
 
         
     def Remove_Node_Button_Func(self):
-        # Grab Item from Highlighted Row
-        clicked = self.Nodes_Table_Widget.currentRow()
+        try:
+            # Grab Item from Highlighted Row
+            clicked = self.Nodes_Table_Widget.currentRow()
 
-        # Delete Highlighted Row
-        self.Nodes_Table_Widget.removeRow(clicked)
-        self.Renumber_Nodes_Func()
-        
-        if int(self.Node_Number_LEdit.text()) == 2:
-            self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
+            # Delete Highlighted Row
+            self.Nodes_Table_Widget.removeRow(clicked)
+            self.Renumber_Nodes_Func()
+            
+            if int(self.Node_Number_LEdit.text()) == 2:
+                self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
 
-        # Reinitialize nodes dictionary and copy all data from table into dictionary        
-        self.nodes = {}
-        for index in range(self.Nodes_Table_Widget.rowCount()):
-            node = int(self.Nodes_Table_Widget.item(index,0).text())
-            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
-            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
-            self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
+            # Reinitialize nodes dictionary and copy all data from table into dictionary        
+            self.nodes = {}
+            for index in range(self.Nodes_Table_Widget.rowCount()):
+                node = int(self.Nodes_Table_Widget.item(index,0).text())
+                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+                self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
 
-        # Change LineEdit to maximum number of rows
-        self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
-        
-        # Draw Truss
-        self.Draw_Setup()
+            # Change LineEdit to maximum number of rows
+            self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
+            
+            # Draw Truss
+            self.Draw_Setup()
+        except:
+            self.statusBar.showMessage("Error Deleting node. Double check Bar Elements nodes")
 
     def Renumber_Nodes_Func(self):
         for index in range(self.Nodes_Table_Widget.rowCount()):

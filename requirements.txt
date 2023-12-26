@@ -1,0 +1,7 @@
+numpy
+matplotlib
+pandas 
+openpyxl
+pyqt6
+qdarkstyle
+qt_material
