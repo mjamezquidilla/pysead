@@ -341,7 +341,7 @@ class Truss_2D:
         if shared_keys:        
             reactions = {}
             for key in shared_keys:
-                reactions.update({key:[x + y for x, y in zip(self.forces[key], self.reactions_[key])]})
+                reactions.update({key:[-x + y for x, y in zip(self.forces[key], self.reactions_[key])]})
             self.reactions_.update(reactions)
         
         # Member Forces
@@ -1025,3 +1025,44 @@ class Truss_2D:
 
         ax.axis('equal')
         # plt.show()
+        
+    def Apply_Selfweight(self, density):
+        nodes = self.nodes
+        elements = self.elements
+        cross_area = self.cross_area
+        
+        self.self_weight = {}
+        
+        for element in elements:
+                
+                # Get Nodes list from members
+                node_1 = elements[element][0]
+                node_2 = elements[element][1]
+                
+                # Get node coordinates
+                x1 = nodes[node_1][0]
+                y1 = nodes[node_1][1]
+                x2 = nodes[node_2][0]
+                y2 = nodes[node_2][1]
+                
+                # compute member length
+                length = np.sqrt((x2-x1)**2+(y2-y1)**2)
+                
+                # Get member cross-sectional area
+                area = cross_area[element]
+                
+                # Compute total weight of the member
+                weight = area * length * density
+                
+                # Make a dictionary for selfweight nodes and Apply half of total weight to each node
+                temp_selfweight = {node_1: [0, np.round(-weight/2,2)], node_2: [0, np.round(-weight/2,2)]}
+                
+                # Add to global self weight dictionary
+                for key, value in temp_selfweight.items():
+                        if key in self.self_weight:
+                                value = self.self_weight[key][1] + value[1]
+                                self.self_weight.update({key:[0, value]})
+                        
+                        else:
+                                self.self_weight[key] = value
+        self.forces = self.self_weight

@@ -103,6 +103,8 @@ class UI(QMainWindow):
         self.Add_Load_Combo_Button = self.findChild(QPushButton, "Add_Load_Combo_Button")
         self.Remove_Load_Combo_Button = self.findChild(QPushButton, "Remove_Load_Combo_Button")
         
+        self.Self_Weight_Button = self.findChild(QPushButton, "Self_Weight_Button")
+        
         self.Add_Force_Button = self.findChild(QPushButton, "Add_Force_Button")
         self.Remove_Force_Button = self.findChild(QPushButton, "Remove_Force_Button")
         self.Update_Truss_Forces_Button = self.findChild(QPushButton, "Update_Truss_Forces_Button")
@@ -128,6 +130,8 @@ class UI(QMainWindow):
         self.Bar_Number_LEdit = self.findChild(QLineEdit, "Bar_Number_LEdit")
         self.Node_1_LEdit = self.findChild(QLineEdit, "Node_1_LEdit")
         self.Node_2_LEdit = self.findChild(QLineEdit, "Node_2_LEdit")
+        
+        self.Self_Weight_LEdit = self.findChild(QLineEdit, "Self_Weight_LEdit")
         
         self.Displacement_Factor_LEdit = self.findChild(QLineEdit, "Displacement_Factor_LEdit")
         self.Line_Width_LEdit = self.findChild(QLineEdit, "Line_Width_LEdit")
@@ -225,6 +229,8 @@ class UI(QMainWindow):
         self.Show_Load_Case_Table_Button.clicked.connect(self.Show_Load_Case_Table_Button_Func)
 
         # Forces
+        self.Self_Weight_Button.clicked.connect(self.Self_Weight_Func)
+        
         self.Add_Force_Button.clicked.connect(self.Add_Force_Button_Func)
         self.Remove_Force_Button.clicked.connect(self.Remove_Force_Button_Func)
         self.Update_Truss_Forces_Button.clicked.connect(self.Draw_Setup)
@@ -865,7 +871,77 @@ class UI(QMainWindow):
             self.forces_LC1.update({bar: [f_x, f_y]})
 
         print(self.forces_LC1)
-        
+    
+    def Self_Weight_Func(self):
+        if self.Self_Weight_LEdit.text() == "":
+            print("Do not leave Self-Weight textboxes empty")
+        else:
+            # Grabe Item from LEdit Box
+            unit_weight = float(self.Self_Weight_LEdit.text())
+            
+            self.Renumber_Nodes_Func()
+            self.Renumber_Bars_Func()
+            
+            self.nodes = {}
+            self.elements = {}
+            self.areas = {}
+            self.forces = {}
+            self.supports = {}
+
+
+            # Nodes
+            for index in range(self.Nodes_Table_Widget.rowCount()):
+                node = int(self.Nodes_Table_Widget.item(index,0).text())
+                x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+                y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+                self.nodes.update({node: [x_coord,y_coord]})
+
+            # Elements
+            for index in range(self.Element_Table_Widget.rowCount()):
+                bar = int(self.Element_Table_Widget.item(index,0).text())
+                node_1 = int(self.Element_Table_Widget.item(index,1).text())
+                node_2 = int(self.Element_Table_Widget.item(index,2).text())
+                self.elements.update({bar:[node_1, node_2]})
+
+            # Materials
+            for index in range(self.Material_Table_Widget.rowCount()):
+                bar = int(self.Material_Table_Widget.item(index,0).text())
+                area = float(self.Material_Table_Widget.item(index,1).text())
+                elasticity = float(self.Material_Table_Widget.item(index,2).text())
+                self.areas.update({bar: area})
+                self.elasticity.update({bar: elasticity})
+
+            # Supports
+            for index in range(self.Support_Table_Widget.rowCount()):
+                node = int(self.Support_Table_Widget.item(index,0).text())
+                x = int(self.Support_Table_Widget.item(index,1).text())
+                y = int(self.Support_Table_Widget.item(index,2).text())
+                self.supports.update({node: [x, y]})
+                
+
+            self.Truss_LC1 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+            self.Truss_LC1.Apply_Selfweight(unit_weight)
+                  
+            self.forces_LC1 = self.Truss_LC1.forces
+            
+            self.Force_Table_Widget.setRowCount(0)
+            
+            for key, item in self.forces_LC1.items():
+                node = str(key)
+                f_x = str(item[0])
+                f_y = str(item[1])
+
+                # Add Items to Table Widget
+                rowPosition = self.Force_Table_Widget.rowCount()
+
+                # print(rowPosition)
+                self.Force_Table_Widget.insertRow(rowPosition)
+                self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
+                self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
+            
+            self.Draw_Setup()
+            
     ###### Support Function ######
     def Add_Support_Button_Func(self):
         if self.Support_Node_LEdit.text() == "":
