@@ -1055,14 +1055,14 @@ class Truss_2D:
                 weight = area * length * density
                 
                 # Make a dictionary for selfweight nodes and Apply half of total weight to each node
-                temp_selfweight = {node_1: [0, np.round(-weight/2,2)], node_2: [0, np.round(-weight/2,2)]}
+                temp_selfweight = {node_1: [0, -weight/2], node_2: [0, -weight/2]}
                 
                 # Add to global self weight dictionary
                 for key, value in temp_selfweight.items():
                         if key in self.self_weight:
                                 value = self.self_weight[key][1] + value[1]
-                                self.self_weight.update({key:[0, value]})
+                                self.self_weight.update({key:[0, np.round(value,2)]})
                         
                         else:
-                                self.self_weight[key] = value
+                                self.self_weight[key] = np.round(value,2)
         self.forces = self.self_weight
