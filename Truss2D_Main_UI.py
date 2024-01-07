@@ -1,6 +1,7 @@
 # from PyQt5 import QtWidgets
 import os
 import sys
+import gc
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -49,7 +50,8 @@ os.environ['QT_API'] = 'PyQt6'
 class UI(QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
-
+        self.setFocus()
+        
         #Global Variables
         self.nodes = {}
         self.elements = {}
@@ -123,15 +125,22 @@ class UI(QMainWindow):
         self.Save_Figure_Button = self.findChild(QPushButton, "Save_Figure_Button")
 
         # Line Edit Widget
-        self.Node_Number_LEdit = self.findChild(QLineEdit, "Node_Number_LEdit")
-        self.X_Coord_LEdit = self.findChild(QLineEdit, "X_Coord_LEdit")
-        self.Y_Coord_LEdit = self.findChild(QLineEdit, "Y_Coord_LEdit")
+        self.Node_Number_From_LEdit = self.findChild(QLineEdit, "Node_Number_From_LEdit")
+        self.X1_Coord_LEdit = self.findChild(QLineEdit, "X1_Coord_LEdit")
+        self.Y1_Coord_LEdit = self.findChild(QLineEdit, "Y1_Coord_LEdit")
+        self.Node_Number_Current_LEdit = self.findChild(QLineEdit, "Node_Number_Current_LEdit")
+        self.X2_Coord_LEdit = self.findChild(QLineEdit, "X2_Coord_LEdit")
+        self.Y2_Coord_LEdit = self.findChild(QLineEdit, "Y2_Coord_LEdit")
+        self.Node_Step_LEdit = self.findChild(QLineEdit, "Node_Step_LEdit")
+        
 
-        self.Bar_Number_LEdit = self.findChild(QLineEdit, "Bar_Number_LEdit")
-        self.Node_1_LEdit = self.findChild(QLineEdit, "Node_1_LEdit")
-        self.Node_2_LEdit = self.findChild(QLineEdit, "Node_2_LEdit")
+        self.Bar_Number_From_LEdit = self.findChild(QLineEdit, "Bar_Number_From_LEdit")
+        self.Bar_Number_Current_LEdit = self.findChild(QLineEdit, "Bar_Number_Current_LEdit")
+        self.Node_1_From_LEdit = self.findChild(QLineEdit, "Node_1_From_LEdit")
+        self.Node_2_From_LEdit = self.findChild(QLineEdit, "Node_2_From_LEdit")
         
         self.Self_Weight_LEdit = self.findChild(QLineEdit, "Self_Weight_LEdit")
+        self.Force_Node_To_LEdit = self.findChild(QLineEdit, "Force_Node_To_LEdit")
         
         self.Displacement_Factor_LEdit = self.findChild(QLineEdit, "Displacement_Factor_LEdit")
         self.Line_Width_LEdit = self.findChild(QLineEdit, "Line_Width_LEdit")
@@ -281,13 +290,19 @@ class UI(QMainWindow):
     ###### Nodes Function ######
     def Add_Node_Button_Func(self):
         # Check if all textbox is not empty
-        if self.Node_Number_LEdit.text() == "" or self.X_Coord_LEdit.text() == "" or self.Y_Coord_LEdit.text() == "":
+        if self.Node_Number_From_LEdit.text() == "" or self.X1_Coord_LEdit.text() == "" or self.Y1_Coord_LEdit.text() == "":
             print("Do not leave nodes textboxes empty")
         else:
             # Grabe Item from LEdit Box
-            node = int(self.Node_Number_LEdit.text())
-            x_coord = float(self.X_Coord_LEdit.text())
-            y_coord = float(self.Y_Coord_LEdit.text())
+            node1 = int(self.Node_Number_From_LEdit.text())
+            x1_coord = float(self.X1_Coord_LEdit.text())
+            y1_coord = float(self.Y1_Coord_LEdit.text())
+            
+            node2 = int(self.Node_Number_Current_LEdit.text())
+            x2_coord = float(self.X2_Coord_LEdit.text())
+            y2_coord = float(self.Y2_Coord_LEdit.text())
+            
+            step = int(self.Node_Step_LEdit.text())
             
             # self.node_number = int(node) + 1
 
@@ -295,12 +310,21 @@ class UI(QMainWindow):
             # self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
             
             # # Clear the Textboxes
-            self.Node_Number_LEdit.setText(str(int(node) + 1))
-            self.X_Coord_LEdit.setText("")
-            self.Y_Coord_LEdit.setText("")
+            self.Node_Number_Current_LEdit.setText("")
+            self.X2_Coord_LEdit.setText("")
+            self.Y2_Coord_LEdit.setText("")
 
             # Update the nodes and auto sort
-            self.nodes.update({node: [x_coord, y_coord]})
+            # self.nodes.update({node: [x_coord, y_coord]})
+            
+            no_of_nodes = int((node2 - node1)/step + 1)
+
+            x_array = np.linspace(x1_coord, x2_coord, num=no_of_nodes, endpoint=True)
+            y_array = np.linspace(y1_coord, y2_coord, num=no_of_nodes, endpoint=True)
+
+            for i in range(int(no_of_nodes)):
+                self.nodes.update({node1 + i: [round(x_array[i],3), round(y_array[i],3)]})
+            
             self.nodes = {k: v for k, v in sorted(self.nodes.items(), key=lambda item: item[0])}
 
             # Remove duplicated nodes
@@ -326,7 +350,11 @@ class UI(QMainWindow):
             self.Renumber_Nodes_Func()
 
             # Change LineEdit to maximum number of rows
-            self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
+            self.Node_Number_From_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount())))
+            self.X1_Coord_LEdit.setText(str(int(x2_coord)))
+            self.Y1_Coord_LEdit.setText(str(int(y2_coord)))
+            
+            self.Node_Number_From_LEdit.setFocus()
 
             # Draw Truss
             self.Draw_Setup()
@@ -342,8 +370,8 @@ class UI(QMainWindow):
             self.Nodes_Table_Widget.removeRow(clicked)
             self.Renumber_Nodes_Func()
             
-            if int(self.Node_Number_LEdit.text()) == 2:
-                self.Node_Number_LEdit.setText(str(int(self.Node_Number_LEdit.text()) - 1))
+            if int(self.Node_Number_From_LEdit.text()) == 2:
+                self.Node_Number_From_LEdit.setText(str(int(self.Node_Number_From_LEdit.text()) - 1))
 
             # Reinitialize nodes dictionary and copy all data from table into dictionary        
             self.nodes = {}
@@ -354,7 +382,7 @@ class UI(QMainWindow):
                 self.nodes.update({index+1:[int(node), float(x_coord), float(y_coord)]})
 
             # Change LineEdit to maximum number of rows
-            self.Node_Number_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
+            self.Node_Number_From_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
             
             # Draw Truss
             self.Draw_Setup()
@@ -388,24 +416,40 @@ class UI(QMainWindow):
             
     ###### Elements Function ######
     def Add_Bar_Button_Func(self):
-        if self.Bar_Number_LEdit.text() == "" or self.Node_1_LEdit.text() == "" or self.Node_2_LEdit.text() == "":
+        if self.Bar_Number_From_LEdit.text() == "" or self.Node_1_From_LEdit.text() == "" or self.Node_2_From_LEdit.text() == "":
             print("Do not leave Bar/Elements textboxes empty")
         else:
             # Grabe Item from LEdit Box
-            bar = int(self.Bar_Number_LEdit.text())
-            node_1 = int(self.Node_1_LEdit.text())
-            node_2 = int(self.Node_2_LEdit.text())
+            bar1 = int(self.Bar_Number_From_LEdit.text())
+            bar2 = int(self.Bar_Number_Current_LEdit.text())
+            node_1 = int(self.Node_1_From_LEdit.text())
+            node_2 = int(self.Node_2_From_LEdit.text())            
+            
             area = float(self.Area_LEdit.text())
             elasticity = float(self.Elasticity_LEdit.text())
 
-            new_bar_number = bar + 1
+            new_bar_number = bar1 + 1
 
-            # Update the elements, areas, and elasticity and auto sort
-            self.elements.update({bar: [node_1, node_2]})
+            # Update the elements, areas, and elasticity 
+            # self.elements.update({bar1: [node_1, node_2]})
+            no_of_bars = int((bar2+1) - bar1)
+            node1_array = np.arange(node_1, node_1 + (no_of_bars), 1)
+            node2_array = np.arange(node_2, node_2 + (no_of_bars), 1)
+
+            for i in range(int(no_of_bars)):
+                self.elements.update({bar1 + i: [int(node1_array[i]), int(node2_array[i])]})
+            
+            # self.areas.update({bar1: area})
+            for i in range(int(no_of_bars)):
+                self.areas.update({bar1 + i: area})
+            
+            # self.elasticity.update({bar1: elasticity})
+            for i in range(int(no_of_bars)):
+                self.elasticity.update({bar1 + i: elasticity})
+            
+            # auto sort the elements, areas, and elasticity 
             self.elements = {k: v for k, v in sorted(self.elements.items(), key=lambda item: item[0])}
-            self.areas.update({bar: area})
             self.areas = {k: v for k, v in sorted(self.areas.items(), key=lambda item: item[0])}
-            self.elasticity.update({bar: elasticity})
             self.elasticity = {k: v for k, v in sorted(self.elasticity.items(), key=lambda item: item[0])}
 
 
@@ -415,7 +459,7 @@ class UI(QMainWindow):
 
             # Loop all the nodes dictionary and replace/update the table widget
             for key, item in self.elements.items():
-                bar = str(key)
+                bar1 = str(key)
                 node_1 = str(item[0])
                 node_2 = str(item[1])
 
@@ -424,30 +468,30 @@ class UI(QMainWindow):
 
                 # print(rowPosition)
                 self.Element_Table_Widget.insertRow(rowPosition)
-                self.Element_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                self.Element_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar1))
                 self.Element_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(node_1))
                 self.Element_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(node_2))
 
             for (key, area), (_, elasticity) in zip(self.areas.items(), self.elasticity.items()):
-                bar = str(key)
+                bar1 = str(key)
                 areas = str(area)
                 elasticity = str(elasticity)
 
                 rowPosition = self.Material_Table_Widget.rowCount()
                 self.Material_Table_Widget.insertRow(rowPosition)
-                self.Material_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar))
+                self.Material_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar1))
                 self.Material_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(areas))
                 self.Material_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(elasticity))
 
             # Clear the Textboxes
-            self.Bar_Number_LEdit.setText(str(new_bar_number))
-            self.Node_1_LEdit.setText("")
-            self.Node_2_LEdit.setText("")
+            self.Bar_Number_From_LEdit.setText(str(new_bar_number))
+            self.Node_1_From_LEdit.setText("")
+            self.Node_2_From_LEdit.setText("")
 
             self.Renumber_Bars_Func()
 
             # Change LineEdit to maximum number of rows
-            self.Bar_Number_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
+            self.Bar_Number_From_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
 
             # Draw Truss
             self.Draw_Setup()
@@ -487,8 +531,8 @@ class UI(QMainWindow):
         self.Element_Table_Widget.removeRow(clicked)
         self.Material_Table_Widget.removeRow(clicked)
 
-        if int(self.Bar_Number_LEdit.text()) == 2:
-            self.Bar_Number_LEdit.setText(str(int(self.Bar_Number_LEdit.text())-1))
+        if int(self.Bar_Number_From_LEdit.text()) == 2:
+            self.Bar_Number_From_LEdit.setText(str(int(self.Bar_Number_From_LEdit.text())-1))
         
         self.Renumber_Bars_Func()
 
@@ -512,7 +556,7 @@ class UI(QMainWindow):
             self.elasticity.update({int(bar): float(elasticity)})
                         
         # Change LineEdit to maximum number of rows
-        self.Bar_Number_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
+        self.Bar_Number_From_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
         
         # Draw Truss
         self.Draw_Setup()
@@ -623,7 +667,7 @@ class UI(QMainWindow):
 
 
     ###### Forces Function ######
-    def Add_Force_Button_Func(self):
+    def Add_Force_Button_Func(self): #TODO ADD FORCES
         if self.Force_Node_Number_LEdit.text() == "" or self.Force_X_LEdit.text() == "" or self.Force_Y_LEdit.text() == "":
             print("Do not leave Force textboxes empty")
         else:
@@ -2269,6 +2313,7 @@ class UI(QMainWindow):
             self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
     def New_File_Func(self):
+        
         self.Nodes_Table_Widget.setRowCount(0)
         self.Element_Table_Widget.setRowCount(0)
         self.Material_Table_Widget.setRowCount(0)
@@ -2282,6 +2327,25 @@ class UI(QMainWindow):
         plt.clf()
         self.canvas.draw()
 
+        del(self.nodes)
+        del(self.elements)
+        del(self.supports)
+        del(self.forces_LC1)
+        del(self.forces_LC2)
+        del(self.forces_LC3)
+        del(self.forces_LC4)
+        del(self.forces_LC5)
+        del(self.forces_LC6)
+        del(self.forces_LC7)
+        del(self.forces_LC8)
+        del(self.forces_LC9)
+        del(self.forces_LC10)
+        del(self.elasticity)
+        # del(self.cross_area)
+        del(self.areas)
+        
+        gc.collect()
+        
         self.nodes = {}
         self.elements = {}
         self.supports = {}
@@ -2296,10 +2360,12 @@ class UI(QMainWindow):
         self.forces_LC9 = {}
         self.forces_LC10 = {}
         self.elasticity = {}
-        self.cross_area = {}
-
-        self.Node_Number_LEdit.setText("1")
-        self.Bar_Number_LEdit.setText("1")
+        # self.cross_area = {}
+        self.areas = {}
+        self.load_case_index = 0
+        
+        self.Node_Number_From_LEdit.setText("1")
+        self.Bar_Number_From_LEdit.setText("1")
 
         self.statusBar.showMessage("New File")
         
@@ -2679,8 +2745,8 @@ class UI(QMainWindow):
             self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
             self.Bar_row_Position = self.Element_Table_Widget.rowCount()
 
-            self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
-            self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
+            self.Node_Number_From_LEdit.setText(str(self.Node_row_Position + 1))
+            self.Bar_Number_From_LEdit.setText(str(self.Bar_row_Position + 1))
             
             title = "PySEAD Truss 2D - " + file_name[0]
             self.setWindowTitle(title)
@@ -2773,8 +2839,8 @@ class UI(QMainWindow):
                 self.Node_row_Position = self.Nodes_Table_Widget.rowCount()
                 self.Bar_row_Position = self.Element_Table_Widget.rowCount()
 
-                self.Node_Number_LEdit.setText(str(self.Node_row_Position + 1))
-                self.Bar_Number_LEdit.setText(str(self.Bar_row_Position + 1))
+                self.Node_Number_From_LEdit.setText(str(self.Node_row_Position + 1))
+                self.Bar_Number_From_LEdit.setText(str(self.Bar_row_Position + 1))
 
                 self.Save_As_Func()
             except:

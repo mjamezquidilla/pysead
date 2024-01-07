@@ -772,8 +772,8 @@ class Truss_2D:
             
             ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = line_color)
             
-        cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 0.5, pad=color_bar_padding, spacing = 'proportional', ax=ax)
-        cbar.set_label(label='Force: (+) Tension, (-) Compression')    
+        # cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 0.5, pad=color_bar_padding, spacing = 'proportional', ax=ax)
+        # cbar.set_label(label='Force: (+) Tension, (-) Compression')    
         # plt.show()
 
 
@@ -858,9 +858,9 @@ class Truss_2D:
                 
                 ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = line_color)
             
-        cbar = plt.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
-        cbar.set_label(label='Stress: (+) Tension, (-) Compression')    
-        # plt.show()
+        cbar = ax.colorbar(s_map, orientation=color_bar_orientation, extend = 'both', shrink = 1, pad=color_bar_padding)
+        cbar.set_label(label='Stress: (-) Compression (+) Tension')    
+        plt.show()
 
     def Draw_Reactions_(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = False, show_ext_forces = False, darkmode = False):
         '''

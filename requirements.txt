@@ -3,6 +3,5 @@ matplotlib
 pandas 
 openpyxl
 pyqt6
-pyqt6-tools
 qdarkstyle
 qt_material

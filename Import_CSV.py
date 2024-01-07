@@ -1,5 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
+import os
+import sys
 
 class Import_CSV(QDialog):
     def __init__(self, parent=None):
@@ -9,7 +11,7 @@ class Import_CSV(QDialog):
 
     def setupUi(self):
         # uic.loadUi("D:\\07 Github Repo\\Engineering\\pysead\\Import_CSV.ui", self)
-        uic.loadUi("Import_CSV.ui", self)
+        uic.loadUi(self.resource_path("Import_CSV.ui"), self)
 
         # Line Edits
         self.Nodes_LEdit = self.findChild(QLineEdit, "Nodes_LEdit")
@@ -68,3 +70,13 @@ class Import_CSV(QDialog):
             self.Supports_LEdit.setText(file_name[0])
         except:
             self.statusBar.showMessage("Canceled Dialog")
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+    
+        return os.path.join(base_path, relative_path)
