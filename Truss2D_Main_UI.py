@@ -2843,7 +2843,7 @@ class UI(QMainWindow):
         self.canvas.draw()
         
     def MaterialLight_Menu_Func(self):
-        apply_stylesheet(app, theme='light_cyan.xml', invert_secondary = True, extra = extra)
+        apply_stylesheet(app, theme='light_blue.xml', invert_secondary = True, extra = extra)
         # app.setStyleSheet("")
         plt.clf()
         plt.style.use('fivethirtyeight')
