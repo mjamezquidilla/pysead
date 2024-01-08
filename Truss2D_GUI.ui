@@ -940,19 +940,6 @@
                   <property name="rightMargin">
                    <number>5</number>
                   </property>
-                  <item row="2" column="3">
-                   <widget class="QPushButton" name="Remove_Force_Button">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Remove Selected</string>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="0" column="0">
                    <widget class="QLabel" name="Force_Node_Number_Label">
                     <property name="text">
@@ -965,47 +952,6 @@
                   </item>
                   <item row="1" column="3">
                    <widget class="QLineEdit" name="Force_Y_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0" colspan="4">
-                   <widget class="QPushButton" name="Update_Truss_Forces_Button">
-                    <property name="text">
-                     <string>Update Truss based on Forces Table</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLineEdit" name="Force_Node_Number_LEdit">
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QLabel" name="Force_Y_Label">
-                    <property name="text">
-                     <string>Force Y-Direction</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QLabel" name="Force_X_Label">
-                    <property name="text">
-                     <string>Force X-Direction</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLineEdit" name="Force_X_LEdit">
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
@@ -1031,6 +977,40 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="Force_X_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QLabel" name="Force_Y_Label">
+                    <property name="text">
+                     <string>Fy</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QLabel" name="Force_X_Label">
+                    <property name="text">
+                     <string>Fx</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLineEdit" name="Force_Node_Number_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="1">
                    <widget class="QLabel" name="label_15">
                     <property name="text">
@@ -1038,6 +1018,43 @@
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="4">
+                   <widget class="QLineEdit" name="Force_Step_LEdit">
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="4">
+                   <widget class="QLabel" name="label_16">
+                    <property name="text">
+                     <string>Step</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3" colspan="2">
+                   <widget class="QPushButton" name="Remove_Force_Button">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Remove Selected</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="5">
+                   <widget class="QPushButton" name="Update_Truss_Forces_Button">
+                    <property name="text">
+                     <string>Update Truss based on Forces Table</string>
                     </property>
                    </widget>
                   </item>
@@ -1629,7 +1646,7 @@
      <x>0</x>
      <y>0</y>
      <width>1181</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

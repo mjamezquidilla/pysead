@@ -140,7 +140,9 @@ class UI(QMainWindow):
         self.Node_2_From_LEdit = self.findChild(QLineEdit, "Node_2_From_LEdit")
         
         self.Self_Weight_LEdit = self.findChild(QLineEdit, "Self_Weight_LEdit")
+        self.Force_Node_Number_LEdit = self.findChild(QLineEdit, "Force_Node_Number_LEdit")
         self.Force_Node_To_LEdit = self.findChild(QLineEdit, "Force_Node_To_LEdit")
+        self.Force_Step_LEdit = self.findChild(QLineEdit, "Force_Step_LEdit")
         
         self.Displacement_Factor_LEdit = self.findChild(QLineEdit, "Displacement_Factor_LEdit")
         self.Line_Width_LEdit = self.findChild(QLineEdit, "Line_Width_LEdit")
@@ -672,19 +674,28 @@ class UI(QMainWindow):
             print("Do not leave Force textboxes empty")
         else:
             # Grabe Item from LEdit Box
-            node = int(self.Force_Node_Number_LEdit.text())
+            node1 = int(self.Force_Node_Number_LEdit.text())
+            node2 = int(self.Force_Node_To_LEdit.text())
             f_x = float(self.Force_X_LEdit.text())
             f_y = float(self.Force_Y_LEdit.text())
+            step = int(self.Force_Step_LEdit.text())
+            
+            node_array = np.arange(node1, node2+step, step)
 
             if self.Load_Case_ComboBox.currentIndex() == 0:
-                self.forces_LC1.update({node:[f_x,f_y]})
+                
+                # self.forces_LC1.update({node1:[f_x,f_y]})
+                
+                for i in node_array:
+                    self.forces_LC1.update({i: [f_x, f_y]})                    
+                    
                 self.forces_LC1 = {k: v for k, v in sorted(self.forces_LC1.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC1.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -693,19 +704,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
                     
             elif self.Load_Case_ComboBox.currentIndex() == 1:
-                self.forces_LC2.update({node:[f_x,f_y]})
+                # self.forces_LC2.update({node1:[f_x,f_y]})
+                
+                for i in node_array:
+                    self.forces_LC2.update({i: [f_x, f_y]})
+                    
                 self.forces_LC2 = {k: v for k, v in sorted(self.forces_LC2.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC2.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -714,20 +729,24 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
                     
             elif self.Load_Case_ComboBox.currentIndex() == 2:
-                self.forces_LC3.update({node:[f_x,f_y]})
+                # self.forces_LC3.update({node1:[f_x,f_y]})
+                                
+                for i in node_array:
+                    self.forces_LC3.update({i: [f_x, f_y]})
+                    
                 self.forces_LC3 = {k: v for k, v in sorted(self.forces_LC3.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC3.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -736,19 +755,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
                     
             elif self.Load_Case_ComboBox.currentIndex() == 3:
-                self.forces_LC4.update({node:[f_x,f_y]})
+                # self.forces_LC4.update({node1:[f_x,f_y]})
+                                                
+                for i in node_array:
+                    self.forces_LC4.update({i: [f_x, f_y]})
+                
                 self.forces_LC4 = {k: v for k, v in sorted(self.forces_LC4.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC4.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -757,19 +780,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
             elif self.Load_Case_ComboBox.currentIndex() == 4:
-                self.forces_LC5.update({node:[f_x,f_y]})
+                # self.forces_LC5.update({node1:[f_x,f_y]})
+                                                                
+                for i in node_array:
+                    self.forces_LC5.update({i: [f_x, f_y]})                
+                
                 self.forces_LC5 = {k: v for k, v in sorted(self.forces_LC5.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC5.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -778,19 +805,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
                     
             elif self.Load_Case_ComboBox.currentIndex() == 5:
-                self.forces_LC6.update({node:[f_x,f_y]})
+                # self.forces_LC6.update({node1:[f_x,f_y]})
+                                                                
+                for i in node_array:
+                    self.forces_LC6.update({i: [f_x, f_y]})
+                
                 self.forces_LC6 = {k: v for k, v in sorted(self.forces_LC6.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC6.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -799,19 +830,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
                     
             elif self.Load_Case_ComboBox.currentIndex() == 6:
-                self.forces_LC7.update({node:[f_x,f_y]})
+                # self.forces_LC7.update({node1:[f_x,f_y]})
+            
+                for i in node_array:
+                    self.forces_LC7.update({i: [f_x, f_y]})
+                
                 self.forces_LC7 = {k: v for k, v in sorted(self.forces_LC7.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC7.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -820,19 +855,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
                     
             elif self.Load_Case_ComboBox.currentIndex() == 7:
-                self.forces_LC8.update({node:[f_x,f_y]})
+                # self.forces_LC8.update({node1:[f_x,f_y]})
+                
+                for i in node_array:
+                    self.forces_LC8.update({i: [f_x, f_y]})
+                
                 self.forces_LC8 = {k: v for k, v in sorted(self.forces_LC8.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC8.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -841,19 +880,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
             elif self.Load_Case_ComboBox.currentIndex() == 8:
-                self.forces_LC9.update({node:[f_x,f_y]})
+                # self.forces_LC9.update({node1:[f_x,f_y]})
+                
+                for i in node_array:
+                    self.forces_LC9.update({i: [f_x, f_y]})
+                                
                 self.forces_LC9 = {k: v for k, v in sorted(self.forces_LC9.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC9.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -862,19 +905,23 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
 
             elif self.Load_Case_ComboBox.currentIndex() == 9:
-                self.forces_LC10.update({node:[f_x,f_y]})
+                # self.forces_LC10.update({node1:[f_x,f_y]})
+                
+                for i in node_array:
+                    self.forces_LC10.update({i: [f_x, f_y]})
+                
                 self.forces_LC10 = {k: v for k, v in sorted(self.forces_LC10.items(), key=lambda item: item[0])}
 
                 self.Force_Table_Widget.setRowCount(0)
 
                 # Loop all the nodes dictionary and replace/update the table widget
                 for key, item in self.forces_LC10.items():
-                    node = str(key)
+                    node1 = str(key)
                     f_x = str(item[0])
                     f_y = str(item[1])
 
@@ -883,7 +930,7 @@ class UI(QMainWindow):
 
                     # print(rowPosition)
                     self.Force_Table_Widget.insertRow(rowPosition)
-                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node))
+                    self.Force_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(node1))
                     self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                     self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
                     
@@ -892,6 +939,7 @@ class UI(QMainWindow):
                                        
             # Clear the Textboxes
             self.Force_Node_Number_LEdit.setText("")
+            self.Force_Node_To_LEdit.setText("")
             # self.Force_X_LEdit.setText("")
             # self.Force_Y_LEdit.setText("")
             
