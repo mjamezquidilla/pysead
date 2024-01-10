@@ -75,6 +75,8 @@ class UI(QMainWindow):
         # PyQt5
         uic.loadUi(self.resource_path("Truss2D_GUI.ui"), self)
         
+        self.setWindowIcon(QIcon('icon.ico'))
+        
         # PySide6
         # ui_file = QFile(self.resource_path("Truss2D_GUI.ui"))
         # # if not ui_en(QFile.read)
@@ -158,7 +160,7 @@ class UI(QMainWindow):
         self.Y_Coord_ComboBox = self.findChild(QComboBox, "Y_Coord_ComboBox")
         self.Load_Case_ComboBox = self.findChild(QComboBox, "LoadCaseComboBox_Widget")
         self.Load_Combination_Combo_Box = self.findChild(QComboBox, "Load_Combination_Combo_Box")
-
+       
         # Table Widget
         self.Nodes_Table_Widget = self.findChild(QTableWidget, "Nodes_Table_Widget")
         self.Element_Table_Widget = self.findChild(QTableWidget, "Element_Table_Widget")
@@ -197,6 +199,7 @@ class UI(QMainWindow):
         self.Quit_Menu = self.findChild(QAction, "actionQuit")
         self.Import_CSV = self.findChild(QAction, "actionImport_CSV")
         self.About = self.findChild(QAction, "actionPySEAD_Truss")
+        self.Export_HTML = self.findChild(QAction, "actionHTML")
 
         self.DarkMode_Menu = self.findChild(QAction, "actionDarkMode")
         # self.LightMode_Menu = self.findChild(QAction, "actionLightMode")
@@ -237,7 +240,7 @@ class UI(QMainWindow):
         # Load Case and Load Combinations
         # self.Add_Load_Case_Button.clicked.connect(self.Add_Load_Case_Button_Func)
         # self.Remove_Load_Case_Button.clicked.connect(self.Remove_Load_Case_Button_Func)
-        self.Show_Load_Case_Table_Button.clicked.connect(self.Show_Load_Case_Table_Button_Func)
+        # self.Show_Load_Case_Table_Button.clicked.connect(self.Show_Load_Case_Table_Button_Func)
 
         # Forces
         self.Self_Weight_Button.clicked.connect(self.Self_Weight_Func)
@@ -266,6 +269,7 @@ class UI(QMainWindow):
         self.Save_As_Menu.triggered.connect(self.Save_As_Func)
         self.Quit_Menu.triggered.connect(self.Quit_Func)
         self.Import_CSV.triggered.connect(self.Import_CSV_Func)
+        self.Export_HTML.triggered.connect(self.Export_Nodes_HTML_Func)
         
         self.DarkMode_Menu.triggered.connect(self.DarkMode_Menu_Func)
         # self.LightMode_Menu.triggered.connect(self.LightMode_Menu_Func)
@@ -281,6 +285,13 @@ class UI(QMainWindow):
         # status bar
         self.statusBar = self.statusBar()
         self.statusBar.showMessage("Ready")
+
+        # Automate Combo Box when it changes values
+        try:
+            self.Load_Case_ComboBox.activated.connect(self.Show_Load_Case_Table_Button_Func)
+            self.Load_Combination_Combo_Box.activated.connect(self.Draw_Truss_Setup)
+        except:
+            pass
 
         # Show the App
         # self.show()
@@ -437,66 +448,73 @@ class UI(QMainWindow):
             no_of_bars = int((bar2+1) - bar1)
             node1_array = np.arange(node_1, node_1 + (no_of_bars), 1)
             node2_array = np.arange(node_2, node_2 + (no_of_bars), 1)
-
-            for i in range(int(no_of_bars)):
-                self.elements.update({bar1 + i: [int(node1_array[i]), int(node2_array[i])]})
             
-            # self.areas.update({bar1: area})
-            for i in range(int(no_of_bars)):
-                self.areas.update({bar1 + i: area})
+            if node2_array[-1] in self.nodes:
+                
+                for i in range(int(no_of_bars)):
+                    self.elements.update({bar1 + i: [int(node1_array[i]), int(node2_array[i])]})
+                
+                # self.areas.update({bar1: area})
+                for i in range(int(no_of_bars)):
+                    self.areas.update({bar1 + i: area})
+                
+                # self.elasticity.update({bar1: elasticity})
+                for i in range(int(no_of_bars)):
+                    self.elasticity.update({bar1 + i: elasticity})
+                
+                # auto sort the elements, areas, and elasticity 
+                self.elements = {k: v for k, v in sorted(self.elements.items(), key=lambda item: item[0])}
+                self.areas = {k: v for k, v in sorted(self.areas.items(), key=lambda item: item[0])}
+                self.elasticity = {k: v for k, v in sorted(self.elasticity.items(), key=lambda item: item[0])}
+
+
+                # Remove the table items
+                self.Element_Table_Widget.setRowCount(0)
+                self.Material_Table_Widget.setRowCount(0)
+
+                # Loop all the nodes dictionary and replace/update the table widget
+                for key, item in self.elements.items():
+                    bar1 = str(key)
+                    node_1 = str(item[0])
+                    node_2 = str(item[1])
+
+                    # Add Items to Table Widget
+                    rowPosition = self.Element_Table_Widget.rowCount()
+
+                    # print(rowPosition)
+                    self.Element_Table_Widget.insertRow(rowPosition)
+                    self.Element_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar1))
+                    self.Element_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(node_1))
+                    self.Element_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(node_2))
+
+                for (key, area), (_, elasticity) in zip(self.areas.items(), self.elasticity.items()):
+                    bar1 = str(key)
+                    areas = str(area)
+                    elasticity = str(elasticity)
+
+                    rowPosition = self.Material_Table_Widget.rowCount()
+                    self.Material_Table_Widget.insertRow(rowPosition)
+                    self.Material_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar1))
+                    self.Material_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(areas))
+                    self.Material_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(elasticity))
+
+                # Clear the Textboxes
+                self.Bar_Number_From_LEdit.setText(str(new_bar_number))
+                self.Node_1_From_LEdit.setText("")
+                self.Node_2_From_LEdit.setText("")
+
+                self.Renumber_Bars_Func()
+
+                # Change LineEdit to maximum number of rows
+                self.Bar_Number_From_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
+                self.Bar_Number_Current_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+2)))
+
+                # Draw Truss
+                self.Draw_Setup()
+                self.statusBar.showMessage("")
             
-            # self.elasticity.update({bar1: elasticity})
-            for i in range(int(no_of_bars)):
-                self.elasticity.update({bar1 + i: elasticity})
-            
-            # auto sort the elements, areas, and elasticity 
-            self.elements = {k: v for k, v in sorted(self.elements.items(), key=lambda item: item[0])}
-            self.areas = {k: v for k, v in sorted(self.areas.items(), key=lambda item: item[0])}
-            self.elasticity = {k: v for k, v in sorted(self.elasticity.items(), key=lambda item: item[0])}
-
-
-            # Remove the table items
-            self.Element_Table_Widget.setRowCount(0)
-            self.Material_Table_Widget.setRowCount(0)
-
-            # Loop all the nodes dictionary and replace/update the table widget
-            for key, item in self.elements.items():
-                bar1 = str(key)
-                node_1 = str(item[0])
-                node_2 = str(item[1])
-
-                # Add Items to Table Widget
-                rowPosition = self.Element_Table_Widget.rowCount()
-
-                # print(rowPosition)
-                self.Element_Table_Widget.insertRow(rowPosition)
-                self.Element_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar1))
-                self.Element_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(node_1))
-                self.Element_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(node_2))
-
-            for (key, area), (_, elasticity) in zip(self.areas.items(), self.elasticity.items()):
-                bar1 = str(key)
-                areas = str(area)
-                elasticity = str(elasticity)
-
-                rowPosition = self.Material_Table_Widget.rowCount()
-                self.Material_Table_Widget.insertRow(rowPosition)
-                self.Material_Table_Widget.setItem(rowPosition, 0, QTableWidgetItem(bar1))
-                self.Material_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(areas))
-                self.Material_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(elasticity))
-
-            # Clear the Textboxes
-            self.Bar_Number_From_LEdit.setText(str(new_bar_number))
-            self.Node_1_From_LEdit.setText("")
-            self.Node_2_From_LEdit.setText("")
-
-            self.Renumber_Bars_Func()
-
-            # Change LineEdit to maximum number of rows
-            self.Bar_Number_From_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
-
-            # Draw Truss
-            self.Draw_Setup()
+            else:
+                self.statusBar.showMessage("Error in maximum number of bars")
 
 
     def Renumber_Bars_Func(self):
@@ -570,21 +588,32 @@ class UI(QMainWindow):
     def Update_Material_Button_Func(self):
         try:
             # Grab Item from Highlighted Row
-            clicked_row = self.Material_Table_Widget.currentRow()
-
+            # clicked_row = self.Material_Table_Widget.currentRow()
+            clicked_row = self.Material_Table_Widget.selectionModel().selectedRows()
+            
+            # Get all row index
+            indexes = []
+            for row in clicked_row:
+                indexes.append(row.row())
+            
             # Delete Highlighted Row
-            self.Material_Table_Widget.removeRow(clicked_row)
+            # self.Material_Table_Widget.removeRow(clicked_row)
 
             # Grab Items from Columns of the Selected Row
-            bar = self.Element_Table_Widget.item(clicked_row,0).text()
+            # bar = self.Element_Table_Widget.item(clicked_row,0).text()
             area = self.Area_LEdit.text()
             elasticity = self.Elasticity_LEdit.text()
 
             # Add Items to Table Widget
-            self.Material_Table_Widget.insertRow(clicked_row)
-            self.Material_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(bar))
-            self.Material_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(area))
-            self.Material_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(elasticity))
+
+            # self.Material_Table_Widget.insertRow(clicked_row)
+            # self.Material_Table_Widget.setItem(clicked_row, 0, QTableWidgetItem(bar))
+            # self.Material_Table_Widget.setItem(clicked_row, 1, QTableWidgetItem(area))
+            # self.Material_Table_Widget.setItem(clicked_row, 2, QTableWidgetItem(elasticity))
+    
+            for rowidx in indexes:
+                self.Material_Table_Widget.setItem(rowidx, 1, QTableWidgetItem(area))
+                self.Material_Table_Widget.setItem(rowidx, 2, QTableWidgetItem(elasticity))
 
         # def Remove_Material_Button_Func(self):
         #     # Grab Item from Highlighted Row
@@ -949,20 +978,60 @@ class UI(QMainWindow):
 
     def Remove_Force_Button_Func(self):
         # Grab Item from Highlighted Row
-        clicked = self.Force_Table_Widget.currentRow()
+        # clicked = self.Force_Table_Widget.currentRow()
+        clicked_row = self.Force_Table_Widget.selectionModel().selectedRows()
 
-        # Delete Highlighted Row
-        self.Force_Table_Widget.removeRow(clicked)
+        # Get all row index
+        indexes = []
+        for row in clicked_row:
+            indexes.append(row.row())
+            
+        # Reverse sort rows indexes
+        indexes = sorted(indexes, reverse=True)
+        
+        # Forces TODO Remove forces to all load cases and update force pyqt table
+        for rowidx in indexes:
+            # bar = int(self.Force_Table_Widget.item(rowidx,0).text())
+            # f_x = float(self.Force_Table_Widget.item(rowidx,1).text())
+            # f_y = float(self.Force_Table_Widget.item(rowidx,2).text())
+            # self.forces_LC1.update({bar: [f_x, f_y]})
+            self.Force_Table_Widget.removeRow(rowidx)
 
-        # Forces
-        self.forces_LC1 = {}
-        for index in range(self.Force_Table_Widget.rowCount()):
-            bar = int(self.Force_Table_Widget.item(index,0).text())
-            f_x = float(self.Force_Table_Widget.item(index,1).text())
-            f_y = float(self.Force_Table_Widget.item(index,2).text())
-            self.forces_LC1.update({bar: [f_x, f_y]})
-
-        print(self.forces_LC1)
+        # Update Forces Dictionary based on PyQt Table
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.forces_LC1 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(0)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.forces_LC2 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(1)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.forces_LC3 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(2)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.forces_LC4 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(3)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.forces_LC5 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(4)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.forces_LC6 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(5)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.forces_LC7 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(6)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.forces_LC8 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(7)
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.forces_LC9 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(8)
+        else:
+            self.forces_LC10 = {}
+            self.Load_Case_ComboBox.setCurrentIndex(9)
+        
+        self.Draw_Setup()
+        
+        # print(self.forces_LC1)
     
     def Self_Weight_Func(self):
         if self.Self_Weight_LEdit.text() == "":
@@ -2849,6 +2918,237 @@ class UI(QMainWindow):
         plt.style.use('fivethirtyeight')
         
         self.canvas.draw()
+        
+    def Export_Nodes_HTML_Func(self):
+        nodes_dict = {}
+        elements_dict = {}
+        materials_dict = {}
+        forces_LC1_dict = {}
+        forces_LC2_dict = {}
+        forces_LC3_dict = {}
+        forces_LC4_dict = {}
+        forces_LC5_dict = {}
+        forces_LC6_dict = {}
+        forces_LC7_dict = {}
+        forces_LC8_dict = {}
+        forces_LC9_dict = {}
+        forces_LC10_dict = {}
+        supports_dict = {}
+        load_case_dict = {}
+
+        # try:
+        # Nodes    
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+            nodes_dict.update({index+1:[int(node), float(x_coord), float(y_coord)]})
+        nodes_df = pd.DataFrame.from_dict(nodes_dict, orient='index', columns=['Node','x_coord','y_coord'])
+
+        # Elements
+        for index in range(self.Element_Table_Widget.rowCount()):
+            bar = int(self.Element_Table_Widget.item(index,0).text())
+            node_1 = int(self.Element_Table_Widget.item(index,1).text())
+            node_2 = int(self.Element_Table_Widget.item(index,2).text())
+            elements_dict.update({index+1:[int(bar), int(node_1), int(node_2)]})
+        elements_df = pd.DataFrame.from_dict(elements_dict, orient='index', columns=['Element','Node_1','Node_2'])
+
+        # Materials
+        for index in range(self.Material_Table_Widget.rowCount()):
+            bar = int(self.Material_Table_Widget.item(index,0).text())
+            area = float(self.Material_Table_Widget.item(index,1).text())
+            elasticity = float(self.Material_Table_Widget.item(index,2).text())
+            materials_dict.update({index+1:[int(bar), float(area), float(elasticity)]})
+        materials_df = pd.DataFrame.from_dict(materials_dict, orient='index', columns=['Element','Area','Elasticity'])
+        
+        # Load Cases
+        for index in range(self.Load_Case_Table_Widget.rowCount()):
+            load_case_dict.update({index+1:str(self.Load_Case_Table_Widget.item(index,0).text())})
+        load_cases_df = pd.DataFrame.from_dict(load_case_dict, orient='index', columns=['Load Case Name'])
+        
+        # Forces
+        # Load Case 1
+        if bool(self.forces_LC1) == True:
+            index = 1
+            for key, item in self.forces_LC1.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC1_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC1_df = pd.DataFrame.from_dict(forces_LC1_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 2
+        if bool(self.forces_LC2) == True:
+            index = 1
+            for key, item in self.forces_LC2.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC2_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC2_df = pd.DataFrame.from_dict(forces_LC2_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 3
+        if bool(self.forces_LC3) == True:
+            index = 1
+            for key, item in self.forces_LC3.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC3_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC3_df = pd.DataFrame.from_dict(forces_LC3_dict, orient='index', columns=['Node','F_x','F_y'])
+    
+        # Load Case 4
+        if bool(self.forces_LC4) == True:
+            index = 1
+            for key, item in self.forces_LC4.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC4_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC4_df = pd.DataFrame.from_dict(forces_LC4_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 5
+        if bool(self.forces_LC5) == True:
+            index = 1
+            for key, item in self.forces_LC5.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC5_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC5_df = pd.DataFrame.from_dict(forces_LC5_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 6
+        if bool(self.forces_LC6) == True:
+            index = 1
+            for key, item in self.forces_LC6.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC6_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC6_df = pd.DataFrame.from_dict(forces_LC6_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 7
+        if bool(self.forces_LC7) == True:
+            index = 1
+            for key, item in self.forces_LC7.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC7_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC7_df = pd.DataFrame.from_dict(forces_LC7_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 8
+        if bool(self.forces_LC8) == True:
+            index = 1
+            for key, item in self.forces_LC8.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC8_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC8_df = pd.DataFrame.from_dict(forces_LC8_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 9
+        if bool(self.forces_LC9) == True:
+            index = 1
+            for key, item in self.forces_LC9.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC9_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC9_df = pd.DataFrame.from_dict(forces_LC9_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Load Case 10
+        if bool(self.forces_LC10) == True:
+            index = 1
+            for key, item in self.forces_LC10.items():
+                node = key
+                f_x = item[0]
+                f_y = item[1]
+                forces_LC10_dict.update({index:[int(node), float(f_x), float(f_y)]})
+                index+=1
+            forces_LC10_df = pd.DataFrame.from_dict(forces_LC10_dict, orient='index', columns=['Node','F_x','F_y'])
+        
+        # Supports
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            supports_dict.update({index+1:[int(node), float(x), float(y)]})
+        supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
+        
+        file_name = QFileDialog.getSaveFileName(self, "Export to HTML", "", "HTML (*.html);; All Files (*)")
+        with open(file_name[0], 'w') as writer:
+            writer.write("<h1> PYSEAD TRUSS 2D REPORT </h1>")
+            writer.write("<h2> Created by: Engr. Michael James C. Quidilla </h2>")
+            writer.write("<br />")
+            
+            writer.write("<h1> Input Data </h1>")
+            writer.write("<h2> Nodes </h2>")
+            writer.write(nodes_df.to_html(index = False))
+            writer.write("<br />")
+            writer.write("<h2> Elements </h2>")
+            writer.write(elements_df.to_html(index = False))
+            writer.write("<br />")
+            writer.write("<h2>Element Materials</h2>")
+            writer.write(materials_df.to_html(index = False))
+            writer.write("<br />")
+            writer.write("<h2>Node Supports</h2>")
+            writer.write(supports_df.to_html(index = False))
+            writer.write("<br />")
+            writer.write("<h2>Load Cases</h2>")
+            writer.write(load_cases_df.to_html(index = False))
+            writer.write("<br />")
+            if bool(self.forces_LC1) == True:
+                writer.write("<h2>Load Case 1</h2>")
+                writer.write(forces_LC1_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC2) == True:
+                writer.write("<h2>Load Case 2</h2>")
+                writer.write(forces_LC2_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC3) == True:
+                writer.write("<h2>Load Case 3</h2>")
+                writer.write(forces_LC3_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC4) == True:
+                writer.write("<h2>Load Case 4</h2>")
+                writer.write(forces_LC4_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC5) == True:
+                writer.write("<h2>Load Case 5</h2>")
+                writer.write(forces_LC5_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC6) == True:
+                writer.write("<h2>Load Case 6</h2>")
+                writer.write(forces_LC6_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC7) == True:
+                writer.write("<h2>Load Case 7</h2>")
+                writer.write(forces_LC7_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC8) == True:
+                writer.write("<h2>Load Case 8</h2>")
+                writer.write(forces_LC8_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC9) == True:
+                writer.write("<h2>Load Case 9</h2>")
+                writer.write(forces_LC9_df.to_html(index = False))
+                writer.write("<br />")
+            if bool(self.forces_LC10) == True:
+                writer.write("<h2>Load Case 10</h2>")
+                writer.write(forces_LC10_df.to_html(index = False))
+                writer.write("<br />")
+            
+        self.statusBar.showMessage("Exported to HTML")
 
     def Select_Func(self):
         print('select')
