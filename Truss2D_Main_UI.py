@@ -75,7 +75,7 @@ class UI(QMainWindow):
         # PyQt5
         uic.loadUi(self.resource_path("Truss2D_GUI.ui"), self)
         
-        self.setWindowIcon(QIcon('icon.ico'))
+        self.setWindowIcon(QIcon(self.resource_path("icon.ico")))
         
         # PySide6
         # ui_file = QFile(self.resource_path("Truss2D_GUI.ui"))
@@ -167,6 +167,7 @@ class UI(QMainWindow):
         self.Material_Table_Widget = self.findChild(QTableWidget, "Material_Table_Widget")
         
         self.Load_Case_Table_Widget = self.findChild(QTableWidget, "LoadCase_Table_Widget")
+        self.Load_Combination_Table_Widget = self.findChild(QTableWidget, "LoadCombination_Table_Widget")
         
         self.Force_Table_Widget = self.findChild(QTableWidget, "Force_Table_Widget")
         self.Support_Table_Widget = self.findChild(QTableWidget, "Support_Table_Widget")
@@ -226,13 +227,13 @@ class UI(QMainWindow):
         self.Add_Node_Button.clicked.connect(self.Add_Node_Button_Func)
         self.Remove_Node_Button.clicked.connect(self.Remove_Node_Button_Func)
         self.Renumber_Nodes_Button.clicked.connect(self.Renumber_Nodes_Func)
-        self.Update_Truss_Nodes_Button.clicked.connect(self.Draw_Setup)
+        self.Update_Truss_Nodes_Button.clicked.connect(self.Draw_Setup_Load_Case)
 
         # Elements
         self.Add_Bar_Button.clicked.connect(self.Add_Bar_Button_Func)
         self.Remove_Bar_Button.clicked.connect(self.Remove_Bar_Button_Func)
         self.Renumber_Bar_Button.clicked.connect(self.Renumber_Bars_Func)
-        self.Update_Truss_Bars_Button.clicked.connect(self.Draw_Setup)
+        self.Update_Truss_Bars_Button.clicked.connect(self.Draw_Setup_Load_Case)
         
         # Materials
         self.Update_Material_Button.clicked.connect(self.Update_Material_Button_Func)
@@ -247,12 +248,12 @@ class UI(QMainWindow):
         
         self.Add_Force_Button.clicked.connect(self.Add_Force_Button_Func)
         self.Remove_Force_Button.clicked.connect(self.Remove_Force_Button_Func)
-        self.Update_Truss_Forces_Button.clicked.connect(self.Draw_Setup)
+        self.Update_Truss_Forces_Button.clicked.connect(self.Draw_Setup_Load_Case)
 
         # Supports
         self.Add_Support_Button.clicked.connect(self.Add_Support_Button_Func)
         self.Remove_Support_Button.clicked.connect(self.Remove_Support_Button_Func)
-        self.Update_Truss_Supports_Button.clicked.connect(self.Draw_Setup)
+        self.Update_Truss_Supports_Button.clicked.connect(self.Draw_Setup_Load_Case)
 
         # Solve
         self.Solve_Truss_Button.clicked.connect(self.Solve_Truss_Func)
@@ -289,7 +290,7 @@ class UI(QMainWindow):
         # Automate Combo Box when it changes values
         try:
             self.Load_Case_ComboBox.activated.connect(self.Show_Load_Case_Table_Button_Func)
-            self.Load_Combination_Combo_Box.activated.connect(self.Draw_Truss_Setup)
+            self.Load_Combination_Combo_Box.activated.connect(self.Draw_Setup_Load_Combo)
         except:
             pass
 
@@ -370,7 +371,7 @@ class UI(QMainWindow):
             self.Node_Number_From_LEdit.setFocus()
 
             # Draw Truss
-            self.Draw_Setup()
+            self.Draw_Setup_Load_Case()
             print(self.nodes)
 
         
@@ -398,7 +399,7 @@ class UI(QMainWindow):
             self.Node_Number_From_LEdit.setText(str(int(self.Nodes_Table_Widget.rowCount()+1)))
             
             # Draw Truss
-            self.Draw_Setup()
+            self.Draw_Setup_Load_Case()
         except:
             self.statusBar.showMessage("Error Deleting node. Double check Bar Elements nodes")
 
@@ -510,7 +511,7 @@ class UI(QMainWindow):
                 self.Bar_Number_Current_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+2)))
 
                 # Draw Truss
-                self.Draw_Setup()
+                self.Draw_Setup_Load_Case()
                 self.statusBar.showMessage("")
             
             else:
@@ -579,7 +580,7 @@ class UI(QMainWindow):
         self.Bar_Number_From_LEdit.setText(str(int(self.Element_Table_Widget.rowCount()+1)))
         
         # Draw Truss
-        self.Draw_Setup()
+        self.Draw_Setup_Load_Case()
         print(self.elements)
         print(self.areas)
         print(self.elasticity)
@@ -694,7 +695,7 @@ class UI(QMainWindow):
             self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
         
         # Draw Truss
-        self.Draw_Setup()
+        self.Draw_Setup_Load_Case()
 
 
     ###### Forces Function ######
@@ -973,7 +974,7 @@ class UI(QMainWindow):
             # self.Force_Y_LEdit.setText("")
             
             # Draw Truss
-            self.Draw_Setup()
+            self.Draw_Setup_Load_Case()
             # print(self.forces_LC1)
 
     def Remove_Force_Button_Func(self):
@@ -1029,7 +1030,7 @@ class UI(QMainWindow):
             self.forces_LC10 = {}
             self.Load_Case_ComboBox.setCurrentIndex(9)
         
-        self.Draw_Setup()
+        self.Draw_Setup_Load_Case()
         
         # print(self.forces_LC1)
     
@@ -1101,7 +1102,7 @@ class UI(QMainWindow):
                 self.Force_Table_Widget.setItem(rowPosition, 1, QTableWidgetItem(f_x))
                 self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
             
-            self.Draw_Setup()
+            self.Draw_Setup_Load_Case()
             
     ###### Support Function ######
     def Add_Support_Button_Func(self):
@@ -1148,7 +1149,7 @@ class UI(QMainWindow):
             self.Support_Node_LEdit.setText("")
 
             # Draw Truss
-            self.Draw_Setup()
+            self.Draw_Setup_Load_Case()
 
 
     def Remove_Support_Button_Func(self):
@@ -1166,7 +1167,7 @@ class UI(QMainWindow):
             y = int(self.Support_Table_Widget.item(index,2).text())
             self.supports.update({node: [x, y]})
 
-        self.Draw_Setup()
+        self.Draw_Setup_Load_Case()
         print(self.supports)
         
         
@@ -1212,86 +1213,461 @@ class UI(QMainWindow):
             y = int(self.Support_Table_Widget.item(index,2).text())
             self.supports.update({node: [x, y]})
             
+        # Get Load Combination Factors from Load Combination Table
+        # Load Combo 1
+        Combo1_1 = float(self.Load_Combination_Table_Widget.item(0,0).text())
+        Combo1_2 = float(self.Load_Combination_Table_Widget.item(0,1).text())
+        Combo1_3 = float(self.Load_Combination_Table_Widget.item(0,2).text())
+        Combo1_4 = float(self.Load_Combination_Table_Widget.item(0,3).text())
+        Combo1_5 = float(self.Load_Combination_Table_Widget.item(0,4).text())
+        Combo1_6 = float(self.Load_Combination_Table_Widget.item(0,5).text())
+        Combo1_7 = float(self.Load_Combination_Table_Widget.item(0,6).text())
+        Combo1_8 = float(self.Load_Combination_Table_Widget.item(0,7).text())
+        Combo1_9 = float(self.Load_Combination_Table_Widget.item(0,8).text())
+        Combo1_10 = float(self.Load_Combination_Table_Widget.item(0,9).text())
+        
+        # Load Combo 2
+        Combo2_1 = float(self.Load_Combination_Table_Widget.item(1,0).text())
+        Combo2_2 = float(self.Load_Combination_Table_Widget.item(1,1).text())
+        Combo2_3 = float(self.Load_Combination_Table_Widget.item(1,2).text())
+        Combo2_4 = float(self.Load_Combination_Table_Widget.item(1,3).text())
+        Combo2_5 = float(self.Load_Combination_Table_Widget.item(1,4).text())
+        Combo2_6 = float(self.Load_Combination_Table_Widget.item(1,5).text())
+        Combo2_7 = float(self.Load_Combination_Table_Widget.item(1,6).text())
+        Combo2_8 = float(self.Load_Combination_Table_Widget.item(1,7).text())
+        Combo2_9 = float(self.Load_Combination_Table_Widget.item(1,8).text())
+        Combo2_10 = float(self.Load_Combination_Table_Widget.item(1,9).text())
+        
+        # Load Combo 3
+        Combo3_1 = float(self.Load_Combination_Table_Widget.item(2,0).text())
+        Combo3_2 = float(self.Load_Combination_Table_Widget.item(2,1).text())
+        Combo3_3 = float(self.Load_Combination_Table_Widget.item(2,2).text())
+        Combo3_4 = float(self.Load_Combination_Table_Widget.item(2,3).text())
+        Combo3_5 = float(self.Load_Combination_Table_Widget.item(2,4).text())
+        Combo3_6 = float(self.Load_Combination_Table_Widget.item(2,5).text())
+        Combo3_7 = float(self.Load_Combination_Table_Widget.item(2,6).text())
+        Combo3_8 = float(self.Load_Combination_Table_Widget.item(2,7).text())
+        Combo3_9 = float(self.Load_Combination_Table_Widget.item(2,8).text())
+        Combo3_10 = float(self.Load_Combination_Table_Widget.item(2,9).text())
 
+        # Load Combo 4
+        Combo4_1 = float(self.Load_Combination_Table_Widget.item(3,0).text())
+        Combo4_2 = float(self.Load_Combination_Table_Widget.item(3,1).text())
+        Combo4_3 = float(self.Load_Combination_Table_Widget.item(3,2).text())
+        Combo4_4 = float(self.Load_Combination_Table_Widget.item(3,3).text())
+        Combo4_5 = float(self.Load_Combination_Table_Widget.item(3,4).text())
+        Combo4_6 = float(self.Load_Combination_Table_Widget.item(3,5).text())
+        Combo4_7 = float(self.Load_Combination_Table_Widget.item(3,6).text())
+        Combo4_8 = float(self.Load_Combination_Table_Widget.item(3,7).text())
+        Combo4_9 = float(self.Load_Combination_Table_Widget.item(3,8).text())
+        Combo4_10 = float(self.Load_Combination_Table_Widget.item(3,9).text())
 
-        # Solve Trusses TODO
-        self.Truss_LC1 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
+        # Load Combo 5
+        Combo5_1 = float(self.Load_Combination_Table_Widget.item(4,0).text())
+        Combo5_2 = float(self.Load_Combination_Table_Widget.item(4,1).text())
+        Combo5_3 = float(self.Load_Combination_Table_Widget.item(4,2).text())
+        Combo5_4 = float(self.Load_Combination_Table_Widget.item(4,3).text())
+        Combo5_5 = float(self.Load_Combination_Table_Widget.item(4,4).text())
+        Combo5_6 = float(self.Load_Combination_Table_Widget.item(4,5).text())
+        Combo5_7 = float(self.Load_Combination_Table_Widget.item(4,6).text())
+        Combo5_8 = float(self.Load_Combination_Table_Widget.item(4,7).text())
+        Combo5_9 = float(self.Load_Combination_Table_Widget.item(4,8).text())
+        Combo5_10 = float(self.Load_Combination_Table_Widget.item(4,9).text())
+
+        # Load Combo 6
+        Combo6_1 = float(self.Load_Combination_Table_Widget.item(5,0).text())
+        Combo6_2 = float(self.Load_Combination_Table_Widget.item(5,1).text())
+        Combo6_3 = float(self.Load_Combination_Table_Widget.item(5,2).text())
+        Combo6_4 = float(self.Load_Combination_Table_Widget.item(5,3).text())
+        Combo6_5 = float(self.Load_Combination_Table_Widget.item(5,4).text())
+        Combo6_6 = float(self.Load_Combination_Table_Widget.item(5,5).text())
+        Combo6_7 = float(self.Load_Combination_Table_Widget.item(5,6).text())
+        Combo6_8 = float(self.Load_Combination_Table_Widget.item(5,7).text())
+        Combo6_9 = float(self.Load_Combination_Table_Widget.item(5,8).text())
+        Combo6_10 = float(self.Load_Combination_Table_Widget.item(5,9).text())
+        
+        # Load Combo 7
+        Combo7_1 = float(self.Load_Combination_Table_Widget.item(6,0).text())
+        Combo7_2 = float(self.Load_Combination_Table_Widget.item(6,1).text())
+        Combo7_3 = float(self.Load_Combination_Table_Widget.item(6,2).text())
+        Combo7_4 = float(self.Load_Combination_Table_Widget.item(6,3).text())
+        Combo7_5 = float(self.Load_Combination_Table_Widget.item(6,4).text())
+        Combo7_6 = float(self.Load_Combination_Table_Widget.item(6,5).text())
+        Combo7_7 = float(self.Load_Combination_Table_Widget.item(6,6).text())
+        Combo7_8 = float(self.Load_Combination_Table_Widget.item(6,7).text())
+        Combo7_9 = float(self.Load_Combination_Table_Widget.item(6,8).text())
+        Combo7_10 = float(self.Load_Combination_Table_Widget.item(6,9).text())
+        
+        # Load Combo 8
+        Combo8_1 = float(self.Load_Combination_Table_Widget.item(7,0).text())
+        Combo8_2 = float(self.Load_Combination_Table_Widget.item(7,1).text())
+        Combo8_3 = float(self.Load_Combination_Table_Widget.item(7,2).text())
+        Combo8_4 = float(self.Load_Combination_Table_Widget.item(7,3).text())
+        Combo8_5 = float(self.Load_Combination_Table_Widget.item(7,4).text())
+        Combo8_6 = float(self.Load_Combination_Table_Widget.item(7,5).text())
+        Combo8_7 = float(self.Load_Combination_Table_Widget.item(7,6).text())
+        Combo8_8 = float(self.Load_Combination_Table_Widget.item(7,7).text())
+        Combo8_9 = float(self.Load_Combination_Table_Widget.item(7,8).text())
+        Combo8_10 = float(self.Load_Combination_Table_Widget.item(7,9).text())
+        
+        # Load Combo 9
+        Combo9_1 = float(self.Load_Combination_Table_Widget.item(8,0).text())
+        Combo9_2 = float(self.Load_Combination_Table_Widget.item(8,1).text())
+        Combo9_3 = float(self.Load_Combination_Table_Widget.item(8,2).text())
+        Combo9_4 = float(self.Load_Combination_Table_Widget.item(8,3).text())
+        Combo9_5 = float(self.Load_Combination_Table_Widget.item(8,4).text())
+        Combo9_6 = float(self.Load_Combination_Table_Widget.item(8,5).text())
+        Combo9_7 = float(self.Load_Combination_Table_Widget.item(8,6).text())
+        Combo9_8 = float(self.Load_Combination_Table_Widget.item(8,7).text())
+        Combo9_9 = float(self.Load_Combination_Table_Widget.item(8,8).text())
+        Combo9_10 = float(self.Load_Combination_Table_Widget.item(8,9).text())
+        
+        # Load Combo 10
+        Combo10_1 = float(self.Load_Combination_Table_Widget.item(9,0).text())
+        Combo10_2 = float(self.Load_Combination_Table_Widget.item(9,1).text())
+        Combo10_3 = float(self.Load_Combination_Table_Widget.item(9,2).text())
+        Combo10_4 = float(self.Load_Combination_Table_Widget.item(9,3).text())
+        Combo10_5 = float(self.Load_Combination_Table_Widget.item(9,4).text())
+        Combo10_6 = float(self.Load_Combination_Table_Widget.item(9,5).text())
+        Combo10_7 = float(self.Load_Combination_Table_Widget.item(9,6).text())
+        Combo10_8 = float(self.Load_Combination_Table_Widget.item(9,7).text())
+        Combo10_9 = float(self.Load_Combination_Table_Widget.item(9,8).text())
+        Combo10_10 = float(self.Load_Combination_Table_Widget.item(9,9).text())
+        
+        # Convert forces load cases dictionaries to pandas dataframe
+        forces_LC1_df = pd.DataFrame.from_dict(self.forces_LC1, orient='index', columns=['F_x','F_y'])
+        forces_LC2_df = pd.DataFrame.from_dict(self.forces_LC2, orient='index', columns=['F_x','F_y'])
+        forces_LC3_df = pd.DataFrame.from_dict(self.forces_LC3, orient='index', columns=['F_x','F_y'])
+        forces_LC4_df = pd.DataFrame.from_dict(self.forces_LC4, orient='index', columns=['F_x','F_y'])
+        forces_LC5_df = pd.DataFrame.from_dict(self.forces_LC5, orient='index', columns=['F_x','F_y'])
+        forces_LC6_df = pd.DataFrame.from_dict(self.forces_LC6, orient='index', columns=['F_x','F_y'])
+        forces_LC7_df = pd.DataFrame.from_dict(self.forces_LC7, orient='index', columns=['F_x','F_y'])
+        forces_LC8_df = pd.DataFrame.from_dict(self.forces_LC8, orient='index', columns=['F_x','F_y'])
+        forces_LC9_df = pd.DataFrame.from_dict(self.forces_LC9, orient='index', columns=['F_x','F_y'])
+        forces_LC10_df = pd.DataFrame.from_dict(self.forces_LC10, orient='index', columns=['F_x','F_y'])
+        
+        if forces_LC1_df.empty:
+            forces_LC1_df = 0
+        if forces_LC2_df.empty:
+            forces_LC2_df = 0
+        if forces_LC3_df.empty:
+            forces_LC3_df = 0
+        if forces_LC4_df.empty:
+            forces_LC4_df = 0
+        if forces_LC5_df.empty:
+            forces_LC5_df = 0
+        if forces_LC6_df.empty:
+            forces_LC6_df = 0
+        if forces_LC7_df.empty:
+            forces_LC7_df = 0
+        if forces_LC8_df.empty:
+            forces_LC8_df = 0
+        if forces_LC9_df.empty:
+            forces_LC9_df = 0
+        if forces_LC10_df.empty:
+            forces_LC10_df = 0
+            
+        # Apply factors to Load Combinations
+        # Load Combo 1
+        forces_Combo1 = Combo1_1 * forces_LC1_df + Combo1_2 * forces_LC2_df + Combo1_3 * forces_LC3_df + Combo1_4 * forces_LC4_df + Combo1_5 * forces_LC5_df + Combo1_6 * forces_LC6_df + Combo1_7 * forces_LC7_df + Combo1_8 * forces_LC8_df + Combo1_9 * forces_LC9_df + Combo1_10 * forces_LC10_df
+        forces_Combo1 = forces_Combo1.fillna(Combo1_1 * forces_LC1_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_2 * forces_LC2_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_3 * forces_LC3_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_4 * forces_LC4_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_5 * forces_LC5_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_6 * forces_LC6_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_7 * forces_LC7_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_8 * forces_LC8_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_9 * forces_LC9_df)
+        forces_Combo1 = forces_Combo1.fillna(Combo1_10 * forces_LC10_df)
+
+        # Load Combo 2
+        forces_Combo2 = Combo2_1 * forces_LC1_df + Combo2_2 * forces_LC2_df + Combo2_3 * forces_LC3_df + Combo2_4 * forces_LC4_df + Combo2_5 * forces_LC5_df + Combo2_6 * forces_LC6_df + Combo2_7 * forces_LC7_df + Combo2_8 * forces_LC8_df + Combo2_9 * forces_LC9_df + Combo2_10 * forces_LC10_df
+        forces_Combo2 = forces_Combo2.fillna(Combo2_1 * forces_LC1_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_2 * forces_LC2_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_3 * forces_LC3_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_4 * forces_LC4_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_5 * forces_LC5_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_6 * forces_LC6_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_7 * forces_LC7_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_8 * forces_LC8_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_9 * forces_LC9_df)
+        forces_Combo2 = forces_Combo2.fillna(Combo2_10 * forces_LC10_df)
+
+        # Load Combo 3
+        forces_Combo3 = Combo3_1 * forces_LC1_df + Combo3_2 * forces_LC2_df + Combo3_3 * forces_LC3_df + Combo3_4 * forces_LC4_df + Combo3_5 * forces_LC5_df + Combo3_6 * forces_LC6_df + Combo3_7 * forces_LC7_df + Combo3_8 * forces_LC8_df + Combo3_9 * forces_LC9_df + Combo3_10 * forces_LC10_df
+        forces_Combo3 = forces_Combo3.fillna(Combo3_1 * forces_LC1_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_2 * forces_LC2_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_3 * forces_LC3_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_4 * forces_LC4_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_5 * forces_LC5_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_6 * forces_LC6_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_7 * forces_LC7_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_8 * forces_LC8_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_9 * forces_LC9_df)
+        forces_Combo3 = forces_Combo3.fillna(Combo3_10 * forces_LC10_df)
+
+        # Load Combo 4
+        forces_Combo4 = Combo4_1 * forces_LC1_df + Combo4_2 * forces_LC2_df + Combo4_3 * forces_LC3_df + Combo4_4 * forces_LC4_df + Combo4_5 * forces_LC5_df + Combo4_6 * forces_LC6_df + Combo4_7 * forces_LC7_df + Combo4_8 * forces_LC8_df + Combo4_9 * forces_LC9_df + Combo4_10 * forces_LC10_df
+        forces_Combo4 = forces_Combo4.fillna(Combo4_1 * forces_LC1_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_2 * forces_LC2_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_3 * forces_LC3_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_4 * forces_LC4_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_5 * forces_LC5_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_6 * forces_LC6_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_7 * forces_LC7_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_8 * forces_LC8_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_9 * forces_LC9_df)
+        forces_Combo4 = forces_Combo4.fillna(Combo4_10 * forces_LC10_df)
+
+        # Load Combo 5
+        forces_Combo5 = Combo5_1 * forces_LC1_df + Combo5_2 * forces_LC2_df + Combo5_3 * forces_LC3_df + Combo5_4 * forces_LC4_df + Combo5_5 * forces_LC5_df + Combo5_6 * forces_LC6_df + Combo5_7 * forces_LC7_df + Combo5_8 * forces_LC8_df + Combo5_9 * forces_LC9_df + Combo5_10 * forces_LC10_df
+        forces_Combo5 = forces_Combo5.fillna(Combo5_1 * forces_LC1_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_2 * forces_LC2_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_3 * forces_LC3_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_4 * forces_LC4_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_5 * forces_LC5_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_6 * forces_LC6_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_7 * forces_LC7_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_8 * forces_LC8_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_9 * forces_LC9_df)
+        forces_Combo5 = forces_Combo5.fillna(Combo5_10 * forces_LC10_df)
+
+        # Load Combo 6
+        forces_Combo6 = Combo6_1 * forces_LC1_df + Combo6_2 * forces_LC2_df + Combo6_3 * forces_LC3_df + Combo6_4 * forces_LC4_df + Combo6_5 * forces_LC5_df + Combo6_6 * forces_LC6_df + Combo6_7 * forces_LC7_df + Combo6_8 * forces_LC8_df + Combo6_9 * forces_LC9_df + Combo6_10 * forces_LC10_df
+        forces_Combo6 = forces_Combo6.fillna(Combo6_1 * forces_LC1_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_2 * forces_LC2_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_3 * forces_LC3_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_4 * forces_LC4_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_5 * forces_LC5_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_6 * forces_LC6_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_7 * forces_LC7_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_8 * forces_LC8_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_9 * forces_LC9_df)
+        forces_Combo6 = forces_Combo6.fillna(Combo6_10 * forces_LC10_df)
+
+        # Load Combo 7
+        forces_Combo7 = Combo7_1 * forces_LC1_df + Combo7_2 * forces_LC2_df + Combo7_3 * forces_LC3_df + Combo7_4 * forces_LC4_df + Combo7_5 * forces_LC5_df + Combo7_6 * forces_LC6_df + Combo7_7 * forces_LC7_df + Combo7_8 * forces_LC8_df + Combo7_9 * forces_LC9_df + Combo7_10 * forces_LC10_df
+        forces_Combo7 = forces_Combo7.fillna(Combo7_1 * forces_LC1_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_2 * forces_LC2_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_3 * forces_LC3_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_4 * forces_LC4_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_5 * forces_LC5_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_6 * forces_LC6_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_7 * forces_LC7_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_8 * forces_LC8_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_9 * forces_LC9_df)
+        forces_Combo7 = forces_Combo7.fillna(Combo7_10 * forces_LC10_df)
+
+        # Load Combo 8
+        forces_Combo8 = Combo8_1 * forces_LC1_df + Combo8_2 * forces_LC2_df + Combo8_3 * forces_LC3_df + Combo8_4 * forces_LC4_df + Combo8_5 * forces_LC5_df + Combo8_6 * forces_LC6_df + Combo8_7 * forces_LC7_df + Combo8_8 * forces_LC8_df + Combo8_9 * forces_LC9_df + Combo8_10 * forces_LC10_df
+        forces_Combo8 = forces_Combo8.fillna(Combo8_1 * forces_LC1_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_2 * forces_LC2_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_3 * forces_LC3_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_4 * forces_LC4_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_5 * forces_LC5_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_6 * forces_LC6_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_7 * forces_LC7_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_8 * forces_LC8_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_9 * forces_LC9_df)
+        forces_Combo8 = forces_Combo8.fillna(Combo8_10 * forces_LC10_df)
+
+        # Load Combo 9
+        forces_Combo9 = Combo9_1 * forces_LC1_df + Combo9_2 * forces_LC2_df + Combo9_3 * forces_LC3_df + Combo9_4 * forces_LC4_df + Combo9_5 * forces_LC5_df + Combo9_6 * forces_LC6_df + Combo9_7 * forces_LC7_df + Combo9_8 * forces_LC8_df + Combo9_9 * forces_LC9_df + Combo9_10 * forces_LC10_df
+        forces_Combo9 = forces_Combo9.fillna(Combo9_1 * forces_LC1_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_2 * forces_LC2_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_3 * forces_LC3_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_4 * forces_LC4_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_5 * forces_LC5_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_6 * forces_LC6_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_7 * forces_LC7_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_8 * forces_LC8_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_9 * forces_LC9_df)
+        forces_Combo9 = forces_Combo9.fillna(Combo9_10 * forces_LC10_df)
+
+        # Load Combo 10
+        forces_Combo10 = Combo10_1 * forces_LC1_df + Combo10_2 * forces_LC2_df + Combo10_3 * forces_LC3_df + Combo10_4 * forces_LC4_df + Combo10_5 * forces_LC5_df + Combo10_6 * forces_LC6_df + Combo10_7 * forces_LC7_df + Combo10_8 * forces_LC8_df + Combo10_9 * forces_LC9_df + Combo10_10 * forces_LC10_df
+        forces_Combo10 = forces_Combo10.fillna(Combo10_1 * forces_LC1_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_2 * forces_LC2_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_3 * forces_LC3_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_4 * forces_LC4_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_5 * forces_LC5_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_6 * forces_LC6_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_7 * forces_LC7_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_8 * forces_LC8_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_9 * forces_LC9_df)
+        forces_Combo10 = forces_Combo10.fillna(Combo10_10 * forces_LC10_df)
+        
+        # Convert Load Combos back to Dictionary
+        self.forces_Combo1 = {}
+        
+        for i in forces_Combo1.index:
+            for _, row in forces_Combo1.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo1.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo2 = {}
+        
+        for i in forces_Combo2.index:
+            for _, row in forces_Combo2.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo2.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo3 = {}
+        
+        for i in forces_Combo3.index:
+            for _, row in forces_Combo3.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo3.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo4 = {}
+        
+        for i in forces_Combo4.index:
+            for _, row in forces_Combo4.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo4.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo5 = {}
+        
+        for i in forces_Combo5.index:
+            for _, row in forces_Combo5.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo5.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo6 = {}
+        
+        for i in forces_Combo6.index:
+            for _, row in forces_Combo6.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo6.update({node: [float(f_x), float(f_y)]})
+        
+        self.forces_Combo7 = {}
+        
+        for i in forces_Combo7.index:
+            for _, row in forces_Combo7.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo7.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo8 = {}
+        
+        for i in forces_Combo8.index:
+            for _, row in forces_Combo8.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo8.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo9 = {}
+        
+        for i in forces_Combo9.index:
+            for _, row in forces_Combo9.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo9.update({node: [float(f_x), float(f_y)]})
+
+        self.forces_Combo10 = {}
+        
+        for i in forces_Combo10.index:
+            for _, row in forces_Combo10.iterrows():
+                node = int(i)
+                f_x = row['F_x']
+                f_y = row['F_y']
+                self.forces_Combo10.update({node: [float(f_x), float(f_y)]})
+        
+        
+        # Solve Trusses
+        self.Truss_LC1 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo1)
         self.Truss_LC1.Solve()
         
-        self.Truss_LC2 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
+        self.Truss_LC2 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo2)
         self.Truss_LC2.Solve()
         
-        self.Truss_LC3 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
+        self.Truss_LC3 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo3)
         self.Truss_LC3.Solve()
         
-        self.Truss_LC4 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
+        self.Truss_LC4 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo4)
         self.Truss_LC4.Solve()
         
-        self.Truss_LC5 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
+        self.Truss_LC5 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo5)
         self.Truss_LC5.Solve()
         
-        self.Truss_LC6 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
+        self.Truss_LC6 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo6)
         self.Truss_LC6.Solve()
         
-        self.Truss_LC7 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
+        self.Truss_LC7 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo7)
         self.Truss_LC7.Solve()
         
-        self.Truss_LC8 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
+        self.Truss_LC8 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo8)
         self.Truss_LC8.Solve()
         
-        self.Truss_LC9 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
+        self.Truss_LC9 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo9)
         self.Truss_LC9.Solve()
         
-        self.Truss_LC10 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
+        self.Truss_LC10 = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo10)
         self.Truss_LC10.Solve()
 
-        # Save Results TODO
-        # Load Case 1
+        # Save Results
+        # Load Combination 1
         self.df_displacements_LC1 = pd.DataFrame.from_dict(self.Truss_LC1.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC1 = pd.DataFrame.from_dict(self.Truss_LC1.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC1 = pd.DataFrame.from_dict(self.Truss_LC1.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 2
+        # Load Combination 2
         self.df_displacements_LC2 = pd.DataFrame.from_dict(self.Truss_LC2.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC2 = pd.DataFrame.from_dict(self.Truss_LC2.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC2 = pd.DataFrame.from_dict(self.Truss_LC2.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 3
+        # Load Combination 3
         self.df_displacements_LC3 = pd.DataFrame.from_dict(self.Truss_LC3.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC3 = pd.DataFrame.from_dict(self.Truss_LC3.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC3 = pd.DataFrame.from_dict(self.Truss_LC3.reactions_, orient='index', columns=['F_x','F_y'])
             
-        # Load Case 4
+        # Load Combination 4
         self.df_displacements_LC4 = pd.DataFrame.from_dict(self.Truss_LC4.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC4 = pd.DataFrame.from_dict(self.Truss_LC4.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC4 = pd.DataFrame.from_dict(self.Truss_LC4.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 5
+        # Load Combination 5
         self.df_displacements_LC5 = pd.DataFrame.from_dict(self.Truss_LC5.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC5 = pd.DataFrame.from_dict(self.Truss_LC5.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC5 = pd.DataFrame.from_dict(self.Truss_LC5.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 6
+        # Load Combination 6
         self.df_displacements_LC6 = pd.DataFrame.from_dict(self.Truss_LC6.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC6 = pd.DataFrame.from_dict(self.Truss_LC6.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC6 = pd.DataFrame.from_dict(self.Truss_LC6.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 7
+        # Load Combination 7
         self.df_displacements_LC7 = pd.DataFrame.from_dict(self.Truss_LC7.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC7 = pd.DataFrame.from_dict(self.Truss_LC7.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC7 = pd.DataFrame.from_dict(self.Truss_LC7.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 8
+        # Load Combination 8
         self.df_displacements_LC8 = pd.DataFrame.from_dict(self.Truss_LC8.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC8 = pd.DataFrame.from_dict(self.Truss_LC8.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC8 = pd.DataFrame.from_dict(self.Truss_LC8.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 9
+        # Load Combination 9
         self.df_displacements_LC9 = pd.DataFrame.from_dict(self.Truss_LC9.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC9 = pd.DataFrame.from_dict(self.Truss_LC9.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC9 = pd.DataFrame.from_dict(self.Truss_LC9.reactions_, orient='index', columns=['F_x','F_y'])
 
-        # Load Case 10
+        # Load Combination 10
         self.df_displacements_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.displacements_, orient='index', columns=['X','Y'])
         self.df_member_forces_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.member_forces_, orient='index', columns=['Force'])
         self.df_reactions_LC10 = pd.DataFrame.from_dict(self.Truss_LC10.reactions_, orient='index', columns=['F_x','F_y'])
@@ -2007,7 +2383,7 @@ class UI(QMainWindow):
             except:
                 pass
 
-    def Draw_Setup(self):
+    def Draw_Setup_Load_Case(self):
         # self.Initialize_Plotting()
         # Update all dictionaries from tables
         self.Renumber_Nodes_Func()
@@ -2049,7 +2425,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC1.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC1)
-            self.Load_Case_ComboBox.setCurrentIndex(0)
+            # self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2057,7 +2433,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC2.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC2)
-            self.Load_Case_ComboBox.setCurrentIndex(1)
+            # self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2065,7 +2441,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC3.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC3)
-            self.Load_Case_ComboBox.setCurrentIndex(2)
+            # self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2073,7 +2449,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC4.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC4)
-            self.Load_Case_ComboBox.setCurrentIndex(3)
+            # self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2081,7 +2457,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC5.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC5)
-            self.Load_Case_ComboBox.setCurrentIndex(4)
+            # self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2089,7 +2465,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC6.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC6)
-            self.Load_Case_ComboBox.setCurrentIndex(5)
+            # self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2097,7 +2473,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC7.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC7)
-            self.Load_Case_ComboBox.setCurrentIndex(6)
+            # self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2105,7 +2481,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC8.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC8)
-            self.Load_Case_ComboBox.setCurrentIndex(7)
+            # self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2113,7 +2489,7 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC9.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC9)
-            self.Load_Case_ComboBox.setCurrentIndex(8)
+            # self.Load_Case_ComboBox.setCurrentIndex(8)
         else:
             for index in range(self.Force_Table_Widget.rowCount()):
                 node = int(self.Force_Table_Widget.item(index,0).text())
@@ -2121,10 +2497,129 @@ class UI(QMainWindow):
                 f_y = float(self.Force_Table_Widget.item(index,2).text())
                 self.forces_LC10.update({node: [f_x, f_y]})
             self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_LC10)
-            self.Load_Case_ComboBox.setCurrentIndex(9)
+            # self.Load_Case_ComboBox.setCurrentIndex(9)
             
 
 
+        # Supports
+        for index in range(self.Support_Table_Widget.rowCount()):
+            node = int(self.Support_Table_Widget.item(index,0).text())
+            x = int(self.Support_Table_Widget.item(index,1).text())
+            y = int(self.Support_Table_Widget.item(index,2).text())
+            self.supports.update({node: [x, y]})
+
+        # Update plot
+        plt.clf()
+        
+        linewidth = float(self.Line_Width_LEdit.text())
+        offset = float(self.Label_Offset_LEdit.text())
+        length_of_arrow = float(self.Arrow_Length_LEdit.text())
+        width_of_arrow = float(self.Arrow_Head_Size_LEdit.text())
+        arrow_line_width = float(self.Arrow_Line_Width_LEdit.text())
+
+        plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
+        self.Truss_Setup.Draw_Truss_Setup(linewidth = linewidth, offset = offset, length_of_arrow = length_of_arrow, width_of_arrow = width_of_arrow, arrow_line_width = arrow_line_width)
+        
+        
+        self.canvas.draw()
+        self.figure.tight_layout()
+
+    # def Initialize_Truss_Components(self):
+    #     nodes_sheet = pd.read_excel(file_name[0], sheet_name='Nodes')
+    #     elements_sheet = pd.read_excel(file_name[0], sheet_name='Elements')
+    #     materials_sheet = pd.read_excel(file_name[0], sheet_name='Materials')
+    #     forces_sheet = pd.read_excel(file_name[0], sheet_name='Forces')
+    #     supports_sheet = pd.read_excel(file_name[0], sheet_name='Supports')
+
+    #     self.nodes = {}
+    #     for i in range(len(nodes_sheet)):
+    #         self.nodes.update({nodes_sheet['Node'][i]: [nodes_sheet['x_coord'][i], nodes_sheet['y_coord'][i]]})
+
+    #     self.elements = {}
+    #     for i in range(len(elements_sheet)):
+    #         self.elements.update({elements_sheet['Element'][i]: [elements_sheet['Node_1'][i], elements_sheet['Node_2'][i]]})
+
+    #     self.areas = {}
+    #     for i in range(len(materials_sheet)):
+    #         self.areas.update({materials_sheet['Element'][i]: materials_sheet['Area'][i]})
+
+    #     self.elasticity = {}
+    #     for i in range(len(materials_sheet)):
+    #         self.elasticity.update({materials_sheet['Element'][i]: materials_sheet['Elasticity'][i]})
+
+    #     self.forces_LC1 = {}
+    #     for i in range(len(forces_sheet)):
+    #         self.forces_LC1.update({forces_sheet['Node'][i]: [forces_sheet['F_x'][i], forces_sheet['F_y'][i]]})
+
+    #     self.supports = {}
+    #     for i in range(len(supports_sheet)):
+    #         self.supports.update({supports_sheet['Node'][i]: [supports_sheet['X'][i], supports_sheet['Y'][i]]})
+    
+    def Draw_Setup_Load_Combo(self):
+        # self.Initialize_Plotting()
+        # Update all dictionaries from tables
+        self.Renumber_Nodes_Func()
+        self.Renumber_Bars_Func()
+        
+        self.nodes = {}
+        self.elements = {}
+        self.areas = {}
+        self.forces = {}
+        self.supports = {}
+
+        for index in range(self.Nodes_Table_Widget.rowCount()):
+            node = int(self.Nodes_Table_Widget.item(index,0).text())
+            x_coord = float(self.Nodes_Table_Widget.item(index,1).text())
+            y_coord = float(self.Nodes_Table_Widget.item(index,2).text())
+            self.nodes.update({node: [x_coord,y_coord]})
+
+        # Elements
+        for index in range(self.Element_Table_Widget.rowCount()):
+            bar = int(self.Element_Table_Widget.item(index,0).text())
+            node_1 = int(self.Element_Table_Widget.item(index,1).text())
+            node_2 = int(self.Element_Table_Widget.item(index,2).text())
+            self.elements.update({bar:[node_1, node_2]})
+
+        # Materials
+        for index in range(self.Material_Table_Widget.rowCount()):
+            bar = int(self.Material_Table_Widget.item(index,0).text())
+            area = float(self.Material_Table_Widget.item(index,1).text())
+            elasticity = float(self.Material_Table_Widget.item(index,2).text())
+            self.areas.update({bar: area})
+            self.elasticity.update({bar: elasticity})
+            
+        # Forces
+
+        if self.Load_Combination_Combo_Box.currentIndex() == 0:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo1)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 1:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo2)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 2:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo3)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 3:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo4)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 4:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo5)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 5:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo6)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 6:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo7)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 7:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo8)
+
+        elif self.Load_Combination_Combo_Box.currentIndex() == 8:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo9)
+
+        else:
+            self.Truss_Setup = Truss_2D(nodes = self.nodes, supports = self.supports, cross_area = self.areas, elements = self.elements, elasticity = self.elasticity, forces = self.forces_Combo10)
+            
         # Supports
         for index in range(self.Support_Table_Widget.rowCount()):
             node = int(self.Support_Table_Widget.item(index,0).text())
@@ -2186,34 +2681,34 @@ class UI(QMainWindow):
         
         if self.Load_Combination_Combo_Box.currentIndex() == 0:
             self.forces = self.forces_LC1
-            self.Load_Case_ComboBox.setCurrentIndex(0)
+            # self.Load_Case_ComboBox.setCurrentIndex(0)
         elif self.Load_Combination_Combo_Box.currentIndex() == 1:
             self.forces = self.forces_LC2
-            self.Load_Case_ComboBox.setCurrentIndex(1)
+            # self.Load_Case_ComboBox.setCurrentIndex(1)
         elif self.Load_Combination_Combo_Box.currentIndex() == 2:
             self.forces = self.forces_LC3
-            self.Load_Case_ComboBox.setCurrentIndex(2)
+            # self.Load_Case_ComboBox.setCurrentIndex(2)
         elif self.Load_Combination_Combo_Box.currentIndex() == 3:
             self.forces = self.forces_LC4
-            self.Load_Case_ComboBox.setCurrentIndex(3)
+            # self.Load_Case_ComboBox.setCurrentIndex(3)
         elif self.Load_Combination_Combo_Box.currentIndex() == 4:
             self.forces = self.forces_LC5
-            self.Load_Case_ComboBox.setCurrentIndex(4)
+            # self.Load_Case_ComboBox.setCurrentIndex(4)
         elif self.Load_Combination_Combo_Box.currentIndex() == 5:
             self.forces = self.forces_LC6
-            self.Load_Case_ComboBox.setCurrentIndex(5)
+            # self.Load_Case_ComboBox.setCurrentIndex(5)
         elif self.Load_Combination_Combo_Box.currentIndex() == 6:
             self.forces = self.forces_LC7
-            self.Load_Case_ComboBox.setCurrentIndex(6)
+            # self.Load_Case_ComboBox.setCurrentIndex(6)
         elif self.Load_Combination_Combo_Box.currentIndex() == 7:
             self.forces = self.forces_LC8
-            self.Load_Case_ComboBox.setCurrentIndex(7)
+            # self.Load_Case_ComboBox.setCurrentIndex(7)
         elif self.Load_Combination_Combo_Box.currentIndex() == 8:
             self.forces = self.forces_LC9
-            self.Load_Case_ComboBox.setCurrentIndex(8)
+            # self.Load_Case_ComboBox.setCurrentIndex(8)
         elif self.Load_Combination_Combo_Box.currentIndex() == 9:
             self.forces = self.forces_LC10
-            self.Load_Case_ComboBox.setCurrentIndex(9)
+            # self.Load_Case_ComboBox.setCurrentIndex(9)
 
         self.Force_Table_Widget.setRowCount(0)
                     
@@ -2233,7 +2728,7 @@ class UI(QMainWindow):
             self.Force_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(f_y))
         
         # Draw Truss
-        self.Draw_Setup()
+        self.Draw_Setup_Load_Case()
 
     def Draw_Reactions(self):
         plt.rcParams.update({'font.size': float(self.Font_Size_LEdit.text())})
@@ -2538,6 +3033,8 @@ class UI(QMainWindow):
             load_case_dict.update({index+1:str(self.Load_Case_Table_Widget.item(index,0).text())})
         load_cases_df = pd.DataFrame.from_dict(load_case_dict, orient='index', columns=['Load Case Name'])
         
+        # Load Combinations TODO
+        
         # Forces
         # Load Case 1
         index = 1
@@ -2768,7 +3265,7 @@ class UI(QMainWindow):
                 self.Support_Table_Widget.setItem(rowPosition, 2, QTableWidgetItem(y_support))  
             # print(file_name[1])
             
-            self.Draw_Setup()
+            self.Draw_Setup_Load_Case()
         except:
             self.statusBar.showMessage("Canceled Dialogue")
 
