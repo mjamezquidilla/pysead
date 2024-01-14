@@ -257,7 +257,7 @@ class UI(QMainWindow):
 
         # Solve
         self.Solve_Truss_Button.clicked.connect(self.Solve_Truss_Func)
-        self.Setup_Button.clicked.connect(self.Draw_Truss_Setup)
+        self.Setup_Button.clicked.connect(self.Draw_Setup_Load_Combo)
         self.Reactions_Button.clicked.connect(self.Draw_Truss_Reactions)
         self.Axial_Force_Button.clicked.connect(self.Draw_Truss_Axial_Force_Map)
         self.Displacement_Button.clicked.connect(self.Draw_Truss_Displacement)
@@ -1216,122 +1216,122 @@ class UI(QMainWindow):
         # Get Load Combination Factors from Load Combination Table
         # Load Combo 1
         Combo1_1 = float(self.Load_Combination_Table_Widget.item(0,0).text())
-        Combo1_2 = float(self.Load_Combination_Table_Widget.item(0,1).text())
-        Combo1_3 = float(self.Load_Combination_Table_Widget.item(0,2).text())
-        Combo1_4 = float(self.Load_Combination_Table_Widget.item(0,3).text())
-        Combo1_5 = float(self.Load_Combination_Table_Widget.item(0,4).text())
-        Combo1_6 = float(self.Load_Combination_Table_Widget.item(0,5).text())
-        Combo1_7 = float(self.Load_Combination_Table_Widget.item(0,6).text())
-        Combo1_8 = float(self.Load_Combination_Table_Widget.item(0,7).text())
-        Combo1_9 = float(self.Load_Combination_Table_Widget.item(0,8).text())
-        Combo1_10 = float(self.Load_Combination_Table_Widget.item(0,9).text())
+        Combo1_2 = float(self.Load_Combination_Table_Widget.item(1,0).text())
+        Combo1_3 = float(self.Load_Combination_Table_Widget.item(2,0).text())
+        Combo1_4 = float(self.Load_Combination_Table_Widget.item(3,0).text())
+        Combo1_5 = float(self.Load_Combination_Table_Widget.item(4,0).text())
+        Combo1_6 = float(self.Load_Combination_Table_Widget.item(5,0).text())
+        Combo1_7 = float(self.Load_Combination_Table_Widget.item(6,0).text())
+        Combo1_8 = float(self.Load_Combination_Table_Widget.item(7,0).text())
+        Combo1_9 = float(self.Load_Combination_Table_Widget.item(8,0).text())
+        Combo1_10 = float(self.Load_Combination_Table_Widget.item(9,0).text())
         
         # Load Combo 2
-        Combo2_1 = float(self.Load_Combination_Table_Widget.item(1,0).text())
+        Combo2_1 = float(self.Load_Combination_Table_Widget.item(0,1).text())
         Combo2_2 = float(self.Load_Combination_Table_Widget.item(1,1).text())
-        Combo2_3 = float(self.Load_Combination_Table_Widget.item(1,2).text())
-        Combo2_4 = float(self.Load_Combination_Table_Widget.item(1,3).text())
-        Combo2_5 = float(self.Load_Combination_Table_Widget.item(1,4).text())
-        Combo2_6 = float(self.Load_Combination_Table_Widget.item(1,5).text())
-        Combo2_7 = float(self.Load_Combination_Table_Widget.item(1,6).text())
-        Combo2_8 = float(self.Load_Combination_Table_Widget.item(1,7).text())
-        Combo2_9 = float(self.Load_Combination_Table_Widget.item(1,8).text())
-        Combo2_10 = float(self.Load_Combination_Table_Widget.item(1,9).text())
+        Combo2_3 = float(self.Load_Combination_Table_Widget.item(2,1).text())
+        Combo2_4 = float(self.Load_Combination_Table_Widget.item(3,1).text())
+        Combo2_5 = float(self.Load_Combination_Table_Widget.item(4,1).text())
+        Combo2_6 = float(self.Load_Combination_Table_Widget.item(5,1).text())
+        Combo2_7 = float(self.Load_Combination_Table_Widget.item(6,1).text())
+        Combo2_8 = float(self.Load_Combination_Table_Widget.item(7,1).text())
+        Combo2_9 = float(self.Load_Combination_Table_Widget.item(8,1).text())
+        Combo2_10 = float(self.Load_Combination_Table_Widget.item(9,1).text())
         
         # Load Combo 3
-        Combo3_1 = float(self.Load_Combination_Table_Widget.item(2,0).text())
-        Combo3_2 = float(self.Load_Combination_Table_Widget.item(2,1).text())
+        Combo3_1 = float(self.Load_Combination_Table_Widget.item(0,2).text())
+        Combo3_2 = float(self.Load_Combination_Table_Widget.item(1,2).text())
         Combo3_3 = float(self.Load_Combination_Table_Widget.item(2,2).text())
-        Combo3_4 = float(self.Load_Combination_Table_Widget.item(2,3).text())
-        Combo3_5 = float(self.Load_Combination_Table_Widget.item(2,4).text())
-        Combo3_6 = float(self.Load_Combination_Table_Widget.item(2,5).text())
-        Combo3_7 = float(self.Load_Combination_Table_Widget.item(2,6).text())
-        Combo3_8 = float(self.Load_Combination_Table_Widget.item(2,7).text())
-        Combo3_9 = float(self.Load_Combination_Table_Widget.item(2,8).text())
-        Combo3_10 = float(self.Load_Combination_Table_Widget.item(2,9).text())
+        Combo3_4 = float(self.Load_Combination_Table_Widget.item(3,2).text())
+        Combo3_5 = float(self.Load_Combination_Table_Widget.item(4,2).text())
+        Combo3_6 = float(self.Load_Combination_Table_Widget.item(5,2).text())
+        Combo3_7 = float(self.Load_Combination_Table_Widget.item(6,2).text())
+        Combo3_8 = float(self.Load_Combination_Table_Widget.item(7,2).text())
+        Combo3_9 = float(self.Load_Combination_Table_Widget.item(8,2).text())
+        Combo3_10 = float(self.Load_Combination_Table_Widget.item(9,2).text())
 
         # Load Combo 4
-        Combo4_1 = float(self.Load_Combination_Table_Widget.item(3,0).text())
-        Combo4_2 = float(self.Load_Combination_Table_Widget.item(3,1).text())
-        Combo4_3 = float(self.Load_Combination_Table_Widget.item(3,2).text())
+        Combo4_1 = float(self.Load_Combination_Table_Widget.item(0,3).text())
+        Combo4_2 = float(self.Load_Combination_Table_Widget.item(1,3).text())
+        Combo4_3 = float(self.Load_Combination_Table_Widget.item(2,3).text())
         Combo4_4 = float(self.Load_Combination_Table_Widget.item(3,3).text())
-        Combo4_5 = float(self.Load_Combination_Table_Widget.item(3,4).text())
-        Combo4_6 = float(self.Load_Combination_Table_Widget.item(3,5).text())
-        Combo4_7 = float(self.Load_Combination_Table_Widget.item(3,6).text())
-        Combo4_8 = float(self.Load_Combination_Table_Widget.item(3,7).text())
-        Combo4_9 = float(self.Load_Combination_Table_Widget.item(3,8).text())
-        Combo4_10 = float(self.Load_Combination_Table_Widget.item(3,9).text())
+        Combo4_5 = float(self.Load_Combination_Table_Widget.item(4,3).text())
+        Combo4_6 = float(self.Load_Combination_Table_Widget.item(5,3).text())
+        Combo4_7 = float(self.Load_Combination_Table_Widget.item(6,3).text())
+        Combo4_8 = float(self.Load_Combination_Table_Widget.item(7,3).text())
+        Combo4_9 = float(self.Load_Combination_Table_Widget.item(8,3).text())
+        Combo4_10 = float(self.Load_Combination_Table_Widget.item(9,3).text())
 
         # Load Combo 5
-        Combo5_1 = float(self.Load_Combination_Table_Widget.item(4,0).text())
-        Combo5_2 = float(self.Load_Combination_Table_Widget.item(4,1).text())
-        Combo5_3 = float(self.Load_Combination_Table_Widget.item(4,2).text())
-        Combo5_4 = float(self.Load_Combination_Table_Widget.item(4,3).text())
+        Combo5_1 = float(self.Load_Combination_Table_Widget.item(0,4).text())
+        Combo5_2 = float(self.Load_Combination_Table_Widget.item(1,4).text())
+        Combo5_3 = float(self.Load_Combination_Table_Widget.item(2,4).text())
+        Combo5_4 = float(self.Load_Combination_Table_Widget.item(3,4).text())
         Combo5_5 = float(self.Load_Combination_Table_Widget.item(4,4).text())
-        Combo5_6 = float(self.Load_Combination_Table_Widget.item(4,5).text())
-        Combo5_7 = float(self.Load_Combination_Table_Widget.item(4,6).text())
-        Combo5_8 = float(self.Load_Combination_Table_Widget.item(4,7).text())
-        Combo5_9 = float(self.Load_Combination_Table_Widget.item(4,8).text())
-        Combo5_10 = float(self.Load_Combination_Table_Widget.item(4,9).text())
+        Combo5_6 = float(self.Load_Combination_Table_Widget.item(5,4).text())
+        Combo5_7 = float(self.Load_Combination_Table_Widget.item(6,4).text())
+        Combo5_8 = float(self.Load_Combination_Table_Widget.item(7,4).text())
+        Combo5_9 = float(self.Load_Combination_Table_Widget.item(8,4).text())
+        Combo5_10 = float(self.Load_Combination_Table_Widget.item(9,4).text())
 
         # Load Combo 6
-        Combo6_1 = float(self.Load_Combination_Table_Widget.item(5,0).text())
-        Combo6_2 = float(self.Load_Combination_Table_Widget.item(5,1).text())
-        Combo6_3 = float(self.Load_Combination_Table_Widget.item(5,2).text())
-        Combo6_4 = float(self.Load_Combination_Table_Widget.item(5,3).text())
-        Combo6_5 = float(self.Load_Combination_Table_Widget.item(5,4).text())
+        Combo6_1 = float(self.Load_Combination_Table_Widget.item(0,5).text())
+        Combo6_2 = float(self.Load_Combination_Table_Widget.item(1,5).text())
+        Combo6_3 = float(self.Load_Combination_Table_Widget.item(2,5).text())
+        Combo6_4 = float(self.Load_Combination_Table_Widget.item(3,5).text())
+        Combo6_5 = float(self.Load_Combination_Table_Widget.item(4,5).text())
         Combo6_6 = float(self.Load_Combination_Table_Widget.item(5,5).text())
-        Combo6_7 = float(self.Load_Combination_Table_Widget.item(5,6).text())
-        Combo6_8 = float(self.Load_Combination_Table_Widget.item(5,7).text())
-        Combo6_9 = float(self.Load_Combination_Table_Widget.item(5,8).text())
-        Combo6_10 = float(self.Load_Combination_Table_Widget.item(5,9).text())
+        Combo6_7 = float(self.Load_Combination_Table_Widget.item(6,5).text())
+        Combo6_8 = float(self.Load_Combination_Table_Widget.item(7,5).text())
+        Combo6_9 = float(self.Load_Combination_Table_Widget.item(8,5).text())
+        Combo6_10 = float(self.Load_Combination_Table_Widget.item(9,5).text())
         
         # Load Combo 7
-        Combo7_1 = float(self.Load_Combination_Table_Widget.item(6,0).text())
-        Combo7_2 = float(self.Load_Combination_Table_Widget.item(6,1).text())
-        Combo7_3 = float(self.Load_Combination_Table_Widget.item(6,2).text())
-        Combo7_4 = float(self.Load_Combination_Table_Widget.item(6,3).text())
-        Combo7_5 = float(self.Load_Combination_Table_Widget.item(6,4).text())
-        Combo7_6 = float(self.Load_Combination_Table_Widget.item(6,5).text())
+        Combo7_1 = float(self.Load_Combination_Table_Widget.item(0,6).text())
+        Combo7_2 = float(self.Load_Combination_Table_Widget.item(1,6).text())
+        Combo7_3 = float(self.Load_Combination_Table_Widget.item(2,6).text())
+        Combo7_4 = float(self.Load_Combination_Table_Widget.item(3,6).text())
+        Combo7_5 = float(self.Load_Combination_Table_Widget.item(4,6).text())
+        Combo7_6 = float(self.Load_Combination_Table_Widget.item(5,6).text())
         Combo7_7 = float(self.Load_Combination_Table_Widget.item(6,6).text())
-        Combo7_8 = float(self.Load_Combination_Table_Widget.item(6,7).text())
-        Combo7_9 = float(self.Load_Combination_Table_Widget.item(6,8).text())
-        Combo7_10 = float(self.Load_Combination_Table_Widget.item(6,9).text())
+        Combo7_8 = float(self.Load_Combination_Table_Widget.item(7,6).text())
+        Combo7_9 = float(self.Load_Combination_Table_Widget.item(8,6).text())
+        Combo7_10 = float(self.Load_Combination_Table_Widget.item(9,6).text())
         
         # Load Combo 8
-        Combo8_1 = float(self.Load_Combination_Table_Widget.item(7,0).text())
-        Combo8_2 = float(self.Load_Combination_Table_Widget.item(7,1).text())
-        Combo8_3 = float(self.Load_Combination_Table_Widget.item(7,2).text())
-        Combo8_4 = float(self.Load_Combination_Table_Widget.item(7,3).text())
-        Combo8_5 = float(self.Load_Combination_Table_Widget.item(7,4).text())
-        Combo8_6 = float(self.Load_Combination_Table_Widget.item(7,5).text())
-        Combo8_7 = float(self.Load_Combination_Table_Widget.item(7,6).text())
+        Combo8_1 = float(self.Load_Combination_Table_Widget.item(0,7).text())
+        Combo8_2 = float(self.Load_Combination_Table_Widget.item(1,7).text())
+        Combo8_3 = float(self.Load_Combination_Table_Widget.item(2,7).text())
+        Combo8_4 = float(self.Load_Combination_Table_Widget.item(3,7).text())
+        Combo8_5 = float(self.Load_Combination_Table_Widget.item(4,7).text())
+        Combo8_6 = float(self.Load_Combination_Table_Widget.item(5,7).text())
+        Combo8_7 = float(self.Load_Combination_Table_Widget.item(6,7).text())
         Combo8_8 = float(self.Load_Combination_Table_Widget.item(7,7).text())
-        Combo8_9 = float(self.Load_Combination_Table_Widget.item(7,8).text())
-        Combo8_10 = float(self.Load_Combination_Table_Widget.item(7,9).text())
+        Combo8_9 = float(self.Load_Combination_Table_Widget.item(8,7).text())
+        Combo8_10 = float(self.Load_Combination_Table_Widget.item(9,7).text())
         
         # Load Combo 9
-        Combo9_1 = float(self.Load_Combination_Table_Widget.item(8,0).text())
-        Combo9_2 = float(self.Load_Combination_Table_Widget.item(8,1).text())
-        Combo9_3 = float(self.Load_Combination_Table_Widget.item(8,2).text())
-        Combo9_4 = float(self.Load_Combination_Table_Widget.item(8,3).text())
-        Combo9_5 = float(self.Load_Combination_Table_Widget.item(8,4).text())
-        Combo9_6 = float(self.Load_Combination_Table_Widget.item(8,5).text())
-        Combo9_7 = float(self.Load_Combination_Table_Widget.item(8,6).text())
-        Combo9_8 = float(self.Load_Combination_Table_Widget.item(8,7).text())
+        Combo9_1 = float(self.Load_Combination_Table_Widget.item(0,8).text())
+        Combo9_2 = float(self.Load_Combination_Table_Widget.item(1,8).text())
+        Combo9_3 = float(self.Load_Combination_Table_Widget.item(2,8).text())
+        Combo9_4 = float(self.Load_Combination_Table_Widget.item(3,8).text())
+        Combo9_5 = float(self.Load_Combination_Table_Widget.item(4,8).text())
+        Combo9_6 = float(self.Load_Combination_Table_Widget.item(5,8).text())
+        Combo9_7 = float(self.Load_Combination_Table_Widget.item(6,8).text())
+        Combo9_8 = float(self.Load_Combination_Table_Widget.item(7,8).text())
         Combo9_9 = float(self.Load_Combination_Table_Widget.item(8,8).text())
-        Combo9_10 = float(self.Load_Combination_Table_Widget.item(8,9).text())
+        Combo9_10 = float(self.Load_Combination_Table_Widget.item(9,8).text())
         
         # Load Combo 10
-        Combo10_1 = float(self.Load_Combination_Table_Widget.item(9,0).text())
-        Combo10_2 = float(self.Load_Combination_Table_Widget.item(9,1).text())
-        Combo10_3 = float(self.Load_Combination_Table_Widget.item(9,2).text())
-        Combo10_4 = float(self.Load_Combination_Table_Widget.item(9,3).text())
-        Combo10_5 = float(self.Load_Combination_Table_Widget.item(9,4).text())
-        Combo10_6 = float(self.Load_Combination_Table_Widget.item(9,5).text())
-        Combo10_7 = float(self.Load_Combination_Table_Widget.item(9,6).text())
-        Combo10_8 = float(self.Load_Combination_Table_Widget.item(9,7).text())
-        Combo10_9 = float(self.Load_Combination_Table_Widget.item(9,8).text())
+        Combo10_1 = float(self.Load_Combination_Table_Widget.item(0,9).text())
+        Combo10_2 = float(self.Load_Combination_Table_Widget.item(1,9).text())
+        Combo10_3 = float(self.Load_Combination_Table_Widget.item(2,9).text())
+        Combo10_4 = float(self.Load_Combination_Table_Widget.item(3,9).text())
+        Combo10_5 = float(self.Load_Combination_Table_Widget.item(4,9).text())
+        Combo10_6 = float(self.Load_Combination_Table_Widget.item(5,9).text())
+        Combo10_7 = float(self.Load_Combination_Table_Widget.item(6,9).text())
+        Combo10_8 = float(self.Load_Combination_Table_Widget.item(7,9).text())
+        Combo10_9 = float(self.Load_Combination_Table_Widget.item(8,9).text())
         Combo10_10 = float(self.Load_Combination_Table_Widget.item(9,9).text())
         
         # Convert forces load cases dictionaries to pandas dataframe
@@ -1346,248 +1346,355 @@ class UI(QMainWindow):
         forces_LC9_df = pd.DataFrame.from_dict(self.forces_LC9, orient='index', columns=['F_x','F_y'])
         forces_LC10_df = pd.DataFrame.from_dict(self.forces_LC10, orient='index', columns=['F_x','F_y'])
         
-        if forces_LC1_df.empty:
-            forces_LC1_df = 0
-        if forces_LC2_df.empty:
-            forces_LC2_df = 0
-        if forces_LC3_df.empty:
-            forces_LC3_df = 0
-        if forces_LC4_df.empty:
-            forces_LC4_df = 0
-        if forces_LC5_df.empty:
-            forces_LC5_df = 0
-        if forces_LC6_df.empty:
-            forces_LC6_df = 0
-        if forces_LC7_df.empty:
-            forces_LC7_df = 0
-        if forces_LC8_df.empty:
-            forces_LC8_df = 0
-        if forces_LC9_df.empty:
-            forces_LC9_df = 0
-        if forces_LC10_df.empty:
-            forces_LC10_df = 0
+        # if forces_LC1_df.empty:
+        #     forces_LC1_df = 0
+        # if forces_LC2_df.empty:
+        #     forces_LC2_df = 0
+        # if forces_LC3_df.empty:
+        #     forces_LC3_df = 0
+        # if forces_LC4_df.empty:
+        #     forces_LC4_df = 0
+        # if forces_LC5_df.empty:
+        #     forces_LC5_df = 0
+        # if forces_LC6_df.empty:
+        #     forces_LC6_df = 0
+        # if forces_LC7_df.empty:
+        #     forces_LC7_df = 0
+        # if forces_LC8_df.empty:
+        #     forces_LC8_df = 0
+        # if forces_LC9_df.empty:
+        #     forces_LC9_df = 0
+        # if forces_LC10_df.empty:
+        #     forces_LC10_df = 0
             
+        force_Combo = [forces_LC1_df, forces_LC2_df, forces_LC3_df, forces_LC4_df, forces_LC5_df, forces_LC6_df, forces_LC7_df, forces_LC8_df, forces_LC9_df, forces_LC10_df]
+        
         # Apply factors to Load Combinations
         # Load Combo 1
-        forces_Combo1 = Combo1_1 * forces_LC1_df + Combo1_2 * forces_LC2_df + Combo1_3 * forces_LC3_df + Combo1_4 * forces_LC4_df + Combo1_5 * forces_LC5_df + Combo1_6 * forces_LC6_df + Combo1_7 * forces_LC7_df + Combo1_8 * forces_LC8_df + Combo1_9 * forces_LC9_df + Combo1_10 * forces_LC10_df
-        forces_Combo1 = forces_Combo1.fillna(Combo1_1 * forces_LC1_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_2 * forces_LC2_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_3 * forces_LC3_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_4 * forces_LC4_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_5 * forces_LC5_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_6 * forces_LC6_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_7 * forces_LC7_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_8 * forces_LC8_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_9 * forces_LC9_df)
-        forces_Combo1 = forces_Combo1.fillna(Combo1_10 * forces_LC10_df)
-
-        # Load Combo 2
-        forces_Combo2 = Combo2_1 * forces_LC1_df + Combo2_2 * forces_LC2_df + Combo2_3 * forces_LC3_df + Combo2_4 * forces_LC4_df + Combo2_5 * forces_LC5_df + Combo2_6 * forces_LC6_df + Combo2_7 * forces_LC7_df + Combo2_8 * forces_LC8_df + Combo2_9 * forces_LC9_df + Combo2_10 * forces_LC10_df
-        forces_Combo2 = forces_Combo2.fillna(Combo2_1 * forces_LC1_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_2 * forces_LC2_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_3 * forces_LC3_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_4 * forces_LC4_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_5 * forces_LC5_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_6 * forces_LC6_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_7 * forces_LC7_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_8 * forces_LC8_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_9 * forces_LC9_df)
-        forces_Combo2 = forces_Combo2.fillna(Combo2_10 * forces_LC10_df)
+        Combo1 = [Combo1_1, Combo1_2, Combo1_3, Combo1_4, Combo1_5, Combo1_6, Combo1_7, Combo1_8, Combo1_9, Combo1_10]
+        
+        forces_Combo1 = pd.DataFrame()
+        forces_Combo1_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo1[i] == 0:
+                    pass
+                else:
+                    forces_Combo1 = Combo1[i] * j
+                    forces_Combo1_prev = forces_Combo1
+            elif Combo1[i] == 0:
+                pass
+            else:     
+                if Combo1[i] == 0:
+                    pass
+                else:               
+                    forces_Combo1 = forces_Combo1 + Combo1[i] * j
+                    forces_Combo1 = forces_Combo1.fillna(forces_Combo1_prev)
+                    forces_Combo1 = forces_Combo1.fillna(Combo1[i] * j)
+                    forces_Combo1_prev = forces_Combo1
+                
+        forces_Combo1 = forces_Combo1.round(3)
+                
+        # Load Combo 1
+        Combo2 = [Combo2_1, Combo2_2, Combo2_3, Combo2_4, Combo2_5, Combo2_6, Combo2_7, Combo2_8, Combo2_9, Combo2_10]
+        
+        forces_Combo2 = pd.DataFrame()
+        forces_Combo2_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo2[i] == 0:
+                    pass
+                else:
+                    forces_Combo2 = Combo2[i] * j
+                    forces_Combo2_prev = forces_Combo2
+            elif Combo2[i] == 0:
+                pass
+            else:     
+                if Combo2[i] == 0:
+                    pass
+                else:               
+                    forces_Combo2 = forces_Combo2 + Combo2[i] * j
+                    forces_Combo2 = forces_Combo2.fillna(forces_Combo2_prev)
+                    forces_Combo2 = forces_Combo2.fillna(Combo2[i] * j)
+                    forces_Combo2_prev = forces_Combo2
+                
+        forces_Combo2 = forces_Combo2.round(3)
 
         # Load Combo 3
-        forces_Combo3 = Combo3_1 * forces_LC1_df + Combo3_2 * forces_LC2_df + Combo3_3 * forces_LC3_df + Combo3_4 * forces_LC4_df + Combo3_5 * forces_LC5_df + Combo3_6 * forces_LC6_df + Combo3_7 * forces_LC7_df + Combo3_8 * forces_LC8_df + Combo3_9 * forces_LC9_df + Combo3_10 * forces_LC10_df
-        forces_Combo3 = forces_Combo3.fillna(Combo3_1 * forces_LC1_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_2 * forces_LC2_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_3 * forces_LC3_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_4 * forces_LC4_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_5 * forces_LC5_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_6 * forces_LC6_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_7 * forces_LC7_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_8 * forces_LC8_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_9 * forces_LC9_df)
-        forces_Combo3 = forces_Combo3.fillna(Combo3_10 * forces_LC10_df)
+        Combo3 = [Combo3_1, Combo3_2, Combo3_3, Combo3_4, Combo3_5, Combo3_6, Combo3_7, Combo3_8, Combo3_9, Combo3_10]
+        
+        forces_Combo3 = pd.DataFrame()
+        forces_Combo3_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo3[i] == 0:
+                    pass
+                else:
+                    forces_Combo3 = Combo3[i] * j
+                    forces_Combo3_prev = forces_Combo3
+            elif Combo3[i] == 0:
+                pass
+            else:                    
+                forces_Combo3 = forces_Combo3 + Combo3[i] * j
+                forces_Combo3 = forces_Combo3.fillna(forces_Combo3_prev)
+                forces_Combo3 = forces_Combo3.fillna(Combo3[i] * j)
+                forces_Combo3_prev = forces_Combo3
+
+        forces_Combo3 = forces_Combo3.round(3)
 
         # Load Combo 4
-        forces_Combo4 = Combo4_1 * forces_LC1_df + Combo4_2 * forces_LC2_df + Combo4_3 * forces_LC3_df + Combo4_4 * forces_LC4_df + Combo4_5 * forces_LC5_df + Combo4_6 * forces_LC6_df + Combo4_7 * forces_LC7_df + Combo4_8 * forces_LC8_df + Combo4_9 * forces_LC9_df + Combo4_10 * forces_LC10_df
-        forces_Combo4 = forces_Combo4.fillna(Combo4_1 * forces_LC1_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_2 * forces_LC2_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_3 * forces_LC3_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_4 * forces_LC4_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_5 * forces_LC5_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_6 * forces_LC6_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_7 * forces_LC7_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_8 * forces_LC8_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_9 * forces_LC9_df)
-        forces_Combo4 = forces_Combo4.fillna(Combo4_10 * forces_LC10_df)
+        Combo4 = [Combo4_1, Combo4_2, Combo4_3, Combo4_4, Combo4_5, Combo4_6, Combo4_7, Combo4_8, Combo4_9, Combo4_10]
+        
+        forces_Combo4 = pd.DataFrame()
+        forces_Combo4_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo4[i] == 0:
+                    pass
+                else:
+                    forces_Combo4 = Combo4[i] * j
+                    forces_Combo4_prev = forces_Combo4
+            elif Combo4[i] == 0:
+                pass
+            else:                    
+                forces_Combo4 = forces_Combo4 + Combo4[i] * j
+                forces_Combo4 = forces_Combo4.fillna(forces_Combo4_prev)
+                forces_Combo4 = forces_Combo4.fillna(Combo4[i] * j)
+                forces_Combo4_prev = forces_Combo4
+
+        forces_Combo4 = forces_Combo4.round(3)
 
         # Load Combo 5
-        forces_Combo5 = Combo5_1 * forces_LC1_df + Combo5_2 * forces_LC2_df + Combo5_3 * forces_LC3_df + Combo5_4 * forces_LC4_df + Combo5_5 * forces_LC5_df + Combo5_6 * forces_LC6_df + Combo5_7 * forces_LC7_df + Combo5_8 * forces_LC8_df + Combo5_9 * forces_LC9_df + Combo5_10 * forces_LC10_df
-        forces_Combo5 = forces_Combo5.fillna(Combo5_1 * forces_LC1_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_2 * forces_LC2_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_3 * forces_LC3_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_4 * forces_LC4_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_5 * forces_LC5_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_6 * forces_LC6_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_7 * forces_LC7_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_8 * forces_LC8_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_9 * forces_LC9_df)
-        forces_Combo5 = forces_Combo5.fillna(Combo5_10 * forces_LC10_df)
+        Combo5 = [Combo5_1, Combo5_2, Combo5_3, Combo5_4, Combo5_5, Combo5_6, Combo5_7, Combo5_8, Combo5_9, Combo5_10]
+        
+        forces_Combo5 = pd.DataFrame()
+        forces_Combo5_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo5[i] == 0:
+                    pass
+                else:
+                    forces_Combo5 = Combo5[i] * j
+                    forces_Combo5_prev = forces_Combo5
+            elif Combo5[i] == 0:
+                pass
+            else:                    
+                forces_Combo5 = forces_Combo5 + Combo5[i] * j
+                forces_Combo5 = forces_Combo5.fillna(forces_Combo5_prev)
+                forces_Combo5 = forces_Combo5.fillna(Combo5[i] * j)
+                forces_Combo5_prev = forces_Combo5
+
+        forces_Combo5 = forces_Combo5.round(3)
 
         # Load Combo 6
-        forces_Combo6 = Combo6_1 * forces_LC1_df + Combo6_2 * forces_LC2_df + Combo6_3 * forces_LC3_df + Combo6_4 * forces_LC4_df + Combo6_5 * forces_LC5_df + Combo6_6 * forces_LC6_df + Combo6_7 * forces_LC7_df + Combo6_8 * forces_LC8_df + Combo6_9 * forces_LC9_df + Combo6_10 * forces_LC10_df
-        forces_Combo6 = forces_Combo6.fillna(Combo6_1 * forces_LC1_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_2 * forces_LC2_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_3 * forces_LC3_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_4 * forces_LC4_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_5 * forces_LC5_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_6 * forces_LC6_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_7 * forces_LC7_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_8 * forces_LC8_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_9 * forces_LC9_df)
-        forces_Combo6 = forces_Combo6.fillna(Combo6_10 * forces_LC10_df)
+        Combo6 = [Combo6_1, Combo6_2, Combo6_3, Combo6_4, Combo6_5, Combo6_6, Combo6_7, Combo6_8, Combo6_9, Combo6_10]
+        
+        forces_Combo6 = pd.DataFrame()
+        forces_Combo6_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo6[i] == 0:
+                    pass
+                else:
+                    forces_Combo6 = Combo6[i] * j
+                    forces_Combo6_prev = forces_Combo6
+            elif Combo6[i] == 0:
+                pass
+            else:                    
+                forces_Combo6 = forces_Combo6 + Combo6[i] * j
+                forces_Combo6 = forces_Combo6.fillna(forces_Combo6_prev)
+                forces_Combo6 = forces_Combo6.fillna(Combo6[i] * j)
+                forces_Combo6_prev = forces_Combo6
+
+        forces_Combo6 = forces_Combo6.round(3)
 
         # Load Combo 7
-        forces_Combo7 = Combo7_1 * forces_LC1_df + Combo7_2 * forces_LC2_df + Combo7_3 * forces_LC3_df + Combo7_4 * forces_LC4_df + Combo7_5 * forces_LC5_df + Combo7_6 * forces_LC6_df + Combo7_7 * forces_LC7_df + Combo7_8 * forces_LC8_df + Combo7_9 * forces_LC9_df + Combo7_10 * forces_LC10_df
-        forces_Combo7 = forces_Combo7.fillna(Combo7_1 * forces_LC1_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_2 * forces_LC2_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_3 * forces_LC3_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_4 * forces_LC4_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_5 * forces_LC5_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_6 * forces_LC6_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_7 * forces_LC7_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_8 * forces_LC8_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_9 * forces_LC9_df)
-        forces_Combo7 = forces_Combo7.fillna(Combo7_10 * forces_LC10_df)
+        Combo7 = [Combo7_1, Combo7_2, Combo7_3, Combo7_4, Combo7_5, Combo7_6, Combo7_7, Combo7_8, Combo7_9, Combo7_10]
+        
+        forces_Combo7 = pd.DataFrame()
+        forces_Combo7_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo7[i] == 0:
+                    pass
+                else:
+                    forces_Combo7 = Combo7[i] * j
+                    forces_Combo7_prev = forces_Combo7
+            elif Combo7[i] == 0:
+                pass
+            else:                    
+                forces_Combo7 = forces_Combo7 + Combo7[i] * j
+                forces_Combo7 = forces_Combo7.fillna(forces_Combo7_prev)
+                forces_Combo7 = forces_Combo7.fillna(Combo7[i] * j)
+                forces_Combo7_prev = forces_Combo7
+
+        forces_Combo7 = forces_Combo7.round(3)
 
         # Load Combo 8
-        forces_Combo8 = Combo8_1 * forces_LC1_df + Combo8_2 * forces_LC2_df + Combo8_3 * forces_LC3_df + Combo8_4 * forces_LC4_df + Combo8_5 * forces_LC5_df + Combo8_6 * forces_LC6_df + Combo8_7 * forces_LC7_df + Combo8_8 * forces_LC8_df + Combo8_9 * forces_LC9_df + Combo8_10 * forces_LC10_df
-        forces_Combo8 = forces_Combo8.fillna(Combo8_1 * forces_LC1_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_2 * forces_LC2_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_3 * forces_LC3_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_4 * forces_LC4_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_5 * forces_LC5_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_6 * forces_LC6_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_7 * forces_LC7_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_8 * forces_LC8_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_9 * forces_LC9_df)
-        forces_Combo8 = forces_Combo8.fillna(Combo8_10 * forces_LC10_df)
+        Combo8 = [Combo8_1, Combo8_2, Combo8_3, Combo8_4, Combo8_5, Combo8_6, Combo8_7, Combo8_8, Combo8_9, Combo8_10]
+        
+        forces_Combo8 = pd.DataFrame()
+        forces_Combo8_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo8[i] == 0:
+                    pass
+                else:
+                    forces_Combo8 = Combo8[i] * j
+                    forces_Combo8_prev = forces_Combo8
+            elif Combo8[i] == 0:
+                pass
+            else:                    
+                forces_Combo8 = forces_Combo8 + Combo8[i] * j
+                forces_Combo8 = forces_Combo8.fillna(forces_Combo8_prev)
+                forces_Combo8 = forces_Combo8.fillna(Combo8[i] * j)
+                forces_Combo8_prev = forces_Combo8
+                
+        forces_Combo8 = forces_Combo8.round(3)
 
         # Load Combo 9
-        forces_Combo9 = Combo9_1 * forces_LC1_df + Combo9_2 * forces_LC2_df + Combo9_3 * forces_LC3_df + Combo9_4 * forces_LC4_df + Combo9_5 * forces_LC5_df + Combo9_6 * forces_LC6_df + Combo9_7 * forces_LC7_df + Combo9_8 * forces_LC8_df + Combo9_9 * forces_LC9_df + Combo9_10 * forces_LC10_df
-        forces_Combo9 = forces_Combo9.fillna(Combo9_1 * forces_LC1_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_2 * forces_LC2_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_3 * forces_LC3_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_4 * forces_LC4_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_5 * forces_LC5_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_6 * forces_LC6_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_7 * forces_LC7_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_8 * forces_LC8_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_9 * forces_LC9_df)
-        forces_Combo9 = forces_Combo9.fillna(Combo9_10 * forces_LC10_df)
+        Combo9 = [Combo9_1, Combo9_2, Combo9_3, Combo9_4, Combo9_5, Combo9_6, Combo9_7, Combo9_8, Combo9_9, Combo9_10]
+        
+        forces_Combo9 = pd.DataFrame()
+        forces_Combo9_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo9[i] == 0:
+                    pass
+                else:
+                    forces_Combo9 = Combo9[i] * j
+                    forces_Combo9_prev = forces_Combo9
+            elif Combo9[i] == 0:
+                pass
+            else:                    
+                forces_Combo9 = forces_Combo9 + Combo9[i] * j
+                forces_Combo9 = forces_Combo9.fillna(forces_Combo9_prev)
+                forces_Combo9 = forces_Combo9.fillna(Combo9[i] * j)
+                forces_Combo9_prev = forces_Combo9
 
+        forces_Combo9 = forces_Combo9.round(3)
+                
         # Load Combo 10
-        forces_Combo10 = Combo10_1 * forces_LC1_df + Combo10_2 * forces_LC2_df + Combo10_3 * forces_LC3_df + Combo10_4 * forces_LC4_df + Combo10_5 * forces_LC5_df + Combo10_6 * forces_LC6_df + Combo10_7 * forces_LC7_df + Combo10_8 * forces_LC8_df + Combo10_9 * forces_LC9_df + Combo10_10 * forces_LC10_df
-        forces_Combo10 = forces_Combo10.fillna(Combo10_1 * forces_LC1_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_2 * forces_LC2_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_3 * forces_LC3_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_4 * forces_LC4_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_5 * forces_LC5_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_6 * forces_LC6_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_7 * forces_LC7_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_8 * forces_LC8_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_9 * forces_LC9_df)
-        forces_Combo10 = forces_Combo10.fillna(Combo10_10 * forces_LC10_df)
+        Combo10 = [Combo10_1, Combo10_2, Combo10_3, Combo10_4, Combo10_5, Combo10_6, Combo10_7, Combo10_8, Combo10_9, Combo10_10]
+        
+        forces_Combo10 = pd.DataFrame()
+        forces_Combo10_prev = pd.DataFrame()
+        
+        for i, j in enumerate(force_Combo):
+            if i == 0:
+                if Combo10[i] == 0:
+                    pass
+                else:
+                    forces_Combo10 = Combo10[i] * j
+                    forces_Combo10_prev = forces_Combo10
+            elif Combo10[i] == 0:
+                pass
+            else:                    
+                forces_Combo10 = forces_Combo10 + Combo10[i] * j
+                forces_Combo10 = forces_Combo10.fillna(forces_Combo10_prev)
+                forces_Combo10 = forces_Combo10.fillna(Combo10[i] * j)
+                forces_Combo10_prev = forces_Combo10
+                
+        forces_Combo10 = forces_Combo10.round(3)
         
         # Convert Load Combos back to Dictionary
         self.forces_Combo1 = {}
         
-        for i in forces_Combo1.index:
-            for _, row in forces_Combo1.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo1.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo1.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo1.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo2 = {}
         
-        for i in forces_Combo2.index:
-            for _, row in forces_Combo2.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo2.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo2.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo2.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo3 = {}
         
-        for i in forces_Combo3.index:
-            for _, row in forces_Combo3.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo3.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo3.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo3.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo4 = {}
         
-        for i in forces_Combo4.index:
-            for _, row in forces_Combo4.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo4.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo4.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo4.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo5 = {}
         
-        for i in forces_Combo5.index:
-            for _, row in forces_Combo5.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo5.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo5.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo5.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo6 = {}
         
-        for i in forces_Combo6.index:
-            for _, row in forces_Combo6.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo6.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo6.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo6.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
         
         self.forces_Combo7 = {}
         
-        for i in forces_Combo7.index:
-            for _, row in forces_Combo7.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo7.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo7.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo7.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo8 = {}
         
-        for i in forces_Combo8.index:
-            for _, row in forces_Combo8.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo8.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo8.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo8.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
 
         self.forces_Combo9 = {}
         
-        for i in forces_Combo9.index:
-            for _, row in forces_Combo9.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo9.update({node: [float(f_x), float(f_y)]})
-
+        for i, row in forces_Combo9.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo9.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
         self.forces_Combo10 = {}
         
-        for i in forces_Combo10.index:
-            for _, row in forces_Combo10.iterrows():
-                node = int(i)
-                f_x = row['F_x']
-                f_y = row['F_y']
-                self.forces_Combo10.update({node: [float(f_x), float(f_y)]})
+        for i, row in forces_Combo10.iterrows():
+            node = int(i)
+            f_x = row['F_x']
+            f_y = row['F_y']
+            print(node, f_x, f_y)
+            self.forces_Combo10.update({node: [np.round(float(f_x),3), np.round(float(f_y),3)]})
         
         
         # Solve Trusses
@@ -1722,6 +1829,7 @@ class UI(QMainWindow):
         self.Reactions_Button.setEnabled(True)
         self.Displacement_Button.setEnabled(True)
         self.Axial_Force_Button.setEnabled(True)
+        self.Load_Combination_Combo_Box.setEnabled(True)
 
         # save_file_name = file_name[0].split('xlsx')[0]
         # plt.savefig(save_file_name+'setup.png', dpi=300)
@@ -2983,6 +3091,11 @@ class UI(QMainWindow):
         
         title = "PySEAD Truss 2D"
         self.setWindowTitle(title)
+        
+        self.Reactions_Button.setEnabled(False)
+        self.Displacement_Button.setEnabled(False)
+        self.Axial_Force_Button.setEnabled(False)
+        self.Load_Combination_Combo_Box.setEnabled(False)
 
     ##### Menu Functions #####
 
@@ -3002,6 +3115,7 @@ class UI(QMainWindow):
         forces_LC10_dict = {}
         supports_dict = {}
         load_case_dict = {}
+        load_combo_dict = {}
 
         # try:
         # Nodes    
@@ -3144,12 +3258,28 @@ class UI(QMainWindow):
             supports_dict.update({index+1:[int(node), float(x), float(y)]})
         supports_df = pd.DataFrame.from_dict(supports_dict, orient='index', columns=['Node','X','Y'])
         
+        # Load Combinations
+        for index in range(self.Load_Combination_Table_Widget.rowCount()):
+            C1 = float(self.Load_Combination_Table_Widget.item(index,0).text())
+            C2 = float(self.Load_Combination_Table_Widget.item(index,1).text())
+            C3 = float(self.Load_Combination_Table_Widget.item(index,2).text())
+            C4 = float(self.Load_Combination_Table_Widget.item(index,3).text())
+            C5 = float(self.Load_Combination_Table_Widget.item(index,4).text())
+            C6 = float(self.Load_Combination_Table_Widget.item(index,5).text())
+            C7 = float(self.Load_Combination_Table_Widget.item(index,6).text())
+            C8 = float(self.Load_Combination_Table_Widget.item(index,7).text())
+            C9 = float(self.Load_Combination_Table_Widget.item(index,8).text())
+            C10 = float(self.Load_Combination_Table_Widget.item(index,9).text())
+            load_combo_dict.update({index+1:[float(C1), float(C2), float(C3), float(C4), float(C5), float(C6),float(C7), float(C8), float(C9), float(C10)]})
+        load_combo_dict_df = pd.DataFrame.from_dict(load_combo_dict, orient='index', columns=['Combo1','Combo2','Combo3','Combo4','Combo5','Combo6','Combo7','Combo8','Combo9','Combo10'])
+        
         with pd.ExcelWriter(file_name[0]) as writer:
             nodes_df.to_excel(writer, sheet_name='Nodes')
             elements_df.to_excel(writer, sheet_name='Elements')
             materials_df.to_excel(writer, sheet_name='Materials')
             supports_df.to_excel(writer, sheet_name='Supports')
             load_cases_df.to_excel(writer, sheet_name='Load_Cases')
+            load_combo_dict_df.to_excel(writer, sheet_name='Load_Combo')
             forces_LC1_df.to_excel(writer, sheet_name='Forces_LC1')
             forces_LC2_df.to_excel(writer, sheet_name='Forces_LC2')
             forces_LC3_df.to_excel(writer, sheet_name='Forces_LC3')
@@ -3181,7 +3311,7 @@ class UI(QMainWindow):
             # print("Canceled Dialogue")
             # self.Solve_Truss_Button.setEnabled(False)
 
-    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet, load_cases_sheet):
+    def Open_File(self, nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet, load_cases_sheet, load_combo_sheet):
         try:
             # Nodes
             for index, row in nodes_sheet.iterrows():
@@ -3232,6 +3362,30 @@ class UI(QMainWindow):
             for index, row in load_cases_sheet.iterrows():
                 load_case = str(row['Load Case Name'])
                 self.Load_Case_Table_Widget.setItem(index, 0, QTableWidgetItem(str(load_case)))
+
+            # Load Combo
+            for index, row in load_combo_sheet.iterrows():
+                C1 = str(row['Combo1'])
+                C2 = str(row['Combo2'])
+                C3 = str(row['Combo3'])
+                C4 = str(row['Combo4'])
+                C5 = str(row['Combo5'])
+                C6 = str(row['Combo6'])
+                C7 = str(row['Combo7'])
+                C8 = str(row['Combo8'])
+                C9 = str(row['Combo9'])
+                C10 = str(row['Combo10'])
+
+                self.Load_Combination_Table_Widget.setItem(index, 0, QTableWidgetItem(C1))
+                self.Load_Combination_Table_Widget.setItem(index, 1, QTableWidgetItem(C2))
+                self.Load_Combination_Table_Widget.setItem(index, 2, QTableWidgetItem(C3))
+                self.Load_Combination_Table_Widget.setItem(index, 3, QTableWidgetItem(C4))
+                self.Load_Combination_Table_Widget.setItem(index, 4, QTableWidgetItem(C5))
+                self.Load_Combination_Table_Widget.setItem(index, 5, QTableWidgetItem(C6))
+                self.Load_Combination_Table_Widget.setItem(index, 6, QTableWidgetItem(C7))
+                self.Load_Combination_Table_Widget.setItem(index, 7, QTableWidgetItem(C8))
+                self.Load_Combination_Table_Widget.setItem(index, 8, QTableWidgetItem(C9))
+                self.Load_Combination_Table_Widget.setItem(index, 9, QTableWidgetItem(C10))
 
             # Forces
             # Add Load Case 1 in Table
@@ -3290,6 +3444,7 @@ class UI(QMainWindow):
             forces_LC9_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC9')
             forces_LC10_sheet = pd.read_excel(file_name[0], sheet_name='Forces_LC10')
             load_cases_sheet = pd.read_excel(file_name[0], sheet_name='Load_Cases')
+            load_combo_sheet = pd.read_excel(file_name[0], sheet_name='Load_Combo')
             
             # Save Dataframes into Dictionaries
             for _, row in forces_LC1_sheet.iterrows():
@@ -3352,7 +3507,7 @@ class UI(QMainWindow):
                 f_y = row['F_y']
                 self.forces_LC10.update({int(node): [float(f_x), float(f_y)]}) 
                 
-            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet, load_cases_sheet)
+            self.Open_File(nodes_sheet, elements_sheet, materials_sheet, forces_LC1_sheet, supports_sheet, load_cases_sheet, load_combo_sheet)
 
             self.Solve_Truss_Button.setEnabled(True)
 
