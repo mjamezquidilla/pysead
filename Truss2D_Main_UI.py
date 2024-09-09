@@ -2,6 +2,8 @@
 import os
 import sys
 import gc
+import datetime
+from time import ctime
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -3867,8 +3869,44 @@ class NavigationToolbarCustom(NavigationToolbar):
                  t[0] in ("Save","Pan","Zoom", "Home")]
 
 
+####################
+### TRIAL PERIOD ###
+####################
+class Trial_Period():
+    def __init__(self):
+        
+        # Set the expiration date (YYYY, MM, DD)
+        expiration_date = datetime.datetime(2024, 1, 31)
+
+        # Get the current date and time (attempt to use internet time)
+        current_date = self.get_internet_time()
+       
+        # If the current date is past the expiration date, show the pop-up and exit
+        if current_date > expiration_date:
+            self.show_expired_popup()        
+
+    # Function to get the current time from an NTP server
+    def get_internet_time(self):
+        return datetime.datetime.now()
+
+    # Function to show an expiration message in a pop-up window
+    def show_expired_popup(self):
+        app = QApplication(sys.argv)
+        dlg = QMessageBox()
+        dlg.setWindowTitle("PySEAD Truss 2D - Trial Period Expired")
+        dlg.setText("Trial Period of this program has expired and will now close")
+
+        # Show the message box and exit when OK is clicked
+        dlg.buttonClicked.connect(lambda: sys.exit())
+        dlg.exec()
+
+
 if __name__ == "__main__":
     # Initialize the App
+    
+    # Check Trial Period
+    Trial_Period()
+    
     # sys.argv += ['--style', 'Material']
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='dark_cyan.xml', extra = extra, css_file='custom.css')
