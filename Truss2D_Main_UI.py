@@ -3,18 +3,19 @@ import os
 import sys
 import gc
 import datetime
-from time import ctime
+import requests
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import qdarkstyle
 
 # Using PyQt6
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
+
+import qdarkstyle
 
 # Using PySide6
 # from PySide6.QtUiTools import QUiLoader
@@ -3876,7 +3877,8 @@ class Trial_Period():
     def __init__(self):
         
         # Set the expiration date (YYYY, MM, DD)
-        expiration_date = datetime.datetime(2024, 1, 31)
+        expiration_date = datetime.datetime(2024, 12, 31)
+        expiration_date = expiration_date.date()
 
         # Get the current date and time (attempt to use internet time)
         current_date = self.get_internet_time()
@@ -3887,7 +3889,16 @@ class Trial_Period():
 
     # Function to get the current time from an NTP server
     def get_internet_time(self):
-        return datetime.datetime.now()
+        try:
+            response = requests.get('http://worldtimeapi.org/api/ip')
+            response.raise_for_status()  # Check for request errors
+            data = response.json()
+            datetime_str = data['datetime']
+            current_date = datetime.datetime.fromisoformat(datetime_str) 
+            current_date = current_date.date()
+        except requests.RequestException as e:
+            current_date = datetime.datetime.now().date()
+        return current_date 
 
     # Function to show an expiration message in a pop-up window
     def show_expired_popup(self):
