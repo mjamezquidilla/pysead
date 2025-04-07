@@ -1519,7 +1519,7 @@ class Frame_2D:
 
     def __drawCirc(self, ax,radius,centX,centY,angle_,theta2_,color_='green',lw=2,direction="Positive"):
         # Arc
-        arc = Arc([centX,centY],radius,radius,angle=angle_,
+        arc = Arc((centX,centY),radius,radius,angle=angle_,
             theta1=0,theta2=theta2_,capstyle='round',linestyle='-',lw=lw,color=color_)
         ax.add_patch(arc)
 
@@ -1533,20 +1533,20 @@ class Frame_2D:
         if direction=="Positive":
             ax.add_patch(                    #Create triangle as arrow head
                 RegularPolygon(
-                    (endX, endY),            # (x,y)
-                    3,                       # number of vertices
-                    radius/9,                # radius
-                    rad(angle_+theta2_),     # orientation
+                    xy=(endX, endY),            # (x,y)
+                    numVertices=3,                       # number of vertices
+                    radius=radius/9,                # radius
+                    orientation=rad(angle_+theta2_),     # orientation
                     color=color_
                 )
             )
         else:
             ax.add_patch(                    #Create triangle as arrow head
                 RegularPolygon(
-                    (startX, startY),            # (x,y)
-                    3,                       # number of vertices
-                    radius/9,                # radius
-                    rad(angle_+theta2_),     # orientation
+                    xy=(startX, startY),            # (x,y)
+                    numVertices=3,                       # number of vertices
+                    radius=radius/9,                # radius
+                    orientation=rad(angle_+theta2_),     # orientation
                     color=color_
                 )
             )
