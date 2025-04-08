@@ -1175,7 +1175,7 @@ class Frame_2D:
         displacements_dict = {}
         
         for displacement in range(1,int(len(displacements)/3 + 1)):
-            displacements_dict.update({displacement: [displacements[3 * displacement - 2], displacements[3 * displacement - 1], displacements[3 * displacement] ]})
+            displacements_dict.update({displacement: [float(displacements[3 * displacement - 2]), float(displacements[3 * displacement - 1]), float(displacements[3 * displacement]) ]})
 
         return displacements_dict
 
@@ -1555,7 +1555,9 @@ class Frame_2D:
 
         reactions_dict = {}
         for support in supports:
-            reactions_dict.update({support: [forces_dict[3 * support - 2], forces_dict[3 * support-1], forces_dict[3 * support]]})
+            reactions_dict.update({support: [float(forces_dict[3 * support - 2]), 
+                                             float(forces_dict[3 * support-1]), 
+                                             float(forces_dict[3 * support])]})
 
         return reactions_dict
 
@@ -1795,7 +1797,7 @@ class Frame_2D:
         plt.show()
        
        
-    def Draw_Moment_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10):
+    def Draw_Moment_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10, dpi = 100):
     
         nodes = self.nodes
         elements = self.elements
@@ -1810,7 +1812,7 @@ class Frame_2D:
         average_area = np.array(average_area)
         average_area = np.average(average_area)
     
-        plt.figure(figsize=figure_size)
+        plt.figure(figsize=figure_size, dpi=dpi)
         plt.grid(grid)
         ax = plt.gca()
         scale_factor = scale_factor
@@ -1829,7 +1831,10 @@ class Frame_2D:
                     color = 'black', zorder = 5, 
                     linewidth = linewidth * areas[element] / average_area, 
                     markersize = node_size)
-
+            middlePoint = [abs((to_point[0] - from_point[0])/2) + min(from_point[0], to_point[0]), 
+                abs((to_point[1] - from_point[1])/2) + min(from_point[1], to_point[1])]
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b') 
+            
         for member in self.members_list:
             x = []
             y = []
@@ -1902,7 +1907,7 @@ class Frame_2D:
         plt.show()
 
 
-    def Draw_Shear_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10):
+    def Draw_Shear_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10, dpi = 100):
     
         nodes = self.nodes
         elements = self.elements
@@ -1917,7 +1922,7 @@ class Frame_2D:
         average_area = np.array(average_area)
         average_area = np.average(average_area)
     
-        plt.figure(figsize=figure_size)
+        plt.figure(figsize=figure_size, dpi=dpi)
         plt.grid(grid)
         ax = plt.gca()
         scale_factor = scale_factor
@@ -1936,6 +1941,9 @@ class Frame_2D:
                     color = 'black', zorder = 5, 
                     linewidth = linewidth * areas[element] / average_area, 
                     markersize = node_size)
+            middlePoint = [abs((to_point[0] - from_point[0])/2) + min(from_point[0], to_point[0]), 
+                abs((to_point[1] - from_point[1])/2) + min(from_point[1], to_point[1])]
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b') 
 
         for member in self.members_list:
             x = []
@@ -2009,7 +2017,7 @@ class Frame_2D:
         plt.show()
 
 
-    def Draw_Axial_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10):
+    def Draw_Axial_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=300, linewidth = 2, node_size = 10, dpi=100):
     
         nodes = self.nodes
         elements = self.elements
@@ -2024,7 +2032,7 @@ class Frame_2D:
         average_area = np.array(average_area)
         average_area = np.average(average_area)
     
-        plt.figure(figsize=figure_size)
+        plt.figure(figsize=figure_size, dpi=dpi)
         plt.grid(grid)
         ax = plt.gca()
         scale_factor = scale_factor
@@ -2043,6 +2051,9 @@ class Frame_2D:
                     color = 'black', zorder = 5, 
                     linewidth = linewidth * areas[element] / average_area, 
                     markersize = node_size)
+            middlePoint = [abs((to_point[0] - from_point[0])/2) + min(from_point[0], to_point[0]), 
+                abs((to_point[1] - from_point[1])/2) + min(from_point[1], to_point[1])]
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b') 
 
         for member in self.members_list:
             x = []
