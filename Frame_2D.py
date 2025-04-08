@@ -167,8 +167,6 @@ class Member_2D:
         
         c = (x2 - x1) / L
         s = (y2 - y1) / L
-
-        # w1 = w * c
         
         if x2 >= x1 and y2 >= y1: # 1st quadrant
             w1 = w * c
@@ -183,20 +181,72 @@ class Member_2D:
             w1 = w * c
             w2 = -w * s
 
-            
-
-        # if y2 > y1:
-        #     # w1 = w * c
-        #     w2 = -w * s
-
-        # else:
-        #     # w1 = -w * c
-        #     w2 = w * s
-
         self.Add_Load_Full_Uniform(w1)
         self.Add_Load_Axial_Uniform(w2)
 
 
+    def Add_Load_Full_Uniform_Fy(self, w): # TODO ONLY QUADRANT 1 WORKS 
+        nodes = self.nodes
+        coordinates = []
+        for node in nodes:
+            coordinates.append(nodes[node])
+        x1 = coordinates[0][0]
+        y1 = coordinates[0][1]
+        x2 = coordinates[1][0]
+        y2 = coordinates[1][1]
+        L = self.length
+        
+        if x2 <= x1 and y2 <= y1:
+            x2new = x1
+            x1new = x2
+            x2 = x2new
+            x1 = x1new
+            y2new = y1
+            y1new = y2
+            y2 = y2new
+            y1 = y1new
+        
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
+
+        w1 = w * c
+        w2 = -w * s 
+
+        self.Add_Load_Full_Uniform(-w1)
+        self.Add_Load_Axial_Uniform(-w2)
+
+    
+    def Add_Load_Full_Uniform_Fx(self, w): # TODO ONLY QUADRANT 1 WORKS
+        nodes = self.nodes
+        coordinates = []
+        for node in nodes:
+            coordinates.append(nodes[node])
+        x1 = coordinates[0][0]
+        y1 = coordinates[0][1]
+        x2 = coordinates[1][0]
+        y2 = coordinates[1][1]
+        L = self.length
+        
+        if x2 <= x1 and y2 <= y1:
+            x2new = x1
+            x1new = x2
+            x2 = x2new
+            x1 = x1new
+            y2new = y1
+            y1new = y2
+            y2 = y2new
+            y1 = y1new
+            
+        c = (x2 - x1) / L
+        s = (y2 - y1) / L
+
+        w1 = w * s        
+        w2 = w * c 
+
+        self.Add_Load_Full_Uniform(w1)
+        self.Add_Load_Axial_Uniform(w2)
+    
+    
     # def Add_load_Axial(self, P, a):
     #     L = self.length
     #     beginning_axial = P * (L - a) / L
@@ -270,14 +320,6 @@ class Member_2D:
 
     def Add_Load_Full_Uniform(self, w): # OKAY!
         L = self.length
-        
-        coordinates = []
-        for node in self.nodes:
-            coordinates.append(self.nodes[node])
-        x1 = coordinates[0][0]
-        y1 = coordinates[0][1]
-        x2 = coordinates[1][0]
-        y2 = coordinates[1][1]
         
         beginning_moment = w * L**2 / 12
         end_moment = -w * L**2 / 12
