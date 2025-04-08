@@ -146,8 +146,8 @@ class Member_2D:
 
         # Axial Values
         axial_values = self.x_array.copy()
-        for index, _ in enumerate(axial_values):
-            axial_values[index] = beginning_axial
+        for index, x in enumerate(axial_values):
+            axial_values[index] = w*x - beginning_axial
 
         self.axial += axial_values        
 
@@ -1792,4 +1792,325 @@ class Frame_2D:
                 pass
 
         ax.axis('equal')
+        plt.show()
+       
+       
+    def Draw_Moment_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10):
+    
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports      
+        areas = self.areas
+        linewidth = linewidth
+        node_size = node_size
+        
+        average_area = []
+        for area in areas:
+            average_area.append(areas[area])
+        average_area = np.array(average_area)
+        average_area = np.average(average_area)
+    
+        plt.figure(figsize=figure_size)
+        plt.grid(grid)
+        ax = plt.gca()
+        scale_factor = scale_factor
+
+        # plotting nodes and members
+        for element in elements:
+            from_node = elements[element][0]
+            to_node = elements[element][1]
+            from_point = nodes[from_node]
+            to_point = nodes[to_node]
+            x1 = from_point[0]
+            y1 = from_point[1]
+            x2 = to_point[0]
+            y2 = to_point[1]
+            ax.plot([x1,x2],[y1,y2], marker = 'o', 
+                    color = 'black', zorder = 5, 
+                    linewidth = linewidth * areas[element] / average_area, 
+                    markersize = node_size)
+
+        for member in self.members_list:
+            x = []
+            y = []
+            for _, array in member.nodes.items():
+                x.append(array[0])
+                y.append(array[1])
+
+            # Rotation angle (in degrees)
+            theta_deg = np.arctan2(y[1]-y[0],x[1]-x[0]) * 180 / np.pi
+            theta_rad = np.deg2rad(theta_deg)  # convert to radians
+
+            # Translation (dx, dy)
+            dx = x[0]
+            dy = y[0]
+            
+            # Scale factor
+            scaled_member_moment = member.moment / scale_factor
+
+            # Apply rotation
+            x_rot = (member.x_array * np.cos(theta_rad) - scaled_member_moment * np.sin(theta_rad))
+            y_rot = (member.x_array * np.sin(theta_rad) + scaled_member_moment * np.cos(theta_rad))
+
+            # Apply translation
+            x_final = x_rot + dx
+            y_final = y_rot + dy
+            
+            # insert
+            x_final = np.insert(x_final, 0, x[0])
+            last_fron_end_index = len(x_final)
+            x_final = np.insert(x_final, last_fron_end_index, x[-1])
+
+            y_final = np.insert(y_final, 0, y[0])
+            last_fron_end_index = len(y_final)
+            y_final = np.insert(y_final, last_fron_end_index, y[-1])
+
+            # Plot
+            ax.plot(x_final, y_final, 'b-', linewidth = linewidth * areas[element] / average_area)
+            
+            moment = np.insert(member.moment, 0, x[0])
+            last_fron_end_index = len(moment)
+            moment = np.insert(moment, last_fron_end_index, x[-1])
+            
+            if show_labels:
+                first = 0
+                last = int(len(moment) - 1)
+                for i, text in enumerate(moment):
+                    if i != first and i != last:
+                        plt.annotate(round(text,2), (x_final[i], y_final[i]))
+            
+            # plotting supports
+            for support in supports:
+
+                support_x = supports[support][0]
+                support_y = supports[support][1]
+                support_z = supports[support][2]
+
+                x = nodes[support][0]
+                y = nodes[support][1]
+
+                if support_x == 1 and support_y == 1 and support_z == 1:
+                    ax.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
+                elif support_x == 1 and support_y == 1 and support_z == 0:
+                    ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                else: 
+                    ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+
+        ax.axis('equal')
+        ax.grid(True)
+
+        plt.show()
+
+
+    def Draw_Shear_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10):
+    
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports      
+        areas = self.areas
+        linewidth = linewidth
+        node_size = node_size
+        
+        average_area = []
+        for area in areas:
+            average_area.append(areas[area])
+        average_area = np.array(average_area)
+        average_area = np.average(average_area)
+    
+        plt.figure(figsize=figure_size)
+        plt.grid(grid)
+        ax = plt.gca()
+        scale_factor = scale_factor
+
+        # plotting nodes and members
+        for element in elements:
+            from_node = elements[element][0]
+            to_node = elements[element][1]
+            from_point = nodes[from_node]
+            to_point = nodes[to_node]
+            x1 = from_point[0]
+            y1 = from_point[1]
+            x2 = to_point[0]
+            y2 = to_point[1]
+            ax.plot([x1,x2],[y1,y2], marker = 'o', 
+                    color = 'black', zorder = 5, 
+                    linewidth = linewidth * areas[element] / average_area, 
+                    markersize = node_size)
+
+        for member in self.members_list:
+            x = []
+            y = []
+            for _, array in member.nodes.items():
+                x.append(array[0])
+                y.append(array[1])
+
+            # Rotation angle (in degrees)
+            theta_deg = np.arctan2(y[1]-y[0],x[1]-x[0]) * 180 / np.pi
+            theta_rad = np.deg2rad(theta_deg)  # convert to radians
+
+            # Translation (dx, dy)
+            dx = x[0]
+            dy = y[0]
+            
+            # Scale factor
+            scaled_member_shear = member.shear / scale_factor
+
+            # Apply rotation
+            x_rot = (member.x_array * np.cos(theta_rad) - scaled_member_shear * np.sin(theta_rad))
+            y_rot = (member.x_array * np.sin(theta_rad) + scaled_member_shear * np.cos(theta_rad))
+
+            # Apply translation
+            x_final = x_rot + dx
+            y_final = y_rot + dy
+            
+            # insert
+            x_final = np.insert(x_final, 0, x[0])
+            last_fron_end_index = len(x_final)
+            x_final = np.insert(x_final, last_fron_end_index, x[-1])
+
+            y_final = np.insert(y_final, 0, y[0])
+            last_fron_end_index = len(y_final)
+            y_final = np.insert(y_final, last_fron_end_index, y[-1])
+
+            # Plot
+            ax.plot(x_final, y_final, 'm-', linewidth = linewidth * areas[element] / average_area)
+            
+            shear = np.insert(member.shear, 0, x[0])
+            last_fron_end_index = len(shear)
+            shear = np.insert(shear, last_fron_end_index, x[-1])
+            
+            if show_labels:
+                first = 0
+                last = int(len(shear) - 1)
+                for i, text in enumerate(shear):
+                    if i != first and i != last:
+                        plt.annotate(round(text,2), (x_final[i], y_final[i]))
+            
+            # plotting supports
+            for support in supports:
+
+                support_x = supports[support][0]
+                support_y = supports[support][1]
+                support_z = supports[support][2]
+
+                x = nodes[support][0]
+                y = nodes[support][1]
+
+                if support_x == 1 and support_y == 1 and support_z == 1:
+                    ax.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
+                elif support_x == 1 and support_y == 1 and support_z == 0:
+                    ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                else: 
+                    ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+
+        ax.axis('equal')
+        ax.grid(True)
+
+        plt.show()
+
+
+    def Draw_Axial_Diagram(self, figure_size = None, show_labels=False, grid=True, scale_factor=50, linewidth = 2, node_size = 10):
+    
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports      
+        areas = self.areas
+        linewidth = linewidth
+        node_size = node_size
+        
+        average_area = []
+        for area in areas:
+            average_area.append(areas[area])
+        average_area = np.array(average_area)
+        average_area = np.average(average_area)
+    
+        plt.figure(figsize=figure_size)
+        plt.grid(grid)
+        ax = plt.gca()
+        scale_factor = scale_factor
+
+        # plotting nodes and members
+        for element in elements:
+            from_node = elements[element][0]
+            to_node = elements[element][1]
+            from_point = nodes[from_node]
+            to_point = nodes[to_node]
+            x1 = from_point[0]
+            y1 = from_point[1]
+            x2 = to_point[0]
+            y2 = to_point[1]
+            ax.plot([x1,x2],[y1,y2], marker = 'o', 
+                    color = 'black', zorder = 5, 
+                    linewidth = linewidth * areas[element] / average_area, 
+                    markersize = node_size)
+
+        for member in self.members_list:
+            x = []
+            y = []
+            for _, array in member.nodes.items():
+                x.append(array[0])
+                y.append(array[1])
+
+            # Rotation angle (in degrees)
+            theta_deg = np.arctan2(y[1]-y[0],x[1]-x[0]) * 180 / np.pi
+            theta_rad = np.deg2rad(theta_deg)  # convert to radians
+
+            # Translation (dx, dy)
+            dx = x[0]
+            dy = y[0]
+            
+            # Scale factor
+            scaled_member_axial = member.axial / scale_factor
+
+            # Apply rotation
+            x_rot = (member.x_array * np.cos(theta_rad) - scaled_member_axial * np.sin(theta_rad))
+            y_rot = (member.x_array * np.sin(theta_rad) + scaled_member_axial * np.cos(theta_rad))
+
+            # Apply translation
+            x_final = x_rot + dx
+            y_final = y_rot + dy
+            
+            # insert
+            x_final = np.insert(x_final, 0, x[0])
+            last_fron_end_index = len(x_final)
+            x_final = np.insert(x_final, last_fron_end_index, x[-1])
+
+            y_final = np.insert(y_final, 0, y[0])
+            last_fron_end_index = len(y_final)
+            y_final = np.insert(y_final, last_fron_end_index, y[-1])
+
+            # Plot
+            ax.plot(x_final, y_final, 'r-', linewidth = linewidth * areas[element] / average_area)
+            
+            axial = np.insert(member.axial, 0, x[0])
+            last_fron_end_index = len(axial)
+            axial = np.insert(axial, last_fron_end_index, x[-1])
+            
+            if show_labels:
+                first = 0
+                last = int(len(axial) - 1)
+                for i, text in enumerate(axial):
+                    if i != first and i != last:
+                        plt.annotate(round(text,2), (x_final[i], y_final[i]))
+            
+            # plotting supports
+            for support in supports:
+
+                support_x = supports[support][0]
+                support_y = supports[support][1]
+                support_z = supports[support][2]
+
+                x = nodes[support][0]
+                y = nodes[support][1]
+
+                if support_x == 1 and support_y == 1 and support_z == 1:
+                    ax.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
+                elif support_x == 1 and support_y == 1 and support_z == 0:
+                    ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+                else: 
+                    ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+
+        ax.axis('equal')
+        ax.grid(True)
+
         plt.show()
