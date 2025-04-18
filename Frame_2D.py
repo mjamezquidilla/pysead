@@ -63,6 +63,11 @@ class Member_2D:
             self.__Release_Node_Coordinates()
 
     def Compile_Member_Forces(self):
+        # Reinitialize forces dictionary
+        self.forces = {}
+        for node in self.nodes:
+            self.forces.update({node: [0,0,0]})
+        
         # Insert the points of interest into x_array
         for a in self.points_of_interest:
             index = np.searchsorted(self.x_array, a)
@@ -78,7 +83,6 @@ class Member_2D:
         self.axial = np.zeros(len(self.x_array))
         self.shear = np.zeros(len(self.x_array))
         self.moment = np.zeros(len(self.x_array))
-        
         # Recompute the axial, moment and shear values based on new x_array
         for p in self.point_load:
             self.Add_Load_Point(p[0], p[1])
@@ -88,13 +92,13 @@ class Member_2D:
             
         for a in self.uniform_axial_load:
             self.Add_Load_Axial_Uniform(a)
-            
+
         for w in self.self_weight:
             self.Add_Self_Weight(w)
-            
+
         for w in self.uniform_full_load_fx:
             self.Add_Load_Full_Uniform_Fx(w)
-            
+
         for w in self.uniform_full_load_fy:
             self.Add_Load_Full_Uniform_Fy(w)
 
@@ -580,7 +584,7 @@ class Member_2D:
 
 
     def Resolve_Forces_into_Components(self): # OKAY!
-        # self.Compile_Member_Forces()
+        self.Compile_Member_Forces()
         # solve for angle
         nodes = self.nodes
 
