@@ -22,6 +22,13 @@ class Member_2D:
         self.moment_release_left = moment_release[0]
         self.moment_release_right = moment_release[1]
         self.no_of_divs = no_of_divs
+        self.points_of_interest = []
+        self.uniform_full_load = []
+        self.point_load = []
+        self.uniform_axial_load = []
+        self.self_weight = []
+        self.uniform_full_load_fx = []
+        self.uniform_full_load_fy = []
         
         # Check if nodes dictionary is not empty
         if nodes:
@@ -54,6 +61,46 @@ class Member_2D:
 
             # Plotting Member Releases
             self.__Release_Node_Coordinates()
+
+    def Compile_Member_Forces(self):
+        # Reinitialize forces dictionary
+        self.forces = {}
+        for node in self.nodes:
+            self.forces.update({node: [0,0,0]})
+        
+        # Insert the points of interest into x_array
+        for a in self.points_of_interest:
+            index = np.searchsorted(self.x_array, a)
+            self.x_array = np.insert(self.x_array, index, a)
+            
+            before = np.searchsorted(self.x_array, a-0.001)
+            self.x_array = np.insert(self.x_array, before, a-0.001)
+            
+            after = np.searchsorted(self.x_array, a+0.001)
+            self.x_array = np.insert(self.x_array, after, a+0.001)
+
+        # Re-initialize axial, shear, and moment arrays based on length of x_array
+        self.axial = np.zeros(len(self.x_array))
+        self.shear = np.zeros(len(self.x_array))
+        self.moment = np.zeros(len(self.x_array))
+        # Recompute the axial, moment and shear values based on new x_array
+        for p in self.point_load:
+            self.Add_Load_Point(p[0], p[1])
+        
+        for w in self.uniform_full_load:
+            self.Add_Load_Full_Uniform(w, False)
+            
+        for a in self.uniform_axial_load:
+            self.Add_Load_Axial_Uniform(a)
+
+        for w in self.self_weight:
+            self.Add_Self_Weight(w)
+
+        for w in self.uniform_full_load_fx:
+            self.Add_Load_Full_Uniform_Fx(w)
+
+        for w in self.uniform_full_load_fy:
+            self.Add_Load_Full_Uniform_Fy(w)
 
     def __Release_Node_Coordinates(self):
         nodes = self.nodes
@@ -136,7 +183,7 @@ class Member_2D:
         self.__Release_Node_Coordinates()
 
 
-    def Add_Load_Axial_Uniform(self, w): # OKAY!
+    def Add_Load_Axial_Uniform(self, w, skip_part = False): # OKAY!
         L = self.length
         beginning_axial = w * L / 2
         end_axial = w * L / 2
@@ -151,6 +198,9 @@ class Member_2D:
 
         self.axial += axial_values        
 
+        if not skip_part:
+            if not w in self.uniform_axial_load:
+                self.uniform_axial_load.append(w)
 
     def Add_Self_Weight(self, unit_weight): # OKAY!
         w = unit_weight * self.area
@@ -181,11 +231,14 @@ class Member_2D:
             w1 = w * c
             w2 = -w * s
 
-        self.Add_Load_Full_Uniform(w1)
-        self.Add_Load_Axial_Uniform(w2)
+        self.Add_Load_Full_Uniform(w1, True)
+        self.Add_Load_Axial_Uniform(w2, True)
+        
+        if not unit_weight in self.self_weight:
+            self.self_weight.append(unit_weight)
 
 
-    def Add_Load_Full_Uniform_Fy(self, w): # TODO ONLY QUADRANT 1 WORKS 
+    def Add_Load_Full_Uniform_Fy(self, w): # OKAY!
         nodes = self.nodes
         coordinates = []
         for node in nodes:
@@ -212,11 +265,14 @@ class Member_2D:
         w1 = w * c
         w2 = -w * s 
 
-        self.Add_Load_Full_Uniform(-w1)
-        self.Add_Load_Axial_Uniform(-w2)
+        self.Add_Load_Full_Uniform(-w1, True)
+        self.Add_Load_Axial_Uniform(-w2, True)
+        
+        if not w in self.uniform_full_load_fy:
+            self.uniform_full_load_fy.append(w)
 
     
-    def Add_Load_Full_Uniform_Fx(self, w): # TODO ONLY QUADRANT 1 WORKS
+    def Add_Load_Full_Uniform_Fx(self, w): # OKAY!
         nodes = self.nodes
         coordinates = []
         for node in nodes:
@@ -243,23 +299,11 @@ class Member_2D:
         w1 = w * s        
         w2 = w * c 
 
-        self.Add_Load_Full_Uniform(w1)
-        self.Add_Load_Axial_Uniform(w2)
+        self.Add_Load_Full_Uniform(w1, True)
+        self.Add_Load_Axial_Uniform(w2, True)
     
-    
-    # def Add_load_Axial(self, P, a):
-    #     L = self.length
-    #     beginning_axial = P * (L - a) / L
-    #     end_axial = P * (a) / L
-    #     self.forces[self.node_list[0]][0] += beginning_axial
-    #     self.forces[self.node_list[1]][0] += end_axial
-        
-    #     # Axial Values
-    #     axial_values = self.x_array.copy()
-    #     for index, _ in enumerate(axial_values):
-    #         axial_values[index] = beginning_axial
-
-    #     self.axial += axial_values
+        if not w in self.uniform_full_load_fx:
+            self.uniform_full_load_fx.append(w)
 
 
     def Add_Load_Point(self, P, a): # OKAY
@@ -315,10 +359,14 @@ class Member_2D:
                 moment_values[index] = beginning_moment  - beginning_shear * x
             else:
                 moment_values[index] = beginning_moment  - beginning_shear * x + P * (x - a)
-        self.moment += moment_values        
+        self.moment += moment_values    
 
-
-    def Add_Load_Full_Uniform(self, w): # OKAY!
+        if not a in self.points_of_interest:
+            self.points_of_interest.append(a)
+            self.point_load.append([P,a])
+   
+   
+    def Add_Load_Full_Uniform(self, w, skip_part=False): # OKAY!
         L = self.length
         
         beginning_moment = w * L**2 / 12
@@ -366,14 +414,9 @@ class Member_2D:
         self.shear += shear_values
         self.moment += moment_values
         
-        # if x2 >= x1 and y2 >= y1: # 0 to 90 degrees
-        #     pass
-        # elif x1 >= x2 and y2 >= y1: # 91 to 180 degrees
-        #     pass
-        # elif x1 >= x2 and y1 >= y2: # 181 to 270 degrees
-        #     pass
-        # else: # 271 to 360 degrees
-        #     pass
+        if not skip_part:
+            if not w in self.uniform_full_load:
+                self.uniform_full_load.append(w)
 
 
     # def Add_Load_Moment(self,M,a): #TODO Recheck values for all quadrants
@@ -466,11 +509,11 @@ class Member_2D:
     def Plot_Axial_Diagram(self, figure_size=[10,5], show_annoation = True): # OKAY
 
         range = int(np.ceil(self.length)/self.division_spacing)
-        x_array = np.linspace(0,1,range)
+        x_array_relative = self.x_array / np.ceil(self.length)
 
         plt.figure(figsize=figure_size)
-        plt.plot(x_array,self.axial, marker='o')
-        plt.fill_between(x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        plt.plot(x_array_relative,self.axial, marker='o')
+        plt.fill_between(x_array_relative, 0, self.axial, hatch = '/', alpha = 0.1)
         plt.xlim([-0.1, 1.1])
         # plt.plot(self.x_array,self.axial, marker='o')
         # plt.fill_between(self.x_array, 0, self.axial, hatch = '/', alpha = 0.1)
@@ -481,7 +524,7 @@ class Member_2D:
 
         if show_annoation == True:
             for i, text in enumerate(self.axial):
-                plt.annotate(round(text,2), (x_array[i], self.axial[i]))
+                plt.annotate(round(text,2), (x_array_relative[i], self.axial[i]))
 
         plt.tight_layout()
         plt.show()
@@ -492,11 +535,11 @@ class Member_2D:
     def Plot_Shear_Diagram(self, figure_size=[10,5], show_annotation = True):
         
         range = int(np.ceil(self.length)/self.division_spacing)
-        x_array = np.linspace(0,1,range)
+        x_array_relative = self.x_array / np.ceil(self.length)
 
         plt.figure(figsize=figure_size)
-        plt.plot(x_array,self.shear, marker='o')
-        plt.fill_between(x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        plt.plot(x_array_relative,self.shear, marker='o')
+        plt.fill_between(x_array_relative, 0, self.shear, hatch = '/', alpha = 0.1)
         plt.xlim([-0.1, 1.1])
         # plt.plot(self.x_array,self.shear, marker='o')
         # plt.fill_between(self.x_array, 0, self.shear, hatch = '/', alpha = 0.1)
@@ -507,9 +550,9 @@ class Member_2D:
 
         if show_annotation == True:
             for i, text in enumerate(self.shear):
-                plt.annotate(round(text,2), (x_array[i], self.shear[i]))
+                plt.annotate(round(text,2), (x_array_relative[i], self.shear[i]))
         
-        plt.xticks(x_array)
+        plt.xticks(x_array_relative)
         plt.tight_layout()
         plt.show()
 
@@ -518,11 +561,11 @@ class Member_2D:
     def Plot_Moment_Diagram(self, figure_size = [10,5], show_annotation = True):
 
         range = int(np.ceil(self.length)/self.division_spacing)
-        x_array = np.linspace(0,1,range)
+        x_array_relative = self.x_array / np.ceil(self.length)
 
         plt.figure(figsize=figure_size)
-        plt.plot(x_array,-self.moment, marker='o')
-        plt.fill_between(x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
+        plt.plot(x_array_relative,-self.moment, marker='o')
+        plt.fill_between(x_array_relative, 0, -self.moment, hatch = '/', alpha = 0.1)
         plt.xlim([-0.1, 1.1])
         # plt.plot(self.x_array,-self.moment, marker='o')
         # plt.fill_between(self.x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
@@ -533,14 +576,15 @@ class Member_2D:
 
         if show_annotation == True:
             for i, text in enumerate(self.moment):
-                plt.annotate(round(-text,2), (x_array[i], -self.moment[i]))
+                plt.annotate(round(-text,2), (x_array_relative[i], -self.moment[i]))
 
-        plt.xticks(x_array)
+        plt.xticks(x_array_relative)
         plt.tight_layout()
         plt.show()
 
 
     def Resolve_Forces_into_Components(self): # OKAY!
+        self.Compile_Member_Forces()
         # solve for angle
         nodes = self.nodes
 
@@ -639,12 +683,13 @@ class Member_2D:
         fig.set_figheight(figure_size[0])
         fig.set_figwidth(figure_size[1])
 
-        range = int(np.ceil(self.length)/self.division_spacing)
-        x_array = np.linspace(0,1,range)
+        # range = int(np.ceil(self.length)/self.division_spacing)
+        # x_array_relative = np.linspace(0,1,range)
+        x_array_relative = self.x_array / np.ceil(self.length)
 
         # Plot Axial Diagram
-        axs[0].plot(x_array,self.axial, marker = 'o')
-        axs[0].fill_between(x_array, 0, self.axial, hatch = '/', alpha = 0.1)
+        axs[0].plot(x_array_relative,self.axial, marker = 'o')
+        axs[0].fill_between(x_array_relative, 0, self.axial, hatch = '/', alpha = 0.1)
         axs[0].set_xlim([-0.1,1.1])
         axs[0].set_ylabel('Axial')
         axs[0].set_xlabel('Length ratio, Length = {}'.format(self.length))
@@ -652,13 +697,13 @@ class Member_2D:
         
         if show_annotation == True:
             for i, text in enumerate(self.axial):
-                axs[0].annotate(round(text,2), (x_array[i], self.axial[i]))
+                axs[0].annotate(round(text,2), (x_array_relative[i], self.axial[i]))
 
         axs[0].margins(0.2)
 
         # Plot Shear Diagram
-        axs[1].plot(x_array,self.shear, marker = 'o')
-        axs[1].fill_between(x_array, 0, self.shear, hatch = '/', alpha = 0.1)
+        axs[1].plot(x_array_relative,self.shear, marker = 'o')
+        axs[1].fill_between(x_array_relative, 0, self.shear, hatch = '/', alpha = 0.1)
         axs[1].set_xlim([-0.1,1.1])
         axs[1].set_ylabel('Shear')
         axs[1].set_xlabel('Length ratio, Length = {}'.format(self.length))
@@ -666,13 +711,13 @@ class Member_2D:
 
         if show_annotation == True:
             for i, text in enumerate(self.shear):
-                axs[1].annotate(round(text,2), (x_array[i], self.shear[i]))
+                axs[1].annotate(round(text,2), (x_array_relative[i], self.shear[i]))
         
         axs[1].margins(0.2)
 
         # Plot Moment Diagram
-        axs[2].plot(x_array,-self.moment, marker = 'o')
-        axs[2].fill_between(x_array, 0, -self.moment, hatch = '/', alpha = 0.1)
+        axs[2].plot(x_array_relative,-self.moment, marker = 'o')
+        axs[2].fill_between(x_array_relative, 0, -self.moment, hatch = '/', alpha = 0.1)
         axs[2].set_xlim([-0.1,1.1])
         axs[2].set_ylabel('Moment')
         axs[2].set_xlabel('Length ratio, Length = {}'.format(self.length))
@@ -680,7 +725,7 @@ class Member_2D:
 
         if show_annotation == True:
             for i, text in enumerate(self.moment):
-                axs[2].annotate(round(-text,2), (x_array[i], -self.moment[i]))
+                axs[2].annotate(round(-text,2), (x_array_relative[i], -self.moment[i]))
         
         axs[2].margins(0.2)
         
@@ -714,74 +759,74 @@ class Member_2D:
         print("Minimum Moment: {}".format(self.moment_min))
         print("Maximum Moment: {}".format(self.moment_max))
         
-    def Assemble_Member_Stiffness_Matrix(self):
-        # moment_releases_left = self.member_moment_releases[element][0]
-        # moment_releases_right = self.member_moment_releases[element][1]
+    # def Assemble_Member_Stiffness_Matrix(self):
+    #     # moment_releases_left = self.member_moment_releases[element][0]
+    #     # moment_releases_right = self.member_moment_releases[element][1]
         
-        # from_point = elements[element][0]
-        # to_point = elements[element][1]
-        # from_node = nodes[from_point]
-        # to_node = nodes[to_point]
+    #     # from_point = elements[element][0]
+    #     # to_point = elements[element][1]
+    #     # from_node = nodes[from_point]
+    #     # to_node = nodes[to_point]
         
-        # compute length of member
-        coordinates = []
-        for node in self.nodes:
-            coordinates.append(self.nodes[node])
-        x1 = coordinates[0][0]
-        y1 = coordinates[0][1]
-        x2 = coordinates[1][0]
-        y2 = coordinates[1][1]
+    #     # compute length of member
+    #     coordinates = []
+    #     for node in self.nodes:
+    #         coordinates.append(self.nodes[node])
+    #     x1 = coordinates[0][0]
+    #     y1 = coordinates[0][1]
+    #     x2 = coordinates[1][0]
+    #     y2 = coordinates[1][1]
         
-        L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        c = (x2 - x1)/L
-        s = (y2 - y1)/L
+    #     L = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    #     c = (x2 - x1)/L
+    #     s = (y2 - y1)/L
 
-        A = self.area
-        I = self.inertia
-        E = self.elasticity
+    #     A = self.area
+    #     I = self.inertia
+    #     E = self.elasticity
 
-        # if moment_releases_left == 1 and moment_releases_right == 1:
-        #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-        #                                 [0,            0,      0,         0,     0,      0],
-        #                                 [0,            0,      0,         0,     0,      0],
-        #                                 [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
-        #                                 [0,            0,      0,         0,     0,      0],
-        #                                 [0,            0,      0,         0,     0,      0]])
+    #     # if moment_releases_left == 1 and moment_releases_right == 1:
+    #     #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+    #     #                                 [0,            0,      0,         0,     0,      0],
+    #     #                                 [0,            0,      0,         0,     0,      0],
+    #     #                                 [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
+    #     #                                 [0,            0,      0,         0,     0,      0],
+    #     #                                 [0,            0,      0,         0,     0,      0]])
         
-        # elif moment_releases_left == 1 and moment_releases_right == 0:
-        #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
-        #                                 [0,          3,        0,         0,   -3,    3*L],
-        #                                 [0,          0,        0,         0,    0,      0],
-        #                                 [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
-        #                                 [0,         -3,        0,         0,    3,    -3*L],
-        #                                 [0,         3*L,       0,         0,  -3*L, 3*L**2]])
+    #     # elif moment_releases_left == 1 and moment_releases_right == 0:
+    #     #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
+    #     #                                 [0,          3,        0,         0,   -3,    3*L],
+    #     #                                 [0,          0,        0,         0,    0,      0],
+    #     #                                 [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
+    #     #                                 [0,         -3,        0,         0,    3,    -3*L],
+    #     #                                 [0,         3*L,       0,         0,  -3*L, 3*L**2]])
         
-        # elif moment_releases_left == 0 and moment_releases_right == 1:
-        #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
-        #                                 [0,            3,    3*L,         0,   -3,    0],
-        #                                 [0,          3*L, 3*L**2,         0, -3*L,    0],
-        #                                 [-A*L**2/I,   0,       0,  A*L**2/I,    0,    0],
-        #                                 [0,          -3,    -3*L,         0,    3,    0],
-        #                                 [0,           0,       0,         0,    0,    0]])
+    #     # elif moment_releases_left == 0 and moment_releases_right == 1:
+    #     #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
+    #     #                                 [0,            3,    3*L,         0,   -3,    0],
+    #     #                                 [0,          3*L, 3*L**2,         0, -3*L,    0],
+    #     #                                 [-A*L**2/I,   0,       0,  A*L**2/I,    0,    0],
+    #     #                                 [0,          -3,    -3*L,         0,    3,    0],
+    #     #                                 [0,           0,       0,         0,    0,    0]])
 
-        # else:
-        k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-                                    [0,          12,    6*L,         0,   -12,    6*L],
-                                    [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
-                                    [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
-                                    [0,         -12,   -6*L,         0,    12,   -6*L],
-                                    [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
+    #     # else:
+    #     k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+    #                                 [0,          12,    6*L,         0,   -12,    6*L],
+    #                                 [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
+    #                                 [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
+    #                                 [0,         -12,   -6*L,         0,    12,   -6*L],
+    #                                 [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
         
-        T = np.array([[c, s, 0 , 0, 0, 0],
-                    [-s, c, 0, 0, 0, 0],
-                    [0, 0, 1, 0, 0, 0],
-                    [0, 0, 0, c, s, 0],
-                    [0, 0, 0, -s, c, 0],
-                    [0, 0, 0, 0, 0, 1]])
+    #     T = np.array([[c, s, 0 , 0, 0, 0],
+    #                 [-s, c, 0, 0, 0, 0],
+    #                 [0, 0, 1, 0, 0, 0],
+    #                 [0, 0, 0, c, s, 0],
+    #                 [0, 0, 0, -s, c, 0],
+    #                 [0, 0, 0, 0, 0, 1]])
 
-        K = np.transpose(T).dot(k).dot(T)
+    #     K = np.transpose(T).dot(k).dot(T)
 
-        return K        
+    #     return K        
         
 
 class Frame_2D:
