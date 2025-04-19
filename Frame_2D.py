@@ -522,7 +522,7 @@ class Member_2D:
         plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Axial Diagram of Member {}'.format(self.member_number))
 
-        if show_annoation == True:
+        if show_annoation:
             for i, text in enumerate(self.axial):
                 plt.annotate(round(text,2), (x_array[i], self.axial[i]))
 
@@ -548,7 +548,7 @@ class Member_2D:
         plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Shear Diagram of Member {}'.format(self.member_number))
 
-        if show_annotation == True:
+        if show_annotation:
             for i, text in enumerate(self.shear):
                 plt.annotate(round(text,2), (x_array[i], self.shear[i]))
         
@@ -574,7 +574,7 @@ class Member_2D:
         plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Moment Diagram of Member {}'.format(self.member_number))
 
-        if show_annotation == True:
+        if show_annotation:
             for i, text in enumerate(self.moment):
                 plt.annotate(round(-text,2), (x_array[i], -self.moment[i]))
 
@@ -997,12 +997,12 @@ class Frame_2D:
                                         [0,            0,      0,         0,     0,      0]])
         
         elif moment_releases_left == 1 and moment_releases_right == 0:
-            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,     0],
-                                        [0,          3,        0,         0,   -3,    3*L],
-                                        [0,          0,        0,         0,    0,      0],
-                                        [-A*L**2/I,   0,       0,  A*L**2/I,    0,      0],
-                                        [0,         -3,        0,         0,    3,    -3*L],
-                                        [0,         3*L,       0,         0,  -3*L, 3*L**2]])
+            k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
+                                        [0,            3,      0,         0,    -3,    3*L],
+                                        [0,            0,      0,         0,     0,      0],
+                                        [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
+                                        [0,           -3,      0,         0,     3,   -3*L],
+                                        [0,          3*L,      0,         0,  -3*L, 3*L**2]])
         
         elif moment_releases_left == 0 and moment_releases_right == 1:
             k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,    0,    0],
@@ -1014,18 +1014,18 @@ class Frame_2D:
 
         else:
             k = E * I / L**3 * np.array([[A*L**2/I,    0,      0, -A*L**2/I,     0,      0],
-                                        [0,          12,    6*L,         0,   -12,    6*L],
-                                        [0,         6*L, 4*L**2,         0,  -6*L, 2*L**2],
-                                        [-A*L**2/I,   0,      0,  A*L**2/I,     0,      0],
-                                        [0,         -12,   -6*L,         0,    12,   -6*L],
-                                        [0,         6*L, 2*L**2,         0,  -6*L, 4*L**2]])
+                                        [0,           12,    6*L,         0,   -12,    6*L],
+                                        [0,          6*L, 4*L**2,         0,  -6*L, 2*L**2],
+                                        [-A*L**2/I,    0,      0,  A*L**2/I,     0,      0],
+                                        [0,          -12,   -6*L,         0,    12,   -6*L],
+                                        [0,          6*L, 2*L**2,         0,  -6*L, 4*L**2]])
         
         T = np.array([[c, s, 0 , 0, 0, 0],
-                    [-s, c, 0, 0, 0, 0],
-                    [0, 0, 1, 0, 0, 0],
-                    [0, 0, 0, c, s, 0],
-                    [0, 0, 0, -s, c, 0],
-                    [0, 0, 0, 0, 0, 1]])
+                     [-s, c, 0, 0, 0, 0],
+                     [0, 0, 1, 0, 0, 0],
+                     [0, 0, 0, c, s, 0],
+                     [0, 0, 0, -s, c, 0],
+                     [0, 0, 0, 0, 0, 1]])
 
         K = np.transpose(T).dot(k).dot(T)
 
@@ -1100,7 +1100,7 @@ class Frame_2D:
 
         # Looping displacement vectors indexes and looks for any of the value within the array "Support_Vector". Replaces with 0 if the value of the index is equal to any of the support vector.
         for i, _ in enumerate(displacement_vector):
-            if np.any(np.in1d(support_vector_new, i)):
+            if np.any(np.isin(support_vector_new, i)):
                 displacement_vector[i] = 0
             else:
                 displacement_vector[i] = displacements[j]
