@@ -1,6 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
-from matplotlib.patches import Arc, RegularPolygon
+from matplotlib.patches import Arc, RegularPolygon, Polygon
 from numpy import radians as rad
 # plt.style.use('fivethirtyeight')
 # plt.rcParams['hatch.color'] = 'white'
@@ -759,6 +759,33 @@ class Member_2D:
         print("Minimum Moment: {}".format(self.moment_min))
         print("Maximum Moment: {}".format(self.moment_max))
         
+
+    def Assemble_Plot_Loadings(self):
+        self.nodes
+        self.member_number
+        
+        # Loadings
+        self.points_of_interest
+        self.uniform_full_load
+        self.point_load
+        self.uniform_axial_load
+        self.self_weight
+        self.uniform_full_load_fx
+        self.uniform_full_load_fy
+        
+        # Assemble nodes and loadings into a dictionary
+        plot_loadings = {self.member_number: {'nodes': self.nodes, 
+                                              'uniform_full_load': self.uniform_full_load, 
+                                              'point_load'  : self.point_load, 
+                                              'uniform_axial_load' : self.uniform_axial_load, 
+                                              'self_weight' : self.self_weight, 
+                                              'uniform_full_load_fx': self.uniform_full_load_fx, 
+                                              'uniform_full_load_fy': self.uniform_full_load_fy}}
+        
+        # print(plot_loadings)
+        return plot_loadings
+        
+
     # def Assemble_Member_Stiffness_Matrix(self):
     #     # moment_releases_left = self.member_moment_releases[element][0]
     #     # moment_releases_right = self.member_moment_releases[element][1]
@@ -867,6 +894,7 @@ class Frame_2D:
         self.elasticities = {}
         self.areas = {}
         self.inertias = {}
+        self.plot_loadings = {}
 
 
     def Compile_Frame_Member_Properties(self, members_list):
@@ -929,6 +957,12 @@ class Frame_2D:
             for m in member.release_node_coordinates:
                 moment_releases_coordinates.append(m)
 
+        # Compile all plot loadings per member
+        plot_loadings = {}
+        for member in members_list:
+            plot_loading = member.Assemble_Plot_Loadings()
+            plot_loadings.update(plot_loading)
+
         self.nodes = nodes
         self.elements = elements
         self.forces = forces
@@ -939,9 +973,11 @@ class Frame_2D:
         self.members_list = members_list
         self.member_moment_releases = member_moment_releases
         self.moment_releases_coordinates = moment_releases_coordinates
-
+        self.plot_loadings = plot_loadings
+        self.plot_loadings.update({'nodal_load': {}}) 
     
     def Add_Load_Node(self, nodal_load):
+        self.plot_loadings.update({'nodal_load': nodal_load})
         forces = self.forces
         for key in forces: 
             if key in nodal_load:
@@ -949,7 +985,6 @@ class Frame_2D:
                 forces[key][1] += nodal_load[key][1] 
                 forces[key][2] += nodal_load[key][2] 
         self.forces.update(forces)
-
 
     def __Member_Lengths(self, element, nodes, elements):
         from_point = elements[element][0]
@@ -1354,7 +1389,7 @@ class Frame_2D:
             member.Reaction_Add_Moment_At_Left_Support(self.solved_member_forces[element + 1][2])
 
 
-    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 0.2):
+    def Draw_Frame_Setup_Matrix_Analysis(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 0.2):
         '''
         Draws the Truss as initialized by the class
         
@@ -2169,4 +2204,200 @@ class Frame_2D:
         ax.axis('equal')
         ax.grid(True)
 
+        plt.show()
+
+
+    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 1.5):
+        '''
+        Draws the Truss as initialized by the class
+        
+        Parameters
+        ----------
+        
+        figure_size: array
+                    size of the plot's figure in x, y heights.
+        length_of_arrow: float
+                        length of force vector arrow. default value is 1.0
+        arrow_head_width: float
+                        width of force vector arrow head. default value is 0.1
+        arrow_line_width: float
+                        width of force vector line. default value is 2.0
+        grid: boolean
+              activates gridlines. default value is False
+        '''
+        
+        
+        nodes = self.nodes
+        elements = self.elements
+        supports = self.supports
+        areas = self.areas
+        moment_releases_coordinates = self.moment_releases_coordinates
+
+        average_area = []
+        for area in areas:
+            average_area.append(areas[area])
+        average_area = np.array(average_area)
+        average_area = np.average(average_area)
+
+        plt.figure(figsize = figure_size)
+        plt.grid(grid)
+        ax = plt.gca()
+       
+        # plotting nodes and members
+        for element in elements:
+            from_node = elements[element][0]
+            to_node = elements[element][1]
+            from_point = nodes[from_node]
+            to_point = nodes[to_node]
+            x1 = from_point[0]
+            y1 = from_point[1]
+            x2 = to_point[0]
+            y2 = to_point[1]
+            ax.plot([x1,x2],[y1,y2], marker = 'o', color = 'black', zorder = 5, linewidth = linewidth * areas[element] / average_area, markersize = node_size)
+
+        # plotting supports
+        for support in supports:
+
+            support_x = supports[support][0]
+            support_y = supports[support][1]
+            support_z = supports[support][2]
+
+            x = nodes[support][0]
+            y = nodes[support][1]
+
+            if support_x == 1 and support_y == 1 and support_z == 1:
+                ax.scatter(x, y, marker = 's', s = 200, c='r', zorder = 2)
+            elif support_x == 1 and support_y == 1 and support_z == 0:
+                ax.scatter(x, y, marker = '^', s = 200, c='r', zorder = 2)
+            else: 
+                ax.scatter(x, y, marker = 'o', s = 200, c='y', zorder = 2)
+    
+        # plotting node labels
+        # offset = 0.12
+        
+        for node in nodes:
+            ax.annotate(node, (nodes[node][0]+offset, nodes[node][1]+offset), zorder = 10, c='black')
+            
+        # plotting member labels
+        for element in elements:
+            fromNode = elements[element][0]
+            toNode = elements[element][1]
+            from_point = nodes[fromNode]
+            to_point = nodes[toNode]
+            
+            middlePoint = [abs((to_point[0] - from_point[0])/2) + min(from_point[0], to_point[0]), 
+                           abs((to_point[1] - from_point[1])/2) + min(from_point[1], to_point[1])]
+            
+            ax.annotate(element, (middlePoint[0], middlePoint[1]), zorder = 10, c = 'b')
+            
+        # Plot Member Release Coordinates
+        for member_release in moment_releases_coordinates:
+            ax.scatter(member_release[0], member_release[1], color = 'lime', s = node_size * 10, zorder = 20)
+
+
+        # plotting nodal load vectors
+        # loop all x-direction forces
+        if self.plot_loadings['nodal_load']:
+            for force in self.plot_loadings['nodal_load']:
+                x = nodes[force][0]
+                y = nodes[force][1]
+
+                f_x = np.round(self.plot_loadings['nodal_load'][force][0],2)
+                f_y = np.round(self.plot_loadings['nodal_load'][force][1],2)
+                M_x = np.round(self.plot_loadings['nodal_load'][force][2],2)
+
+                # plot arrow x-direction
+                if f_x > 0:
+                    # ax.arrow(x - length_of_arrow, y, length_of_arrow, 0, 
+                    #           shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                    #           linewidth = arrow_line_width)
+                    ax.quiver(x - length_of_arrow, y, length_of_arrow, 0, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15)
+                    ax.annotate(f_x, ((x - length_of_arrow), y + offset), c='red')
+                    ax.scatter(x - length_of_arrow, y, c='white')
+                elif f_x < 0:
+                    # ax.arrow(x + length_of_arrow, y, -length_of_arrow, 0, 
+                    #           shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                    #           linewidth = arrow_line_width)
+                    ax.quiver(x + length_of_arrow, y, -length_of_arrow, 0, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15)
+                    ax.annotate(f_x, ((x + length_of_arrow), y + offset), c='red')
+                    ax.scatter(x + length_of_arrow,y, c='white')
+                else:
+                    pass
+
+                # plot arrow y-direction
+                if f_y > 0:
+                    # ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
+                    #           shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                    #           linewidth = arrow_line_width)
+                    ax.quiver(x, y - length_of_arrow, 0, length_of_arrow, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15)
+                    ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
+                    ax.scatter(x,y - length_of_arrow, c='white')
+                elif f_y < 0:
+                    # ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
+                    #           shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
+                    #           linewidth = arrow_line_width)
+                    ax.quiver(x, y + length_of_arrow, 0, -length_of_arrow, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15)
+                    ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
+                    ax.scatter(x,y + length_of_arrow, c='white')
+                else:
+                    pass
+
+                # plot moment arrows
+                if M_x > 0:
+                    self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Positive")
+                    ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+                elif M_x < 0:
+                    self.__drawCirc(ax,radius_of_arc,x,y,0,180,lw=arrow_line_width,direction="Negative")
+                    ax.annotate(M_x, (x, (y + radius_of_arc/1.5)), c='green')
+                else:
+                    pass
+
+        # Plot member loadings
+        for i in self.plot_loadings:
+            if isinstance(i,int):
+                nodes = self.plot_loadings[i]['nodes']
+
+                if figure_size:
+                    scale = figure_size[0] * figure_size[1] / 100
+                else:
+                    scale = 1
+
+                x = []
+                y = []
+
+                for node in nodes:
+                    x.append(nodes[node][0])
+                    y.append(nodes[node][1])
+
+                # For Uniform loading along y-axis Fy
+                if self.plot_loadings[i]['uniform_full_load_fy']:
+                    x_array = np.linspace(x[0],x[1],10)
+                    y_array = np.linspace(y[0],y[1],10) + scale
+                    ax.quiver(x_array,y_array,0,-scale,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2)
+                    vertices = [(x[0], y[0]), (x[0], y[0] + scale), (x[1], y[1] + scale), (x[1], y[1])]
+                    rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
+                    ax.add_patch(rect)
+
+                # For Uniform loading along x-axis Fx
+                if self.plot_loadings[i]['uniform_full_load_fx']:
+                    x_array = np.linspace(x[0],x[1],10) - scale
+                    y_array = np.linspace(y[0],y[1],10) 
+                    ax.quiver(x_array,y_array,scale,0,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2)
+                    vertices = [(x[0] - scale, y[0]), (x[0], y[0]), (x[1], y[1]), (x[1] - scale, y[1])]
+                    rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
+                    ax.add_patch(rect)
+
+                # For Point Load perpendicular to beam axis TODO
+                if self.plot_loadings[i]['point_load']:
+                    length = ((x[1] - x[0])**2 + (y[1] - y[0])**2)**(0.5)
+                    c = (x[1] - x[0]) / length
+                    s = (y[1] - y[0]) / length
+                    x_pl = x[0] + self.plot_loadings[i]['point_load'][0][1] * c
+                    y_pl = y[0] + self.plot_loadings[i]['point_load'][0][1] * s
+                    u = x[0] + self.plot_loadings[i]['point_load'][0][1] * c - scale
+                    v = y[0] + self.plot_loadings[i]['point_load'][0][1] * s - scale
+                    ax.quiver(x_pl,y_pl + scale,0,-scale,angles='xy', scale_units='xy', scale=1)
+
+
+        ax.axis('equal')
         plt.show()
