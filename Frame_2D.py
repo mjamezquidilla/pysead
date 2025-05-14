@@ -1983,7 +1983,7 @@ class Frame_2D:
 
         ax.axis('equal')
         ax.grid(True)
-
+        plt.title('Moment Diagram')
         plt.show()
 
 
@@ -2093,7 +2093,7 @@ class Frame_2D:
 
         ax.axis('equal')
         ax.grid(True)
-
+        plt.title('Shear Diagram')
         plt.show()
 
 
@@ -2203,13 +2203,14 @@ class Frame_2D:
 
         ax.axis('equal')
         ax.grid(True)
+        plt.title('Axial Diagram')
 
         plt.show()
 
 
     def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 1.5):
         '''
-        Draws the Truss as initialized by the class
+        Draws the Frame as initialized by the class
         
         Parameters
         ----------
@@ -2377,6 +2378,7 @@ class Frame_2D:
                     vertices = [(x[0], y[0]), (x[0], y[0] + scale), (x[1], y[1] + scale), (x[1], y[1])]
                     rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
                     ax.add_patch(rect)
+                    ax.annotate(round(self.plot_loadings[i]['uniform_full_load_fy'][0],2), ((x[1]+x[0])/2, y[0] + scale), zorder = 10, c = 'b')
 
                 # For Uniform loading along x-axis Fx
                 if self.plot_loadings[i]['uniform_full_load_fx']:
@@ -2386,6 +2388,7 @@ class Frame_2D:
                     vertices = [(x[0] - scale, y[0]), (x[0], y[0]), (x[1], y[1]), (x[1] - scale, y[1])]
                     rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
                     ax.add_patch(rect)
+                    ax.annotate(round(self.plot_loadings[i]['uniform_full_load_fx'][0],2), ((x[1]+x[0])/2, y[0] + scale), zorder = 10, c = 'b')
 
                 # For Point Load perpendicular to beam axis TODO
                 if self.plot_loadings[i]['point_load']:
@@ -2397,6 +2400,7 @@ class Frame_2D:
                     u = x[0] + self.plot_loadings[i]['point_load'][0][1] * c - scale
                     v = y[0] + self.plot_loadings[i]['point_load'][0][1] * s - scale
                     ax.quiver(x_pl,y_pl + scale,0,-scale,angles='xy', scale_units='xy', scale=1)
+                    ax.annotate(self.plot_loadings[i]['point_load'], (u, v), c='red')
 
 
         ax.axis('equal')
