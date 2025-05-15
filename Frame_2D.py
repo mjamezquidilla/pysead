@@ -2208,7 +2208,7 @@ class Frame_2D:
         plt.show()
 
 
-    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 1.5):
+    def Draw_Frame_Setup(self, figure_size = None, linewidth = 2, offset = 0.12, length_of_arrow = 1.0, arrow_head_size = 0.05, arrow_line_width = 2, grid = True, node_size = 10, radius_of_arc = 1.5, scale_factor=1.0):
         '''
         Draws the Frame as initialized by the class
         
@@ -2239,6 +2239,12 @@ class Frame_2D:
             average_area.append(areas[area])
         average_area = np.array(average_area)
         average_area = np.average(average_area)
+
+        # For quiver variables
+        width = 0.002 * scale_factor
+        headwidth = 3 * scale_factor
+        headaxislength = 4.5 * scale_factor
+        headlength = 5 * scale_factor
 
         plt.figure(figsize = figure_size)
         plt.grid(grid)
@@ -2330,14 +2336,14 @@ class Frame_2D:
                     # ax.arrow(x, y - length_of_arrow, 0, length_of_arrow,
                     #           shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                     #           linewidth = arrow_line_width)
-                    ax.quiver(x, y - length_of_arrow, 0, length_of_arrow, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15)
+                    ax.quiver(x, y - length_of_arrow, 0, length_of_arrow, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
                     ax.annotate(f_y, (x + offset, (y - length_of_arrow)), c='red') 
                     ax.scatter(x,y - length_of_arrow, c='white')
                 elif f_y < 0:
                     # ax.arrow(x, y + length_of_arrow, 0, -length_of_arrow, 
                     #           shape = 'full', head_width = arrow_head_size, length_includes_head = True, color='r', zorder = 15,
                     #           linewidth = arrow_line_width)
-                    ax.quiver(x, y + length_of_arrow, 0, -length_of_arrow, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15)
+                    ax.quiver(x, y + length_of_arrow, 0, -length_of_arrow, angles='xy', scale_units='xy', scale=1, color='red', alpha = 1, zorder = 15, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
                     ax.annotate(f_y, (x + offset, (y + length_of_arrow)), c='red')
                     ax.scatter(x,y + length_of_arrow, c='white')
                 else:
@@ -2374,7 +2380,7 @@ class Frame_2D:
                 if self.plot_loadings[i]['uniform_full_load_fy']:
                     x_array = np.linspace(x[0],x[1],10)
                     y_array = np.linspace(y[0],y[1],10) + scale
-                    ax.quiver(x_array,y_array,0,-scale,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2)
+                    ax.quiver(x_array,y_array,0,-scale,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
                     vertices = [(x[0], y[0]), (x[0], y[0] + scale), (x[1], y[1] + scale), (x[1], y[1])]
                     rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
                     ax.add_patch(rect)
@@ -2384,7 +2390,7 @@ class Frame_2D:
                 if self.plot_loadings[i]['uniform_full_load_fx']:
                     x_array = np.linspace(x[0],x[1],10) - scale
                     y_array = np.linspace(y[0],y[1],10) 
-                    ax.quiver(x_array,y_array,scale,0,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2)
+                    ax.quiver(x_array,y_array,scale,0,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
                     vertices = [(x[0] - scale, y[0]), (x[0], y[0]), (x[1], y[1]), (x[1] - scale, y[1])]
                     rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
                     ax.add_patch(rect)
@@ -2392,15 +2398,18 @@ class Frame_2D:
 
                 # For Point Load perpendicular to beam axis TODO
                 if self.plot_loadings[i]['point_load']:
-                    length = ((x[1] - x[0])**2 + (y[1] - y[0])**2)**(0.5)
-                    c = (x[1] - x[0]) / length
-                    s = (y[1] - y[0]) / length
-                    x_pl = x[0] + self.plot_loadings[i]['point_load'][0][1] * c
-                    y_pl = y[0] + self.plot_loadings[i]['point_load'][0][1] * s
-                    u = x[0] + self.plot_loadings[i]['point_load'][0][1] * c - scale
-                    v = y[0] + self.plot_loadings[i]['point_load'][0][1] * s - scale
-                    ax.quiver(x_pl,y_pl + scale,0,-scale,angles='xy', scale_units='xy', scale=1)
-                    ax.annotate(self.plot_loadings[i]['point_load'], (u, v), c='red')
+                    # print(self.plot_loadings[i]['point_load'])
+                    # print(len(self.plot_loadings[i]['point_load']))
+                    for j in range(0,len(self.plot_loadings[i]['point_load'])):
+                        length = ((x[1] - x[0])**2 + (y[1] - y[0])**2)**(0.5)
+                        c = (x[1] - x[0]) / length
+                        s = (y[1] - y[0]) / length
+                        x_pl = x[0] + self.plot_loadings[i]['point_load'][j][1] * c
+                        y_pl = y[0] + self.plot_loadings[i]['point_load'][j][1] * s
+                        u = x[0] + self.plot_loadings[i]['point_load'][j][1] * c
+                        v = y[0] + self.plot_loadings[i]['point_load'][j][1] * s + scale
+                        ax.quiver(x_pl,y_pl + scale,0,-scale,angles='xy', scale_units='xy', scale=1, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
+                        ax.annotate(round(self.plot_loadings[i]['point_load'][j][0],2), (u, v), c='red')
 
 
         ax.axis('equal')
