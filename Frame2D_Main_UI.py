@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QApplication
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWebEngineWidgets import QWebEngineView
 import plotly.graph_objs as go
@@ -19,6 +19,7 @@ class UI(QMainWindow):
 
         # Load the ui
         self.setWindowTitle("StruQLab Frame 2D")
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         ui_file = QFile(self.resource_path("Frame2D_GUI.ui"))
         loader = QUiLoader()
         self.uic = loader.load(ui_file)
