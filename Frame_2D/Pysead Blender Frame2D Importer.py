@@ -1,4 +1,4 @@
-from pysead.Frame_2D import Member_2D, Frame_2D
+from Frame_2D.Frame_2D import Member_2D, Frame_2D
 import pandas as pd
 
 nodes_sheet = pd.read_csv('nodes.csv')
