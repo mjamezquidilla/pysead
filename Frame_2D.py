@@ -199,7 +199,7 @@ class Member_2D:
         self.axial += axial_values        
 
         if not skip_part:
-            if not w in self.uniform_axial_load:
+            if w not in self.uniform_axial_load:
                 self.uniform_axial_load.append(w)
 
     def Add_Self_Weight(self, unit_weight): # OKAY!
@@ -234,7 +234,7 @@ class Member_2D:
         self.Add_Load_Full_Uniform(w1, True)
         self.Add_Load_Axial_Uniform(w2, True)
         
-        if not unit_weight in self.self_weight:
+        if unit_weight not in self.self_weight:
             self.self_weight.append(unit_weight)
 
 
@@ -268,7 +268,7 @@ class Member_2D:
         self.Add_Load_Full_Uniform(-w1, True)
         self.Add_Load_Axial_Uniform(-w2, True)
         
-        if not w in self.uniform_full_load_fy:
+        if w not in self.uniform_full_load_fy:
             self.uniform_full_load_fy.append(w)
 
     
@@ -302,7 +302,7 @@ class Member_2D:
         self.Add_Load_Full_Uniform(w1, True)
         self.Add_Load_Axial_Uniform(w2, True)
     
-        if not w in self.uniform_full_load_fx:
+        if w not in self.uniform_full_load_fx:
             self.uniform_full_load_fx.append(w)
 
 
@@ -361,7 +361,7 @@ class Member_2D:
                 moment_values[index] = beginning_moment  - beginning_shear * x + P * (x - a)
         self.moment += moment_values    
 
-        if not a in self.points_of_interest:
+        if a not in self.points_of_interest:
             self.points_of_interest.append(a)
             self.point_load.append([P,a])
    
@@ -415,7 +415,7 @@ class Member_2D:
         self.moment += moment_values
         
         if not skip_part:
-            if not w in self.uniform_full_load:
+            if w not in self.uniform_full_load:
                 self.uniform_full_load.append(w)
 
 
@@ -508,7 +508,6 @@ class Member_2D:
 
     def Plot_Axial_Diagram(self, figure_size=[10,5], show_annoation = True): # OKAY
 
-        range = int(np.ceil(self.length)/self.division_spacing)
         x_array_relative = self.x_array / np.ceil(self.length)
 
         plt.figure(figsize=figure_size)
@@ -522,7 +521,7 @@ class Member_2D:
         plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Axial Diagram of Member {}'.format(self.member_number))
 
-        if show_annoation == True:
+        if show_annoation:
             for i, text in enumerate(self.axial):
                 plt.annotate(round(text,2), (x_array_relative[i], self.axial[i]))
 
@@ -534,7 +533,6 @@ class Member_2D:
     # Plot Shear Diagram
     def Plot_Shear_Diagram(self, figure_size=[10,5], show_annotation = True):
         
-        range = int(np.ceil(self.length)/self.division_spacing)
         x_array_relative = self.x_array / np.ceil(self.length)
 
         plt.figure(figsize=figure_size)
@@ -548,7 +546,7 @@ class Member_2D:
         plt.xlabel('Length ratio, Length = {}'.format(self.length))
         plt.title('Shear Diagram of Member {}'.format(self.member_number))
 
-        if show_annotation == True:
+        if show_annotation:
             for i, text in enumerate(self.shear):
                 plt.annotate(round(text,2), (x_array_relative[i], self.shear[i]))
         
@@ -560,7 +558,6 @@ class Member_2D:
     # Plot Moment Diagram
     def Plot_Moment_Diagram(self, figure_size = [10,5], show_annotation = True):
 
-        range = int(np.ceil(self.length)/self.division_spacing)
         x_array_relative = self.x_array / np.ceil(self.length)
 
         plt.figure(figsize=figure_size)
@@ -695,7 +692,7 @@ class Member_2D:
         axs[0].set_xlabel('Length ratio, Length = {}'.format(self.length))
         axs[0].set_title('Axial Diagram of Member {}'.format(self.member_number))
         
-        if show_annotation == True:
+        if show_annotation:
             for i, text in enumerate(self.axial):
                 axs[0].annotate(round(text,2), (x_array_relative[i], self.axial[i]))
 
@@ -709,7 +706,7 @@ class Member_2D:
         axs[1].set_xlabel('Length ratio, Length = {}'.format(self.length))
         axs[1].set_title('Shear Diagram of Member {}'.format(self.member_number))
 
-        if show_annotation == True:
+        if show_annotation:
             for i, text in enumerate(self.shear):
                 axs[1].annotate(round(text,2), (x_array_relative[i], self.shear[i]))
         
@@ -723,7 +720,7 @@ class Member_2D:
         axs[2].set_xlabel('Length ratio, Length = {}'.format(self.length))
         axs[2].set_title('Moment Diagram of Member {}'.format(self.member_number))
 
-        if show_annotation == True:
+        if show_annotation:
             for i, text in enumerate(self.moment):
                 axs[2].annotate(round(-text,2), (x_array_relative[i], -self.moment[i]))
         
@@ -1766,7 +1763,7 @@ class Frame_2D:
             
         # plotting force vectors
         # loop all x-direction forces
-        if show_ext_forces == True:
+        if show_ext_forces:
             for force in forces:
                 x = nodes[force][0]
                 y = nodes[force][1]
