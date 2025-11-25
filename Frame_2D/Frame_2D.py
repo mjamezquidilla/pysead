@@ -14,7 +14,7 @@ from numpy import radians as rad
 
 
 class Member_2D:
-    def __init__(self, member_number, area, elasticity, inertia, nodes = {}, moment_release = [0,0], no_of_divs = 11):
+    def __init__(self, area, elasticity, inertia, nodes = {}, member_number = None,  moment_release = [0,0], no_of_divs = 11):
         self.member_number:int = member_number
         self.area: float = area
         self.inertia: float = inertia
@@ -877,9 +877,29 @@ class Frame_2D:
         self.areas = {}
         self.inertias = {}
         self.plot_loadings = {}
+        self.members = {}
 
 
-    def Compile_Frame_Member_Properties(self, members_list):
+    def Compile_Frame_Member_Properties(self, members_dict):
+        """Imports all the relevant member data stored inside a dictionary.
+
+        Args:
+            members_dict (str, Member_2D): dictionary that stores member name/mark and its Member_2D class.
+
+        example:
+            beams: dict = {}
+            beams.update({'2G-1/1': Member_2D(member_number: 1, area=1_000, elasticity=200_000, inertia=100_000, nodes:{1:[0,0], 2:[5,0]})})
+            beams.update({'2G-1/2': Member_2D(member_number: 2, area=1_000, elasticity=200_000, inertia=100_000, nodes:{2:[5,0], 3:[10,0]})}
+            
+            member_ = [] # <-- THis is the list to be inserted as parameter
+            for _, beam in beams.items():
+                member_list.append(beam)
+        """
+        self.members = members_dict
+        members_list = []
+        for _, beam in members_dict.items():
+            members_list.append(beam)        
+              
         # Compile all nodes
         nodes = {}
         for member in members_list:
@@ -2333,7 +2353,7 @@ class Frame_2D:
                 nodes = self.plot_loadings[i]['nodes']
 
                 if figure_size:
-                    scale = figure_size[0] * figure_size[1] / 100
+                    scale = figure_size[0] * figure_size[1] * (scale_factor/100)
                 else:
                     scale = 1
 
@@ -2346,23 +2366,43 @@ class Frame_2D:
 
                 # For Uniform loading along y-axis Fy
                 if self.plot_loadings[i]['uniform_full_load_fy']:
-                    x_array = np.linspace(x[0],x[1],10)
-                    y_array = np.linspace(y[0],y[1],10) + scale
-                    ax.quiver(x_array,y_array,0,-scale,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
+                    # x_array = np.linspace(x[0],x[1],10)
+                    # y_array = np.linspace(y[0],y[1],10) + scale
+                    # ax.quiver(x_array,y_array,0,-scale,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
                     vertices = [(x[0], y[0]), (x[0], y[0] + scale), (x[1], y[1] + scale), (x[1], y[1])]
-                    rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
-                    ax.add_patch(rect)
-                    ax.annotate(round(self.plot_loadings[i]['uniform_full_load_fy'][0],2), ((x[1]+x[0])/2, y[0] + scale), zorder = 10, c = 'b')
+
+                    if self.plot_loadings[i]['uniform_full_load_fy'][0] >=0:
+                        color = 'blue'
+                        rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2, color=color)
+                        ax.add_patch(rect)
+                        string = '+' + str(round(self.plot_loadings[i]['uniform_full_load_fy'][0],2)) + ', UP'
+                        ax.annotate(string, ((x[1]+x[0])/2 - scale/3, y[0] + scale/2), zorder = 10, c = 'b')
+                    else:
+                        color = 'red' 
+                        rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2, color=color)
+                        ax.add_patch(rect)
+                        string = str(round(self.plot_loadings[i]['uniform_full_load_fy'][0],2)) + ', DN'
+                        ax.annotate(string, ((x[1]+x[0])/2 - scale/3, y[0] + scale/2), zorder = 10, c = 'b')
 
                 # For Uniform loading along x-axis Fx
                 if self.plot_loadings[i]['uniform_full_load_fx']:
-                    x_array = np.linspace(x[0],x[1],10) - scale
-                    y_array = np.linspace(y[0],y[1],10) 
-                    ax.quiver(x_array,y_array,scale,0,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
+                    # x_array = np.linspace(x[0],x[1],10) - scale
+                    # y_array = np.linspace(y[0],y[1],10) 
+                    # ax.quiver(x_array,y_array,scale,0,angles='xy', scale_units='xy', scale=1, color='blue', alpha = 0.2, headwidth = headwidth, headlength = headlength, headaxislength = headaxislength, width = width)
                     vertices = [(x[0] - scale, y[0]), (x[0], y[0]), (x[1], y[1]), (x[1] - scale, y[1])]
-                    rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2)
-                    ax.add_patch(rect)
-                    ax.annotate(round(self.plot_loadings[i]['uniform_full_load_fx'][0],2), ((x[1]+x[0])/2, y[0] + scale), zorder = 10, c = 'b')
+
+                    if self.plot_loadings[i]['uniform_full_load_fx'][0] >=0:
+                        color = 'blue'
+                        rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2, color = color)
+                        ax.add_patch(rect)
+                        string = '+' + str(round(self.plot_loadings[i]['uniform_full_load_fx'][0],2)) + ', RT'
+                        ax.annotate(string, (x[1] - scale/5*4, (y[0] + y[1])/2), zorder = 10, c = 'b')
+                    else:
+                        color = 'red' 
+                        rect = Polygon(vertices, closed=True, fill=True, alpha = 0.2, color = color)
+                        ax.add_patch(rect)
+                        string = str(round(self.plot_loadings[i]['uniform_full_load_fx'][0],2)) + ', RT'
+                        ax.annotate(string, (x[1] - scale/5*4, (y[0] + y[1])/2), zorder = 10, c = 'b')
 
                 # For Point Load perpendicular to beam axis TODO
                 if self.plot_loadings[i]['point_load']:
